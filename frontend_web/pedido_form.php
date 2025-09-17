@@ -8,6 +8,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $page_title = 'Crear Nuevo Pedido';
 include_once 'templates/header.php';
+include_once __DIR__ . '/../backend/config/app_config.php';
 
 // --- Funciones para obtener datos de la API ---
 function getAPIdata($endpoint) {
@@ -54,7 +55,7 @@ if (isset($_GET['id'])) {
                             <?php foreach ($productos as $producto): ?>
                                 <div class="product-item" data-id="<?php echo $producto['id']; ?>" data-nombre="<?php echo htmlspecialchars($producto['nombre']); ?>" data-precio="<?php echo $producto['precio']; ?>">
                                     <h4><?php echo htmlspecialchars($producto['nombre']); ?></h4>
-                                    <p>$<?php echo htmlspecialchars(number_format($producto['precio'], 2)); ?></p>
+                                    <p><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($producto['precio'], 2)); ?></p>
                                     <p><small>Categoría: <?php echo htmlspecialchars($producto['categoria_nombre']); ?></small></p>
                                 </div>
                             <?php endforeach; ?>
@@ -142,6 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const orderForm = document.getElementById('order-form');
     const productSearch = document.getElementById('product-search');
 
+    const currencySymbol = '<?php echo CURRENCY_SYMBOL; ?>';
     const isEditing = <?php echo json_encode($is_editing); ?>;
     const orderId = <?php echo json_encode($is_editing ? $order_id : null); ?>;
     let initialOrderData = <?php echo json_encode($is_editing ? $order_data : null); ?>;
@@ -240,13 +242,13 @@ document.addEventListener('DOMContentLoaded', function() {
             row.innerHTML = `
                 <td>${item.nombre}</td>
                 <td><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></td>
-                <td>$${item.precio.toFixed(2)}</td>
-                <td>$${subtotal.toFixed(2)}</td>
+                <td>${currencySymbol}${item.precio.toFixed(2)}</td>
+                <td>${currencySymbol}${subtotal.toFixed(2)}</td>
                 <td><button type="button" class="btn-delete delete-item" data-id="${item.id}">X</button></td>
             `;
             orderItemsTableBody.appendChild(row);
         }
-        orderTotalElement.textContent = `$${total.toFixed(2)}`;
+        orderTotalElement.textContent = `${currencySymbol}${total.toFixed(2)}`;
     }
     productSearch.addEventListener('keyup', function() {
         const searchTerm = productSearch.value.toLowerCase();

@@ -14,6 +14,7 @@ if (!isset($_GET['id'])) {
 $order_id = intval($_GET['id']);
 $page_title = "Detalle del Pedido #$order_id";
 include_once 'templates/header.php';
+include_once __DIR__ . '/../backend/config/app_config.php';
 
 function getOrderDetails($id) {
     $api_url = "http://localhost/restaurante_system/backend/api/v1/pedidos.php?id=$id";
@@ -111,15 +112,15 @@ $order = getOrderDetails($order_id);
                                         <tr>
                                             <td><?php echo htmlspecialchars($item['nombre_producto']); ?></td>
                                             <td><?php echo htmlspecialchars($item['cantidad']); ?></td>
-                                            <td>$<?php echo htmlspecialchars(number_format($item['precio_unitario'], 2)); ?></td>
-                                            <td>$<?php echo htmlspecialchars(number_format($item['subtotal'], 2)); ?></td>
+                                            <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['precio_unitario'], 2)); ?></td>
+                                            <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['subtotal'], 2)); ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
                                 <tfoot>
                                     <tr>
                                         <td colspan="3" style="text-align: right; font-weight: bold;">Total del Pedido:</td>
-                                        <td style="font-weight: bold;">$<?php echo htmlspecialchars(number_format($order['total'], 2)); ?></td>
+                                        <td style="font-weight: bold;"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($order['total'], 2)); ?></td>
                                     </tr>
                                 </tfoot>
                             </table>
