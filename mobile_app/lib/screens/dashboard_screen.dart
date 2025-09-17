@@ -80,7 +80,7 @@ class DashboardScreen extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               tableName,
-              style: Theme.of(context).textTheme.headlineLarge,
+              style: Theme.of(context).textTheme.headline6,
             ),
             const SizedBox(height: 5),
             Chip(

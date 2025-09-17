@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20),
                 Text(
                   'Bienvenido',
-                  style: Theme.of(context).textTheme.headlineSmall,
+                  style: Theme.of(context).textTheme.headline5,
                 ),
                 const SizedBox(height: 30),
                 TextFormField(
