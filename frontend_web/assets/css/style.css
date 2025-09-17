@@ -479,23 +479,21 @@ body.sidebar-collapsed .mobile-overlay {
         border-radius: 5px;
     }
     #order-items-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         text-align: right;
-        padding-left: 50%;
-        position: relative;
         border: none;
         border-bottom: 1px solid var(--border-color);
+        padding: 10px 15px;
     }
     #order-items-table td:last-child {
         border-bottom: none;
     }
     #order-items-table td::before {
         content: attr(data-label);
-        position: absolute;
-        left: 10px;
-        width: calc(50% - 20px);
-        padding-right: 10px;
-        white-space: nowrap;
-        text-align: left;
         font-weight: bold;
+        text-align: left;
+        padding-right: 1rem;
     }
 }
