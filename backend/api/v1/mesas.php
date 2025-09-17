@@ -11,7 +11,10 @@ $request_method = $_SERVER["REQUEST_METHOD"];
 
 switch ($request_method) {
     case 'GET':
-        if (!empty($_GET["id"])) {
+        if (isset($_GET['status']) && $_GET['status'] == 'available') {
+            handleGetAllAvailableTables($table);
+        }
+        elseif (!empty($_GET["id"])) {
             $table_id = intval($_GET["id"]);
             $table_data = $table->readOne($table_id);
             if ($table_data) {
@@ -80,6 +83,22 @@ switch ($request_method) {
         http_response_code(405);
         echo json_encode(["message" => "Método no permitido."]);
         break;
+}
+
+function handleGetAllAvailableTables($table) {
+    $stmt = $table->getAvailableTables();
+    $num = $stmt->rowCount();
+    if ($num > 0) {
+        $tables_arr = ["records" => []];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            array_push($tables_arr["records"], $row);
+        }
+        http_response_code(200);
+        echo json_encode($tables_arr);
+    } else {
+        http_response_code(200);
+        echo json_encode(["records" => []]);
+    }
 }
 
 function handleGetAllTables($table) {

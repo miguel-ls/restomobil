@@ -109,10 +109,11 @@ class Order {
      * @param int $id_mesa
      * @param int $id_usuario_mozo
      * @param array $items
+     * @param string $status
      * @return bool
      */
-    public function update($id, $id_mesa, $id_usuario_mozo, $items) {
-        $query = "CALL sp_updateOrder(:id, :id_mesa, :id_usuario_mozo, :items_json)";
+    public function update($id, $id_mesa, $id_usuario_mozo, $status, $items) {
+        $query = "CALL sp_updateOrder(:id, :id_mesa, :id_usuario_mozo, :status, :items_json)";
         $stmt = $this->conn->prepare($query);
 
         $items_json = json_encode($items);
@@ -120,6 +121,7 @@ class Order {
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':id_mesa', $id_mesa);
         $stmt->bindParam(':id_usuario_mozo', $id_usuario_mozo);
+        $stmt->bindParam(':status', $status);
         $stmt->bindParam(':items_json', $items_json);
 
         return $stmt->execute();

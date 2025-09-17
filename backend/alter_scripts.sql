@@ -53,6 +53,18 @@ BEGIN
     SELECT id, numero_mesa, capacidad, estado FROM mesas ORDER BY numero_mesa ASC;
 END$$
 
+DROP PROCEDURE IF EXISTS sp_getAvailableTables$$
+CREATE PROCEDURE sp_getAvailableTables()
+BEGIN
+    SELECT m.*
+    FROM mesas m
+    WHERE m.id NOT IN (
+        SELECT p.id_mesa
+        FROM pedidos p
+        WHERE p.estado NOT IN ('pagado', 'cancelado')
+    );
+END$$
+
 DROP PROCEDURE IF EXISTS sp_createTable$$
 CREATE PROCEDURE sp_createTable(IN p_numero_mesa VARCHAR(10), IN p_capacidad INT, IN p_estado ENUM('disponible', 'ocupada', 'reservada', 'mantenimiento'))
 BEGIN
@@ -201,7 +213,7 @@ BEGIN
 END$$
 
 DROP PROCEDURE IF EXISTS sp_updateOrder$$
-CREATE PROCEDURE sp_updateOrder(IN p_id_pedido INT, IN p_id_mesa INT, IN p_id_usuario_mozo INT, IN p_items_json JSON)
+CREATE PROCEDURE sp_updateOrder(IN p_id_pedido INT, IN p_id_mesa INT, IN p_id_usuario_mozo INT, IN p_estado ENUM('recibido', 'en_preparacion', 'listo_para_servir', 'servido', 'pagado', 'cancelado'), IN p_items_json JSON)
 BEGIN
     DECLARE v_total_calculado DECIMAL(10, 2) DEFAULT 0;
     DECLARE v_item JSON;
@@ -221,7 +233,7 @@ BEGIN
         SET v_total_calculado = v_total_calculado + (v_cantidad * v_precio_unitario);
         SET i = i + 1;
     END WHILE;
-    UPDATE pedidos SET id_mesa = p_id_mesa, id_usuario_mozo = p_id_usuario_mozo, total = v_total_calculado, fecha_actualizacion = CURRENT_TIMESTAMP WHERE id = p_id_pedido;
+    UPDATE pedidos SET id_mesa = p_id_mesa, id_usuario_mozo = p_id_usuario_mozo, estado = p_estado, total = v_total_calculado, fecha_actualizacion = CURRENT_TIMESTAMP WHERE id = p_id_pedido;
     COMMIT;
 END$$
 
