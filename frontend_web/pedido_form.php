@@ -21,7 +21,7 @@ function getAPIdata($endpoint) {
 }
 
 $mesas = getAPIdata('mesas.php');
-$mozos = getAPIdata('usuarios.php'); // Asumimos que todos los usuarios pueden ser mozos por ahora
+$mozos = getAPIdata('usuarios.php?rol=Mozo'); // Obtener solo usuarios con el rol de Mozo
 $categorias = getAPIdata('categorias.php');
 $productos = getAPIdata('productos.php');
 

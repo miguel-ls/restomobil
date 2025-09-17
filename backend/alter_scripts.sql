@@ -40,6 +40,25 @@ BEGIN
     DELETE FROM categorias_producto WHERE id = p_id;
 END$$
 
+DROP PROCEDURE IF EXISTS sp_getUsersByRole$$
+CREATE PROCEDURE sp_getUsersByRole(IN p_role_name VARCHAR(50))
+BEGIN
+    SELECT
+        u.id,
+        u.username,
+        u.nombre_completo,
+        u.email,
+        u.id_rol,
+        r.nombre_rol,
+        u.activo
+    FROM
+        usuarios u
+    JOIN
+        roles r ON u.id_rol = r.id
+    WHERE
+        r.nombre_rol = p_role_name AND u.activo = 1;
+END$$
+
 DELIMITER ;
 
 -- -----------------------------------------------------

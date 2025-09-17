@@ -9,10 +9,39 @@ include_once __DIR__ . '/../../models/User.php';
 $user = new User();
 $request_method = $_SERVER["REQUEST_METHOD"];
 
+function handleGetUsersByRole($user, $roleName) {
+    $stmt = $user->getUsersByRole($roleName);
+    $num = $stmt->rowCount();
+    if ($num > 0) {
+        $users_arr = ["records" => []];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $user_item = [
+                "id" => $row['id'],
+                "username" => $row['username'],
+                "nombre_completo" => $row['nombre_completo'],
+                "email" => $row['email'],
+                "id_rol" => $row['id_rol'],
+                "nombre_rol" => $row['nombre_rol'],
+                "activo" => $row['activo'],
+            ];
+            array_push($users_arr["records"], $user_item);
+        }
+        http_response_code(200);
+        echo json_encode($users_arr);
+    } else {
+        http_response_code(200);
+        echo json_encode(["records" => []]);
+    }
+}
+
 switch ($request_method) {
     case 'GET':
+        // /usuarios.php?rol=Mozo
+        if (isset($_GET['rol'])) {
+            handleGetUsersByRole($user, $_GET['rol']);
+        }
         // /usuarios.php?resource=roles
-        if (isset($_GET['resource']) && $_GET['resource'] == 'roles') {
+        elseif (isset($_GET['resource']) && $_GET['resource'] == 'roles') {
             handleGetAllRoles($user);
         }
         // /usuarios.php?id=1
