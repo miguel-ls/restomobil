@@ -4,7 +4,7 @@
             <i class="bi bi-egg-fried"></i>
             <span class="text">Restaurante</span>
         </a>
-        <button id="sidebar-toggle" title="Contraer menú"><i class="bi bi-list"></i></button>
+        <button id="sidebar-toggle" title="Contraer menú" class="desktop-toggle"><i class="bi bi-list"></i></button>
     </div>
     <ul>
         <li><a href="dashboard.php"><i class="bi bi-house-door-fill icon"></i> <span class="text">Inicio</span></a></li>

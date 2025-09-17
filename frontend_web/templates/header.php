@@ -10,3 +10,10 @@
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
 </head>
 <body id="page-body">
+<div class="page-wrapper">
+<header class="mobile-header">
+    <a href="dashboard.php" class="logo">
+        <i class="bi bi-egg-fried"></i>
+    </a>
+    <button id="mobile-menu-toggle"><i class="bi bi-list"></i></button>
+</header>
