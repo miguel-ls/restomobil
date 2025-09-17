@@ -14,7 +14,10 @@ include_once __DIR__ . '/../backend/config/app_config.php';
 // Función para obtener productos desde la API
 function getProducts() {
     $api_url = 'http://localhost/restaurante_system/backend/api/v1/productos.php';
-    $response = file_get_contents($api_url);
+    $ch = curl_init($api_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $response = curl_exec($ch);
+    curl_close($ch);
     return json_decode($response, true);
 }
 
