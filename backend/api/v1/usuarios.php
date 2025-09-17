@@ -112,8 +112,8 @@ function handleGetAllUsers($user) {
         http_response_code(200);
         echo json_encode($users_arr);
     } else {
-        http_response_code(404);
-        echo json_encode(["message" => "No se encontraron usuarios."]);
+        http_response_code(200); // OK
+        echo json_encode(["records" => []]);
     }
 }
 
@@ -133,8 +133,8 @@ function handleGetAllRoles($user) {
         http_response_code(200);
         echo json_encode($roles_arr);
     } else {
-        http_response_code(404);
-        echo json_encode(["message" => "No se encontraron roles."]);
+        http_response_code(200); // OK
+        echo json_encode(["records" => []]);
     }
 }
 ?>

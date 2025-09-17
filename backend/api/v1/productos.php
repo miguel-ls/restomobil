@@ -111,8 +111,9 @@ function handleGetAllProducts($product) {
         http_response_code(200);
         echo json_encode($products_arr);
     } else {
-        http_response_code(404);
-        echo json_encode(array("message" => "No se encontraron productos."));
+        http_response_code(200); // OK
+        // Devolver un array de registros vacío en lugar de un 404
+        echo json_encode(array("records" => []));
     }
 }
 ?>
