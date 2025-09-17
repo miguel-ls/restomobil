@@ -13,8 +13,21 @@ include_once 'templates/header.php';
 // Función para obtener productos desde la API
 function getProducts() {
     $api_url = 'http://localhost/restaurante_system/backend/api/v1/productos.php';
-    $response = file_get_contents($api_url);
-    return json_decode($response, true);
+
+    // Usar cURL para ser más robusto que file_get_contents
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $api_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $response = curl_exec($ch);
+    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpcode >= 200 && $httpcode < 300) {
+        return json_decode($response, true);
+    }
+
+    // Devolver un array vacío en caso de error para no romper la página
+    return ['records' => []];
 }
 
 $products_data = getProducts();
