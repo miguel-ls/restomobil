@@ -13,22 +13,25 @@ $product_data = null;
 $page_title = 'Crear Nuevo Producto';
 $form_action = 'create';
 
+function getAPIdata($url) {
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    return json_decode($response, true);
+}
+
 if ($product_id) {
     // Si es una edición, obtener los datos del producto desde la API
     $api_url = "http://localhost/restaurante_system/backend/api/v1/productos.php?id=" . $product_id;
-    $response = file_get_contents($api_url);
-    $product_data = json_decode($response, true);
+    $product_data = getAPIdata($api_url);
     $page_title = 'Editar Producto';
     $form_action = 'update';
 }
 
-// Placeholder para categorías. Esto debería venir de una llamada a la API en el futuro.
-$categories = [
-    ['id' => 1, 'nombre' => 'Bebidas'],
-    ['id' => 2, 'nombre' => 'Entradas'],
-    ['id' => 3, 'nombre' => 'Plato Fuerte'],
-    ['id' => 4, 'nombre' => 'Postres']
-];
+// Cargar categorías dinámicamente desde la API
+$categories_data = getAPIdata("http://localhost/restaurante_system/backend/api/v1/categorias.php");
+$categories = $categories_data['records'] ?? [];
 
 ?>
 

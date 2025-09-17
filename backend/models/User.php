@@ -126,5 +126,13 @@ class User {
         $stmt->execute();
         return $stmt;
     }
+
+    public function getUsersByRole($roleName) {
+        $query = "CALL sp_getUsersByRole(:role_name)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':role_name', $roleName);
+        $stmt->execute();
+        return $stmt;
+    }
 }
 ?>
