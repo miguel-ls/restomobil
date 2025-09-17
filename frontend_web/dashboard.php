@@ -25,46 +25,6 @@ include_once 'templates/header.php';
     </main>
 </div>
 
-<style>
-.dashboard-container {
-    display: flex;
-    height: 100vh;
-}
-.sidebar {
-    width: 250px;
-    background-color: #343a40; /* Un azul oscuro para la barra lateral */
-    color: var(--light-text);
-    padding: 20px;
-}
-.sidebar h3 {
-    color: var(--light-text);
-    text-align: center;
-    border-bottom: 1px solid #495057;
-    padding-bottom: 15px;
-}
-.sidebar ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-.sidebar ul li a {
-    display: block;
-    color: var(--light-text);
-    text-decoration: none;
-    padding: 15px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-.sidebar ul li a:hover {
-    background-color: #495057;
-}
-.main-content {
-    flex-grow: 1;
-    padding: 20px;
-    overflow-y: auto; /* Para permitir scroll si el contenido es largo */
-}
-</style>
-
 <?php
 include_once 'templates/footer.php';
 ?>

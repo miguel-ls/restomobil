@@ -78,59 +78,6 @@ $products_data = getProducts();
     </main>
 </div>
 
-<style>
-/* Estilos para la tabla de productos */
-.table-container {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    padding: 20px;
-    margin-top: 20px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-table th, table td {
-    padding: 12px 15px;
-    border-bottom: 1px solid var(--border-color);
-    text-align: left;
-}
-
-table th {
-    background-color: var(--light-bg);
-    font-weight: 600;
-}
-
-table tr:last-child td {
-    border-bottom: none;
-}
-
-table tr:hover {
-    background-color: var(--hover-light);
-}
-
-.btn-edit, .btn-delete {
-    text-decoration: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 14px;
-    margin-right: 5px;
-}
-
-.btn-edit {
-    background-color: #ffc107; /* Amarillo */
-    color: #000;
-}
-
-.btn-delete {
-    background-color: #dc3545; /* Rojo */
-    color: #fff;
-}
-</style>
-
 <?php
 include_once 'templates/footer.php';
 ?>
