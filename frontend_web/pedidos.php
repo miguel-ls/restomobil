@@ -58,7 +58,7 @@ $orders_data = getOrders();
                             </div>
                             <div class="card-footer">
                                 <a href="pedido_detalle.php?id=<?php echo $order['id']; ?>" class="btn-card btn-view">Ver Detalle</a>
-                                <a href="pedido_detalle.php?id=<?php echo $order['id']; ?>" class="btn-card btn-edit">Editar</a>
+                                <a href="pedido_form.php?id=<?php echo $order['id']; ?>" class="btn-card btn-edit">Editar</a>
                             </div>
                         </div>
                     <?php endforeach; ?>

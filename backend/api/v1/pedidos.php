@@ -52,7 +52,29 @@ switch ($request_method) {
         $data = json_decode(file_get_contents("php://input"));
         $order_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
 
-        if ($order_id && !empty($data->estado)) {
+        if (!$order_id) {
+            http_response_code(400);
+            echo json_encode(["message" => "ID de pedido no proporcionado."]);
+            break;
+        }
+
+        // Si se envían items, es una actualización completa del pedido
+        if (!empty($data->items) && is_array($data->items)) {
+            if (!empty($data->id_mesa) && !empty($data->id_usuario_mozo)) {
+                if ($order->update($order_id, $data->id_mesa, $data->id_usuario_mozo, $data->items)) {
+                    http_response_code(200);
+                    echo json_encode(["message" => "Pedido actualizado exitosamente."]);
+                } else {
+                    http_response_code(503);
+                    echo json_encode(["message" => "No se pudo actualizar el pedido."]);
+                }
+            } else {
+                 http_response_code(400);
+                 echo json_encode(["message" => "Datos incompletos para actualizar el pedido."]);
+            }
+        }
+        // Si solo se envía el estado, es solo una actualización de estado
+        elseif (!empty($data->estado)) {
             if ($order->updateStatus($order_id, $data->estado)) {
                 http_response_code(200);
                 echo json_encode(["message" => "Estado del pedido actualizado."]);
@@ -60,9 +82,11 @@ switch ($request_method) {
                 http_response_code(503);
                 echo json_encode(["message" => "No se pudo actualizar el estado del pedido."]);
             }
-        } else {
+        }
+        // Si no, los datos son inválidos
+        else {
             http_response_code(400);
-            echo json_encode(["message" => "Datos incompletos. Se requiere ID del pedido y nuevo estado."]);
+            echo json_encode(["message" => "Datos incompletos o inválidos para la actualización."]);
         }
         break;
 
