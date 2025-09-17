@@ -7,10 +7,12 @@ class User {
 
     // Propiedades del objeto Usuario
     public $id;
+    public $username;
     public $nombre_completo;
     public $email;
     public $password_hash;
     public $id_rol;
+    public $nombre_rol;
     public $activo;
 
     public function __construct() {
