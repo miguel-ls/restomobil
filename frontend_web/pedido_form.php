@@ -60,7 +60,14 @@ $productos = getAPIdata('productos.php');
                 </div>
 
                 <div class="order-details" id="order-details">
-                    <h3>Detalles del Pedido</h3>
+                    <div class="order-details-header">
+                        <h3>Detalles del Pedido</h3>
+                        <?php if ($is_editing && isset($order_data['estado'])): ?>
+                            <span class="status status-<?php echo htmlspecialchars($order_data['estado']); ?>">
+                                <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $order_data['estado']))); ?>
+                            </span>
+                        <?php endif; ?>
+                    </div>
                     <form id="order-form" method="POST" action="pedido_handler.php<?php if($is_editing) echo '?id=' . $order_id; ?>">
                         <input type="hidden" name="estado" id="estado" value="<?php echo htmlspecialchars($order_data['estado'] ?? 'recibido'); ?>">
 
@@ -102,7 +109,7 @@ $productos = getAPIdata('productos.php');
                         <fieldset class="status-actions-frame">
                             <legend>Acciones Rápidas de Estado</legend>
                             <div class="btn-group">
-                                <button type="button" class="btn btn-entregado status-btn" data-status="entregado">Entregado</button>
+                                <button type="button" class="btn btn-abierto status-btn" data-status="abierto">Abierto</button>
                                 <button type="button" class="btn btn-completado status-btn" data-status="completado">Completado</button>
                                 <button type="button" class="btn btn-cancelado status-btn" data-status="cancelado">Cancelado</button>
                             </div>

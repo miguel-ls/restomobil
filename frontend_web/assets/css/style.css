@@ -133,7 +133,7 @@ table th { background-color: var(--light-bg); font-weight: 600; }
 .status-recibido { background-color: #cfe2ff; color: #0a58ca; }
 .status-en_preparacion { background-color: #fff3cd; color: #664d03; }
 .status-listo_para_servir { background-color: #d1e7dd; color: #0f5132; }
-.status-entregado { background-color: #e2d9f3; color: #49258a; }
+.status-abierto { background-color: #cfe2ff; color: #0a58ca; } /* Usando el mismo color que recibido para 'Abierto' */
 .status-completado { background-color: #d4edda; color: #155724; }
 .status-cancelado { background-color: #f8d7da; color: #842029; }
 
@@ -172,9 +172,19 @@ table th { background-color: var(--light-bg); font-weight: 600; }
 }
 
 /* Botones de estado con colores sólidos */
-.btn-entregado { background-color: #e2d9f3; color: #49258a; border: 1px solid #d5c8eb; }
-.btn-entregado:hover { background-color: #d5c8eb; border-color: #c8b7e2; }
+.btn-abierto { background-color: #cfe2ff; color: #0a58ca; border: 1px solid #b6d4fe; }
+.btn-abierto:hover { background-color: #b6d4fe; }
 .btn-completado { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
 .btn-completado:hover { background-color: #c3e6cb; border-color: #b1dfbb; }
 .btn-cancelado { background-color: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
 .btn-cancelado:hover { background-color: #f5c6cb; border-color: #f1b9c0; }
+
+/* Encabezado de detalles del pedido */
+.order-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+}
