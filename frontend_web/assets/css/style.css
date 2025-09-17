@@ -531,4 +531,58 @@ body.sidebar-collapsed .mobile-overlay {
         text-align: left;
         padding-right: 1rem;
     }
+    #order-items-table td input.item-quantity {
+        width: 50px; /* Ancho fijo pero pequeño */
+        text-align: center;
+    }
+    #order-items-table td .btn-delete {
+        padding: 5px 8px;
+        font-size: 0.9em;
+    }
+
+    /* --- Clases para mostrar/ocultar en móvil/desktop --- */
+    .desktop-only {
+        display: none !important;
+    }
+    .mobile-only {
+        display: block !important;
+    }
+
+    /* --- Estilos para las tarjetas de items de pedido en móvil --- */
+    .order-item-card {
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #fdfdfd;
+    }
+    .card-item-header {
+        font-weight: bold;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .card-item-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 0.95em;
+    }
+    .card-item-row span:first-child {
+        font-weight: 500;
+        color: #555;
+    }
+    .card-item-footer {
+        margin-top: 10px;
+        text-align: right;
+    }
+    .card-item-footer .btn-delete {
+        padding: 5px 10px;
+        font-size: 0.9em;
+    }
+}
+
+.mobile-only {
+    display: none !important;
 }

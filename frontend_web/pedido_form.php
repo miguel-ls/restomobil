@@ -107,7 +107,8 @@ if (isset($_GET['id'])) {
                         </div>
                         <?php endif; ?>
 
-                        <div class="table-container">
+                        <!-- Vista de Tabla para Desktop -->
+                        <div class="table-container desktop-only">
                             <table id="order-items-table">
                                 <thead>
                                     <tr>
@@ -118,15 +119,18 @@ if (isset($_GET['id'])) {
                                         <th></th>
                                     </tr>
                                 </thead>
-                                <tbody></tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="3" style="text-align: right;"><strong>Total:</strong></td>
-                                        <td id="order-total" style="font-weight: bold;">$0.00</td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
+                                <tbody><!-- Rellenado con JS --></tbody>
                             </table>
+                        </div>
+
+                        <!-- Vista de Tarjetas para Móvil -->
+                        <div id="order-items-cards" class="mobile-only">
+                            <!-- Rellenado con JS -->
+                        </div>
+
+                        <div class="order-total-container">
+                            <strong>Total:</strong>
+                            <span id="order-total" style="font-weight: bold;">$0.00</span>
                         </div>
 
                         <div class="form-actions" style="margin-top: 20px;">
@@ -221,44 +225,81 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             currentOrder[productId] = { id: productId, nombre: productItem.dataset.nombre, precio: parseFloat(productItem.dataset.precio), cantidad: 1 };
         }
-        renderOrderTable();
+        renderOrderItems();
     });
-    orderItemsTableBody.addEventListener('click', function(e) {
-        if (e.target.classList.contains('delete-item')) {
-            delete currentOrder[e.target.dataset.id];
-            renderOrderTable();
-        }
-    });
-    orderItemsTableBody.addEventListener('input', function(e) {
+
+    // Un solo event listener en el contenedor de detalles para manejar clicks e inputs
+    document.getElementById('order-details').addEventListener('input', function(e) {
         if (e.target.classList.contains('item-quantity')) {
             const newQuantity = parseInt(e.target.value, 10);
+            const productId = e.target.dataset.id;
             if (newQuantity > 0) {
-                currentOrder[e.target.dataset.id].cantidad = newQuantity;
+                currentOrder[productId].cantidad = newQuantity;
             } else {
-                delete currentOrder[e.target.dataset.id];
+                delete currentOrder[productId];
             }
-            renderOrderTable();
+            renderOrderItems();
         }
     });
-    function renderOrderTable() {
-        orderItemsTableBody.innerHTML = '';
+
+    document.getElementById('order-details').addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-item')) {
+            delete currentOrder[e.target.dataset.id];
+            renderOrderItems();
+        }
+    });
+
+    function renderOrderItems() {
+        const tableBody = document.querySelector('#order-items-table tbody');
+        const cardsContainer = document.getElementById('order-items-cards');
+        tableBody.innerHTML = '';
+        cardsContainer.innerHTML = '';
         let total = 0;
+
         for (const productId in currentOrder) {
             const item = currentOrder[productId];
             const subtotal = item.precio * item.cantidad;
             total += subtotal;
+
+            // Render Table Row (Desktop)
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td data-label="Producto">${item.nombre}</td>
-                <td data-label="Cantidad"><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></td>
-                <td data-label="Precio">${currencySymbol}${item.precio.toFixed(2)}</td>
-                <td data-label="Subtotal">${currencySymbol}${subtotal.toFixed(2)}</td>
-                <td data-label="Acción"><button type="button" class="btn-delete delete-item" data-id="${item.id}">X</button></td>
+                <td>${item.nombre}</td>
+                <td><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></td>
+                <td>${currencySymbol}${item.precio.toFixed(2)}</td>
+                <td>${currencySymbol}${subtotal.toFixed(2)}</td>
+                <td><button type="button" class="btn-delete delete-item" data-id="${item.id}">X</button></td>
             `;
-            orderItemsTableBody.appendChild(row);
+            tableBody.appendChild(row);
+
+            // Render Card (Mobile)
+            const card = document.createElement('div');
+            card.className = 'order-item-card';
+            card.innerHTML = `
+                <div class="card-item-header">${item.nombre}</div>
+                <div class="card-item-body">
+                    <div class="card-item-row">
+                        <span>Precio:</span>
+                        <span>${currencySymbol}${item.precio.toFixed(2)}</span>
+                    </div>
+                    <div class="card-item-row">
+                        <span>Cantidad:</span>
+                        <input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}">
+                    </div>
+                    <div class="card-item-row">
+                        <span>Subtotal:</span>
+                        <span>${currencySymbol}${subtotal.toFixed(2)}</span>
+                    </div>
+                </div>
+                <div class="card-item-footer">
+                    <button type="button" class="btn-delete delete-item" data-id="${item.id}">Eliminar</button>
+                </div>
+            `;
+            cardsContainer.appendChild(card);
         }
         orderTotalElement.textContent = `${currencySymbol}${total.toFixed(2)}`;
     }
+
     productSearch.addEventListener('keyup', function() {
         const searchTerm = productSearch.value.toLowerCase();
         document.querySelectorAll('#product-list .product-item').forEach(item => {
