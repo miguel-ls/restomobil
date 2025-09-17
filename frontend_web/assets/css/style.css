@@ -328,3 +328,15 @@ body.sidebar-collapsed .sidebar ul li a .icon {
     width: 60px;
     padding: 5px;
 }
+
+/* --- Estilos del Footer --- */
+.main-footer {
+    text-align: center;
+    padding: 15px;
+    background-color: #e9ecef;
+    border-top: 1px solid var(--border-color);
+    color: var(--secondary-color);
+    font-size: 0.9em;
+    /* Asegurarse de que el footer esté dentro del main-content si se quiere que se desplace con él */
+    margin-top: auto; /* Empuja el footer al fondo si el main-content es un flex container */
+}
