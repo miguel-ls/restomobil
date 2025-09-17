@@ -8,6 +8,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $page_title = 'Gestión de Pedidos';
 include_once 'templates/header.php';
+include_once __DIR__ . '/../backend/config/app_config.php';
 
 function getOrders() {
     $api_url = 'http://localhost/restaurante_system/backend/api/v1/pedidos.php';
@@ -54,7 +55,7 @@ $orders_data = getOrders();
                                 <p><strong>Mesa:</strong> <?php echo htmlspecialchars($order['numero_mesa'] ?? 'N/A'); ?></p>
                                 <p><strong>Mozo:</strong> <?php echo htmlspecialchars($order['nombre_mozo'] ?? 'N/A'); ?></p>
                                 <p><strong>Fecha:</strong> <?php echo htmlspecialchars(date("d/m/Y H:i", strtotime($order['fecha_creacion']))); ?></p>
-                                <p class="total"><strong>Total:</strong> $<?php echo htmlspecialchars(number_format($order['total'], 2)); ?></p>
+                                <p class="total"><strong>Total:</strong> <?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($order['total'], 2)); ?></p>
                             </div>
                             <div class="card-footer">
                                 <a href="pedido_detalle.php?id=<?php echo $order['id']; ?>" class="btn-card btn-view">Ver Detalle</a>

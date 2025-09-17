@@ -9,6 +9,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $page_title = 'Gestión de Productos';
 include_once 'templates/header.php';
+include_once __DIR__ . '/../backend/config/app_config.php';
 
 // Función para obtener productos desde la API
 function getProducts() {
@@ -71,7 +72,7 @@ $products_data = getProducts();
                                     <td><?php echo htmlspecialchars($product['id']); ?></td>
                                     <td><?php echo htmlspecialchars($product['nombre']); ?></td>
                                     <td><?php echo htmlspecialchars($product['descripcion']); ?></td>
-                                    <td>$<?php echo htmlspecialchars(number_format($product['precio'], 2)); ?></td>
+                                    <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($product['precio'], 2)); ?></td>
                                     <td><?php echo htmlspecialchars($product['categoria_nombre']); ?></td>
                                     <td class="actions-cell">
                                         <a href="producto_form.php?id=<?php echo $product['id']; ?>" class="btn-edit">Editar</a>
