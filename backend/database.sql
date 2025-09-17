@@ -143,4 +143,60 @@ BEGIN
         p.nombre ASC;
 END$$
 
+CREATE PROCEDURE sp_createProduct(
+    IN p_nombre VARCHAR(100),
+    IN p_descripcion TEXT,
+    IN p_precio DECIMAL(10, 2),
+    IN p_id_categoria INT
+)
+BEGIN
+    INSERT INTO productos (nombre, descripcion, precio, id_categoria)
+    VALUES (p_nombre, p_descripcion, p_precio, p_id_categoria);
+    SELECT LAST_INSERT_ID() as id;
+END$$
+
+CREATE PROCEDURE sp_readOneProduct(
+    IN p_id INT
+)
+BEGIN
+    SELECT
+        p.id,
+        p.nombre,
+        p.descripcion,
+        p.precio,
+        p.id_categoria,
+        c.nombre as categoria_nombre
+    FROM
+        productos p
+    LEFT JOIN
+        categorias_producto c ON p.id_categoria = c.id
+    WHERE
+        p.id = p_id;
+END$$
+
+CREATE PROCEDURE sp_updateProduct(
+    IN p_id INT,
+    IN p_nombre VARCHAR(100),
+    IN p_descripcion TEXT,
+    IN p_precio DECIMAL(10, 2),
+    IN p_id_categoria INT
+)
+BEGIN
+    UPDATE productos
+    SET
+        nombre = p_nombre,
+        descripcion = p_descripcion,
+        precio = p_precio,
+        id_categoria = p_id_categoria
+    WHERE
+        id = p_id;
+END$$
+
+CREATE PROCEDURE sp_deleteProduct(
+    IN p_id INT
+)
+BEGIN
+    DELETE FROM productos WHERE id = p_id;
+END$$
+
 DELIMITER ;

@@ -25,8 +25,19 @@ $products_data = getProducts();
 
     <main class="main-content">
         <div class="container">
-            <h1>Catálogo de Productos</h1>
-            <p>Aquí puede ver y gestionar los productos del menú.</p>
+            <div class="page-header">
+                <h1>Catálogo de Productos</h1>
+                <a href="producto_form.php" class="btn">Crear Producto Nuevo</a>
+            </div>
+
+            <?php
+            if (isset($_GET['success'])) {
+                echo '<p class="success-message">' . htmlspecialchars($_GET['success']) . '</p>';
+            }
+            if (isset($_GET['error'])) {
+                echo '<p class="error-message">' . htmlspecialchars($_GET['error']) . '</p>';
+            }
+            ?>
 
             <div class="table-container">
                 <table>
@@ -49,9 +60,9 @@ $products_data = getProducts();
                                     <td><?php echo htmlspecialchars($product['descripcion']); ?></td>
                                     <td>$<?php echo htmlspecialchars(number_format($product['precio'], 2)); ?></td>
                                     <td><?php echo htmlspecialchars($product['categoria_nombre']); ?></td>
-                                    <td>
-                                        <a href="#" class="btn-edit">Editar</a>
-                                        <a href="#" class="btn-delete">Eliminar</a>
+                                    <td class="actions-cell">
+                                        <a href="producto_form.php?id=<?php echo $product['id']; ?>" class="btn-edit">Editar</a>
+                                        <a href="producto_delete_handler.php?id=<?php echo $product['id']; ?>" class="btn-delete" onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?');">Eliminar</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
