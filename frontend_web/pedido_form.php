@@ -10,7 +10,6 @@ $page_title = 'Crear Nuevo Pedido';
 include_once 'templates/header.php';
 include_once __DIR__ . '/../backend/config/app_config.php';
 
-// --- Funciones para obtener datos de la API ---
 function getAPIdata($endpoint) {
     $api_url = "http://localhost/restaurante_system/backend/api/v1/$endpoint";
     $ch = curl_init($api_url);
@@ -18,14 +17,8 @@ function getAPIdata($endpoint) {
     $response = curl_exec($ch);
     curl_close($ch);
     $data = json_decode($response, true);
-    return isset($data['records']) ? $data['records'] : $data; // Devolver data si no hay 'records'
+    return isset($data['records']) ? $data['records'] : $data;
 }
-
-// Solo obtener mesas disponibles para pedidos nuevos. Para editar, se necesitan todas.
-$mesas_endpoint = isset($_GET['id']) ? 'mesas.php' : 'mesas.php?status=available';
-$mesas = getAPIdata($mesas_endpoint);
-$mozos = getAPIdata('usuarios.php?rol=Mozo');
-$productos = getAPIdata('productos.php');
 
 $is_editing = false;
 $order_data = null;
@@ -36,6 +29,11 @@ if (isset($_GET['id'])) {
     $page_title = "Editar Pedido #$order_id";
     $order_data = getAPIdata("pedidos.php?id=$order_id");
 }
+
+$mesas_endpoint = $is_editing ? 'mesas.php' : 'mesas.php?status=available';
+$mesas = getAPIdata($mesas_endpoint);
+$mozos = getAPIdata('usuarios.php?rol=Mozo');
+$productos = getAPIdata('productos.php');
 ?>
 
 <div class="dashboard-container">
@@ -48,7 +46,6 @@ if (isset($_GET['id'])) {
             </div>
 
             <div id="order-form-container" class="order-grid">
-                <!-- Columna de la izquierda: Productos disponibles -->
                 <div class="product-list-container">
                     <h3>Productos Disponibles</h3>
                     <input type="text" id="product-search" placeholder="Buscar producto...">
@@ -58,21 +55,26 @@ if (isset($_GET['id'])) {
                                 <div class="product-item" data-id="<?php echo $producto['id']; ?>" data-nombre="<?php echo htmlspecialchars($producto['nombre']); ?>" data-precio="<?php echo $producto['precio']; ?>">
                                     <h4><?php echo htmlspecialchars($producto['nombre']); ?></h4>
                                     <p><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($producto['precio'], 2)); ?></p>
-                                    <p><small>Categoría: <?php echo htmlspecialchars($producto['categoria_nombre']); ?></small></p>
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
                 </div>
 
-                <!-- Columna de la derecha: Detalles del pedido -->
-                <div class="order-details">
+                <div class="order-details" id="order-details">
                     <h3>Detalles del Pedido</h3>
                     <form id="order-form">
                         <div class="form-group">
                             <label for="id_mesa">Mesa</label>
                             <select id="id_mesa" name="id_mesa" required>
                                 <option value="">Seleccione una mesa</option>
+                                <?php if ($is_editing && $order_data) {
+                                    $mesa_en_lista = false;
+                                    foreach ($mesas as $mesa) { if ($mesa['id'] == $order_data['id_mesa']) $mesa_en_lista = true; }
+                                    if (!$mesa_en_lista) {
+                                        echo "<option value=\"{$order_data['id_mesa']}\" selected>{$order_data['numero_mesa']} (Ocupada)</option>";
+                                    }
+                                }?>
                                 <?php foreach ($mesas as $mesa): ?>
                                     <option value="<?php echo $mesa['id']; ?>" <?php if($is_editing && $order_data['id_mesa'] == $mesa['id']) echo 'selected'; ?>>
                                         <?php echo htmlspecialchars($mesa['numero_mesa']); ?>
@@ -83,7 +85,7 @@ if (isset($_GET['id'])) {
                         <div class="form-group">
                             <label for="id_usuario_mozo">Mozo</label>
                             <select id="id_usuario_mozo" name="id_usuario_mozo" required>
-                                <option value="">Seleccione un mozo</option>
+                                 <option value="">Seleccione un mozo</option>
                                 <?php foreach ($mozos as $mozo): ?>
                                     <option value="<?php echo $mozo['id']; ?>" <?php if($is_editing && $order_data['id_usuario_mozo'] == $mozo['id']) echo 'selected'; ?>>
                                         <?php echo htmlspecialchars($mozo['nombre_completo']); ?>
@@ -107,33 +109,20 @@ if (isset($_GET['id'])) {
                         </div>
                         <?php endif; ?>
 
-                        <!-- Vista de Tabla para Desktop -->
                         <div class="table-container desktop-only">
                             <table id="order-items-table">
-                                <thead>
-                                    <tr>
-                                        <th>Producto</th>
-                                        <th>Cantidad</th>
-                                        <th>Precio</th>
-                                        <th>Subtotal</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody><!-- Rellenado con JS --></tbody>
+                                <thead><tr><th>Producto</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th><th></th></tr></thead>
+                                <tbody></tbody>
                             </table>
                         </div>
-
-                        <!-- Vista de Tarjetas para Móvil -->
-                        <div id="order-items-cards" class="mobile-only">
-                            <!-- Rellenado con JS -->
-                        </div>
+                        <div id="order-items-cards" class="mobile-only"></div>
 
                         <div class="order-total-container">
                             <strong>Total:</strong>
-                            <span id="order-total" style="font-weight: bold;">$0.00</span>
+                            <span id="order-total" style="font-weight: bold;"><?php echo CURRENCY_SYMBOL; ?>0.00</span>
                         </div>
 
-                        <div class="form-actions" style="margin-top: 20px;">
+                        <div class="form-actions">
                             <button type="submit" class="btn"><?php echo $is_editing ? 'Actualizar Pedido' : 'Crear Pedido'; ?></button>
                             <a href="pedidos.php" class="btn btn-secondary">Cancelar</a>
                         </div>
@@ -146,9 +135,8 @@ if (isset($_GET['id'])) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // --- Variables y referencias del DOM ---
     const productList = document.getElementById('product-list');
-    const orderItemsTableBody = document.querySelector('#order-items-table tbody');
+    const orderDetailsContainer = document.getElementById('order-details');
     const orderTotalElement = document.getElementById('order-total');
     const orderForm = document.getElementById('order-form');
     const productSearch = document.getElementById('product-search');
@@ -157,44 +145,72 @@ document.addEventListener('DOMContentLoaded', function() {
     const isEditing = <?php echo json_encode($is_editing); ?>;
     const orderId = <?php echo json_encode($is_editing ? $order_id : null); ?>;
     let initialOrderData = <?php echo json_encode($is_editing ? $order_data : null); ?>;
-
     let currentOrder = {};
 
-    // --- Lógica de Inicialización ---
-    if (isEditing && initialOrderData && initialOrderData.items) {
-        initialOrderData.items.forEach(item => {
-            currentOrder[item.id_producto] = {
-                id: item.id_producto,
-                nombre: item.nombre_producto,
-                precio: parseFloat(item.precio_unitario),
-                cantidad: parseInt(item.cantidad, 10)
-            };
-        });
-        renderOrderTable();
+    function renderOrderItems() {
+        const tableBody = document.querySelector('#order-items-table tbody');
+        const cardsContainer = document.getElementById('order-items-cards');
+        tableBody.innerHTML = '';
+        cardsContainer.innerHTML = '';
+        let total = 0;
+        for (const productId in currentOrder) {
+            const item = currentOrder[productId];
+            const subtotal = item.precio * item.cantidad;
+            total += subtotal;
+
+            tableBody.innerHTML += `<tr><td>${item.nombre}</td><td><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></td><td>${currencySymbol}${item.precio.toFixed(2)}</td><td>${currencySymbol}${subtotal.toFixed(2)}</td><td><button type="button" class="btn-delete delete-item" data-id="${item.id}">X</button></td></tr>`;
+
+            cardsContainer.innerHTML += `<div class="order-item-card"><div class="card-item-header">${item.nombre}</div><div class="card-item-body"><div class="card-item-row"><span>Precio:</span><span>${currencySymbol}${item.precio.toFixed(2)}</span></div><div class="card-item-row"><span>Cantidad:</span><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></div><div class="card-item-row"><span>Subtotal:</span><strong>${currencySymbol}${subtotal.toFixed(2)}</strong></div></div><div class="card-item-footer"><button type="button" class="btn-delete delete-item" data-id="${item.id}">Eliminar</button></div></div>`;
+        }
+        orderTotalElement.textContent = `${currencySymbol}${total.toFixed(2)}`;
     }
 
-    // --- Lógica de Eventos ---
+    if (isEditing && initialOrderData && initialOrderData.items) {
+        initialOrderData.items.forEach(item => {
+            currentOrder[item.id_producto] = { id: item.id_producto, nombre: item.nombre_producto, precio: parseFloat(item.precio_unitario), cantidad: parseInt(item.cantidad, 10) };
+        });
+        renderOrderItems();
+    }
+
+    productList.addEventListener('click', function(e) {
+        const productItem = e.target.closest('.product-item');
+        if (!productItem) return;
+        const productId = productItem.dataset.id;
+        if (currentOrder[productId]) { currentOrder[productId].cantidad++; } else { currentOrder[productId] = { id: productId, nombre: productItem.dataset.nombre, precio: parseFloat(productItem.dataset.precio), cantidad: 1 }; }
+        renderOrderItems();
+    });
+
+    orderDetailsContainer.addEventListener('input', function(e) {
+        if (e.target.classList.contains('item-quantity')) {
+            const newQuantity = parseInt(e.target.value, 10);
+            const productId = e.target.dataset.id;
+            if (newQuantity > 0) { currentOrder[productId].cantidad = newQuantity; } else { delete currentOrder[productId]; }
+            renderOrderItems();
+        }
+    });
+
+    orderDetailsContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-item')) {
+            delete currentOrder[e.target.dataset.id];
+            renderOrderItems();
+        }
+    });
 
     orderForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const id_mesa = document.getElementById('id_mesa').value;
         const id_usuario_mozo = document.getElementById('id_usuario_mozo').value;
         const items = Object.values(currentOrder).map(item => ({ id: item.id, cantidad: item.cantidad }));
-
         if (!id_mesa || !id_usuario_mozo || items.length === 0) {
             alert('Por favor, complete todos los campos y añada al menos un producto.');
             return;
         }
-
         const orderData = { id_mesa, id_usuario_mozo, items };
         if (isEditing) {
             orderData.estado = document.getElementById('estado').value;
         }
         const method = isEditing ? 'PUT' : 'POST';
-        const url = isEditing
-            ? `http://localhost/restaurante_system/backend/api/v1/pedidos.php?id=${orderId}`
-            : 'http://localhost/restaurante_system/backend/api/v1/pedidos.php';
-
+        const url = isEditing ? `http://localhost/restaurante_system/backend/api/v1/pedidos.php?id=${orderId}` : 'http://localhost/restaurante_system/backend/api/v1/pedidos.php';
         fetch(url, {
             method: method,
             headers: { 'Content-Type': 'application/json' },
@@ -214,91 +230,6 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Ocurrió un error de red.');
         });
     });
-
-    // Re-pegar las funciones que no cambiaron para que el script esté completo
-    productList.addEventListener('click', function(e) {
-        const productItem = e.target.closest('.product-item');
-        if (!productItem) return;
-        const productId = productItem.dataset.id;
-        if (currentOrder[productId]) {
-            currentOrder[productId].cantidad++;
-        } else {
-            currentOrder[productId] = { id: productId, nombre: productItem.dataset.nombre, precio: parseFloat(productItem.dataset.precio), cantidad: 1 };
-        }
-        renderOrderItems();
-    });
-
-    // Un solo event listener en el contenedor de detalles para manejar clicks e inputs
-    document.getElementById('order-details').addEventListener('input', function(e) {
-        if (e.target.classList.contains('item-quantity')) {
-            const newQuantity = parseInt(e.target.value, 10);
-            const productId = e.target.dataset.id;
-            if (newQuantity > 0) {
-                currentOrder[productId].cantidad = newQuantity;
-            } else {
-                delete currentOrder[productId];
-            }
-            renderOrderItems();
-        }
-    });
-
-    document.getElementById('order-details').addEventListener('click', function(e) {
-        if (e.target.classList.contains('delete-item')) {
-            delete currentOrder[e.target.dataset.id];
-            renderOrderItems();
-        }
-    });
-
-    function renderOrderItems() {
-        const tableBody = document.querySelector('#order-items-table tbody');
-        const cardsContainer = document.getElementById('order-items-cards');
-        tableBody.innerHTML = '';
-        cardsContainer.innerHTML = '';
-        let total = 0;
-
-        for (const productId in currentOrder) {
-            const item = currentOrder[productId];
-            const subtotal = item.precio * item.cantidad;
-            total += subtotal;
-
-            // Render Table Row (Desktop)
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${item.nombre}</td>
-                <td><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></td>
-                <td>${currencySymbol}${item.precio.toFixed(2)}</td>
-                <td>${currencySymbol}${subtotal.toFixed(2)}</td>
-                <td><button type="button" class="btn-delete delete-item" data-id="${item.id}">X</button></td>
-            `;
-            tableBody.appendChild(row);
-
-            // Render Card (Mobile)
-            const card = document.createElement('div');
-            card.className = 'order-item-card';
-            card.innerHTML = `
-                <div class="card-item-header">${item.nombre}</div>
-                <div class="card-item-body">
-                    <div class="card-item-row">
-                        <span>Precio:</span>
-                        <span>${currencySymbol}${item.precio.toFixed(2)}</span>
-                    </div>
-                    <div class="card-item-row">
-                        <span>Cantidad:</span>
-                        <input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}">
-                    </div>
-                    <div class="card-item-row">
-                        <span>Subtotal:</span>
-                        <span>${currencySymbol}${subtotal.toFixed(2)}</span>
-                    </div>
-                </div>
-                <div class="card-item-footer">
-                    <button type="button" class="btn-delete delete-item" data-id="${item.id}">Eliminar</button>
-                </div>
-            `;
-            cardsContainer.appendChild(card);
-        }
-        orderTotalElement.textContent = `${currencySymbol}${total.toFixed(2)}`;
-    }
 
     productSearch.addEventListener('keyup', function() {
         const searchTerm = productSearch.value.toLowerCase();

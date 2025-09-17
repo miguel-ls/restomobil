@@ -18,8 +18,7 @@ include_once __DIR__ . '/../backend/config/app_config.php';
 
 function getOrderDetails($id) {
     $api_url = "http://localhost/restaurante_system/backend/api/v1/pedidos.php?id=$id";
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $api_url);
+    $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $response = curl_exec($ch);
     $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -32,7 +31,6 @@ function getOrderDetails($id) {
 }
 
 $order = getOrderDetails($order_id);
-
 ?>
 
 <div class="dashboard-container">
@@ -60,11 +58,12 @@ $order = getOrderDetails($order_id);
                         <p><strong>Última Actualización:</strong> <?php echo htmlspecialchars(date("d/m/Y H:i:s", strtotime($order['fecha_actualizacion']))); ?></p>
                     </div>
 
-
                     <div class="order-items">
                         <h3>Items del Pedido</h3>
-                        <div class="table-container">
-                            <table id="order-detail-items-table">
+
+                        <!-- Vista de Tabla para Desktop -->
+                        <div class="table-container desktop-only">
+                            <table>
                                 <thead>
                                     <tr>
                                         <th>Producto</th>
@@ -76,65 +75,48 @@ $order = getOrderDetails($order_id);
                                 <tbody>
                                     <?php foreach ($order['items'] as $item): ?>
                                         <tr>
-                                            <td data-label="Producto"><?php echo htmlspecialchars($item['nombre_producto']); ?></td>
-                                            <td data-label="Cantidad"><?php echo htmlspecialchars($item['cantidad']); ?></td>
-                                            <td data-label="Precio Unit."><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['precio_unitario'], 2)); ?></td>
-                                            <td data-label="Subtotal"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['subtotal'], 2)); ?></td>
+                                            <td><?php echo htmlspecialchars($item['nombre_producto']); ?></td>
+                                            <td><?php echo htmlspecialchars($item['cantidad']); ?></td>
+                                            <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['precio_unitario'], 2)); ?></td>
+                                            <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['subtotal'], 2)); ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="3" style="text-align: right; font-weight: bold;">Total del Pedido:</td>
-                                        <td style="font-weight: bold;"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($order['total'], 2)); ?></td>
-                                    </tr>
-                                </tfoot>
                             </table>
+                        </div>
+
+                        <!-- Vista de Tarjetas para Móvil -->
+                        <div class="mobile-only">
+                            <?php foreach ($order['items'] as $item): ?>
+                                <div class="order-item-card">
+                                    <div class="card-item-header"><?php echo htmlspecialchars($item['nombre_producto']); ?></div>
+                                    <div class="card-item-body">
+                                        <div class="card-item-row">
+                                            <span>Precio Unit.:</span>
+                                            <span><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['precio_unitario'], 2)); ?></span>
+                                        </div>
+                                        <div class="card-item-row">
+                                            <span>Cantidad:</span>
+                                            <span><?php echo htmlspecialchars($item['cantidad']); ?></span>
+                                        </div>
+                                        <div class="card-item-row">
+                                            <span>Subtotal:</span>
+                                            <strong><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['subtotal'], 2)); ?></strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <div class="order-total-container" style="text-align: right; margin-top: 20px; font-size: 1.2em;">
+                            <strong>Total del Pedido:</strong>
+                            <strong><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($order['total'], 2)); ?></strong>
                         </div>
                     </div>
                 </div>
             <?php else: ?>
-                <p class="error-message">No se pudieron cargar los detalles del pedido. Es posible que el pedido no exista.</p>
+                <p class="error-message">No se pudieron cargar los detalles del pedido. Es posible que el pedido no exista o haya sido eliminado.</p>
             <?php endif; ?>
         </div>
     </main>
 </div>
-
-<style>
-.order-details-container {
-    background-color: #fff;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-.order-header, .order-items {
-    margin-bottom: 25px;
-}
-.order-header h3, .order-items h3 {
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-}
-.order-header p {
-    margin: 5px 0;
-    font-size: 16px;
-}
-.status {
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-    color: #fff;
-    text-transform: capitalize;
-}
-.status-recibido { background-color: #0d6efd; }
-.status-en_preparacion { background-color: #ffc107; color: #000; }
-.status-listo_para_servir { background-color: #fd7e14; }
-.status-servido { background-color: #198754; }
-.status-pagado { background-color: #20c997; }
-.status-cancelado { background-color: #dc3545; }
-</style>
-
-<?php
-include_once 'templates/footer.php';
-?>

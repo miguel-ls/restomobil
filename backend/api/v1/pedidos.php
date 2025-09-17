@@ -12,7 +12,6 @@ $request_method = $_SERVER["REQUEST_METHOD"];
 switch ($request_method) {
     case 'GET':
         if (!empty($_GET["id"])) {
-            // Obtener un solo pedido con sus detalles
             $order_id = intval($_GET["id"]);
             $order_data = $order->readOne($order_id);
             if ($order_data) {
@@ -23,27 +22,24 @@ switch ($request_method) {
                 echo json_encode(["message" => "Pedido no encontrado."]);
             }
         } else {
-            // Obtener todos los pedidos (la lista principal)
             handleGetAllOrders($order);
         }
         break;
 
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
-
-        // Validar que los datos necesarios están presentes
         if (!empty($data->id_mesa) && !empty($data->id_usuario_mozo) && !empty($data->items) && is_array($data->items)) {
             $stmt = $order->create($data->id_mesa, $data->id_usuario_mozo, $data->items);
             if ($stmt) {
                 $new_order = $stmt->fetch(PDO::FETCH_ASSOC);
-                http_response_code(201); // Created
+                http_response_code(201);
                 echo json_encode(["message" => "Pedido creado exitosamente.", "id" => $new_order['id']]);
             } else {
-                http_response_code(503); // Service Unavailable
+                http_response_code(503);
                 echo json_encode(["message" => "No se pudo crear el pedido."]);
             }
         } else {
-            http_response_code(400); // Bad Request
+            http_response_code(400);
             echo json_encode(["message" => "Datos incompletos para crear el pedido."]);
         }
         break;
@@ -51,49 +47,22 @@ switch ($request_method) {
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
         $order_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
-
-        if (!$order_id) {
-            http_response_code(400);
-            echo json_encode(["message" => "ID de pedido no proporcionado."]);
-            break;
-        }
-
-        // Si se envían items, es una actualización completa del pedido
-        if (!empty($data->items) && is_array($data->items)) {
-            if (!empty($data->id_mesa) && !empty($data->id_usuario_mozo) && !empty($data->estado)) {
-                if ($order->update($order_id, $data->id_mesa, $data->id_usuario_mozo, $data->estado, $data->items)) {
-                    http_response_code(200);
-                    echo json_encode(["message" => "Pedido actualizado exitosamente."]);
-                } else {
-                    http_response_code(503);
-                    echo json_encode(["message" => "No se pudo actualizar el pedido."]);
-                }
-            } else {
-                 http_response_code(400);
-                 echo json_encode(["message" => "Datos incompletos para actualizar el pedido."]);
-            }
-        }
-        // Si solo se envía el estado, es solo una actualización de estado
-        elseif (!empty($data->estado)) {
-            if ($order->updateStatus($order_id, $data->estado)) {
+        if ($order_id && !empty($data->id_mesa) && !empty($data->id_usuario_mozo) && isset($data->estado) && isset($data->items) && is_array($data->items)) {
+            if ($order->update($order_id, $data->id_mesa, $data->id_usuario_mozo, $data->estado, $data->items)) {
                 http_response_code(200);
-                echo json_encode(["message" => "Estado del pedido actualizado."]);
+                echo json_encode(["message" => "Pedido actualizado exitosamente."]);
             } else {
                 http_response_code(503);
-                echo json_encode(["message" => "No se pudo actualizar el estado del pedido."]);
+                echo json_encode(["message" => "No se pudo actualizar el pedido."]);
             }
-        }
-        // Si no, los datos son inválidos
-        else {
+        } else {
             http_response_code(400);
-            echo json_encode(["message" => "Datos incompletos o inválidos para la actualización."]);
+            echo json_encode(["message" => "Datos incompletos para actualizar el pedido."]);
         }
         break;
 
-    // El caso DELETE se implementará en fases futuras
-    case 'DELETE':
     default:
-        http_response_code(405); // Method Not Allowed
+        http_response_code(405);
         echo json_encode(["message" => "Método no permitido."]);
         break;
 }
@@ -105,18 +74,12 @@ function handleGetAllOrders($order) {
     if ($num > 0) {
         $orders_arr = ["records" => []];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            // Convertir tipos de datos para JSON
-            $row['id'] = intval($row['id']);
-            $row['id_mesa'] = intval($row['id_mesa']);
-            $row['id_usuario_mozo'] = intval($row['id_usuario_mozo']);
-            $row['total'] = floatval($row['total']);
-
             array_push($orders_arr["records"], $row);
         }
         http_response_code(200);
         echo json_encode($orders_arr);
     } else {
-        http_response_code(200); // OK, pero no hay registros
+        http_response_code(200);
         echo json_encode(["records" => []]);
     }
 }
