@@ -78,6 +78,9 @@ table th { background-color: var(--light-bg); font-weight: 600; }
 /* Formulario de Pedido */
 .order-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
 .product-list-container { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); max-height: 85vh; overflow-y: auto; }
+.category-filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+.btn-category { padding: 8px 15px; border: 1px solid var(--border-color); border-radius: 20px; background-color: transparent; cursor: pointer; transition: all 0.3s ease; }
+.btn-category.active { background-color: var(--primary-color); color: var(--light-text); border-color: var(--primary-color); }
 #product-search { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 5px; box-sizing: border-box; }
 .product-item { padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; margin-bottom: 10px; cursor: pointer; transition: background-color 0.2s; }
 .product-item:hover { background-color: var(--hover-light); }

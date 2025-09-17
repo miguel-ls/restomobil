@@ -51,10 +51,12 @@ if (isset($_GET['id'])) {
 $mesas_data = fetchFromAPI('mesas.php?status=available');
 $mozos_data = fetchFromAPI('usuarios.php?rol=Mozo');
 $productos_data = fetchFromAPI('productos.php');
+$categorias_data = fetchFromAPI('categorias.php');
 
 $mesas = isset($mesas_data['records']) ? $mesas_data['records'] : [];
 $mozos = isset($mozos_data['records']) ? $mozos_data['records'] : [];
 $productos = isset($productos_data['records']) ? $productos_data['records'] : [];
+$categorias = isset($categorias_data['records']) ? $categorias_data['records'] : [];
 ?>
 
 <div class="dashboard-container">
@@ -68,10 +70,22 @@ $productos = isset($productos_data['records']) ? $productos_data['records'] : []
             <div id="order-form-container" class="order-grid">
                 <div class="product-list-container">
                     <h3>Productos Disponibles</h3>
+                    <div id="category-filters" class="category-filters">
+                        <button class="btn-category active" data-category="all">Todos</button>
+                        <?php foreach ($categorias as $categoria): ?>
+                            <button class="btn-category" data-category="<?php echo htmlspecialchars($categoria['nombre']); ?>">
+                                <?php echo htmlspecialchars($categoria['nombre']); ?>
+                            </button>
+                        <?php endforeach; ?>
+                    </div>
                     <input type="text" id="product-search" placeholder="Buscar producto...">
                     <div id="product-list">
                         <?php foreach ($productos as $producto): ?>
-                            <div class="product-item" data-id="<?php echo $producto['id']; ?>" data-nombre="<?php echo htmlspecialchars($producto['nombre']); ?>" data-precio="<?php echo $producto['precio']; ?>">
+                            <div class="product-item"
+                                 data-id="<?php echo $producto['id']; ?>"
+                                 data-nombre="<?php echo htmlspecialchars($producto['nombre']); ?>"
+                                 data-precio="<?php echo $producto['precio']; ?>"
+                                 data-category="<?php echo htmlspecialchars($producto['categoria_nombre']); ?>">
                                 <h4><?php echo htmlspecialchars($producto['nombre']); ?></h4>
                                 <p><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($producto['precio'], 2)); ?></p>
                             </div>
@@ -236,6 +250,31 @@ document.addEventListener('DOMContentLoaded', function() {
         itemsInput.value = JSON.stringify(Object.values(currentOrder));
         this.appendChild(itemsInput);
         // El formulario se enviará de forma nativa
+    });
+
+    // Lógica para el filtro de categorías
+    const categoryFilters = document.getElementById('category-filters');
+    const productItems = document.querySelectorAll('.product-item');
+
+    categoryFilters.addEventListener('click', function(e) {
+        if (e.target.tagName !== 'BUTTON') return;
+
+        // Actualizar el estado activo del botón
+        const currentActive = categoryFilters.querySelector('.active');
+        if (currentActive) {
+            currentActive.classList.remove('active');
+        }
+        e.target.classList.add('active');
+
+        const selectedCategory = e.target.dataset.category;
+
+        productItems.forEach(item => {
+            if (selectedCategory === 'all' || item.dataset.category === selectedCategory) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
     });
 });
 </script>
