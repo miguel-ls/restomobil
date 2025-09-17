@@ -4,7 +4,7 @@
 define('DB_HOST', '127.0.0.1'); // O la IP de tu servidor de BD
 define('DB_USER', 'miguel');      // Usuario de la BD
 define('DB_PASS', 'Miguel123!');  // Contraseña de la BD
-define('DB_NAME', 'ong_db');    // Nombre de la BD
+define('DB_NAME', 'restaurante_db');    // Nombre de la BD
 
 // Opcional: configurar el DSN (Data Source Name) para PDO
 define('DB_DSN', 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4');
