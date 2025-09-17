@@ -74,6 +74,144 @@ BEGIN
     DELETE FROM categorias_producto WHERE id = p_id;
 END$$
 
+-- Crear un nuevo pedido completo (cabecera y detalles)
+CREATE PROCEDURE sp_createOrder(
+    IN p_id_mesa INT,
+    IN p_id_usuario_mozo INT,
+    IN p_items_json JSON
+)
+BEGIN
+    DECLARE v_id_pedido INT;
+    DECLARE v_total_calculado DECIMAL(10, 2) DEFAULT 0;
+    DECLARE v_item JSON;
+    DECLARE v_id_producto INT;
+    DECLARE v_cantidad INT;
+    DECLARE v_precio_unitario DECIMAL(10, 2);
+    DECLARE i INT DEFAULT 0;
+
+    -- Iniciar transacción
+    START TRANSACTION;
+
+    -- 1. Crear la cabecera del pedido en la tabla 'pedidos'
+    -- El total se calculará y se actualizará después
+    INSERT INTO pedidos (id_mesa, id_usuario_mozo, total)
+    VALUES (p_id_mesa, p_id_usuario_mozo, 0);
+
+    -- Obtener el ID del nuevo pedido
+    SET v_id_pedido = LAST_INSERT_ID();
+
+    -- 2. Iterar sobre el JSON de items y agregarlos a 'detalle_pedidos'
+    WHILE i < JSON_LENGTH(p_items_json) DO
+        SET v_item = JSON_EXTRACT(p_items_json, CONCAT('$[', i, ']'));
+        SET v_id_producto = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.id'));
+        SET v_cantidad = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.cantidad'));
+
+        -- Obtener el precio del producto desde la tabla 'productos' para seguridad
+        SELECT precio INTO v_precio_unitario FROM productos WHERE id = v_id_producto;
+
+        -- Insertar en la tabla de detalles
+        INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario)
+        VALUES (v_id_pedido, v_id_producto, v_cantidad, v_precio_unitario);
+
+        -- Acumular el subtotal al total calculado
+        SET v_total_calculado = v_total_calculado + (v_cantidad * v_precio_unitario);
+
+        SET i = i + 1;
+    END WHILE;
+
+    -- 3. Actualizar el pedido con el total calculado
+    UPDATE pedidos SET total = v_total_calculado WHERE id = v_id_pedido;
+
+    -- Confirmar la transacción
+    COMMIT;
+
+    -- Devolver el ID del nuevo pedido
+    SELECT v_id_pedido as id;
+END$$
+
+-- Actualizar el estado de un pedido
+CREATE PROCEDURE sp_updateOrderStatus(
+    IN p_id_pedido INT,
+    IN p_nuevo_estado ENUM('recibido', 'en_preparacion', 'listo_para_servir', 'servido', 'pagado', 'cancelado')
+)
+BEGIN
+    UPDATE pedidos
+    SET
+        estado = p_nuevo_estado
+    WHERE
+        id = p_id_pedido;
+END$$
+
+DELIMITER ;
+
+-- -----------------------------------------------------
+-- Procedimientos Almacenados para 'pedidos'
+-- -----------------------------------------------------
+
+DELIMITER $$
+
+-- Obtener todos los pedidos (lista principal)
+CREATE PROCEDURE sp_getAllOrders()
+BEGIN
+    SELECT
+        p.id,
+        p.id_mesa,
+        m.numero_mesa,
+        p.id_usuario_mozo,
+        u.nombre_completo AS nombre_mozo,
+        p.estado,
+        p.total,
+        p.fecha_creacion
+    FROM
+        pedidos p
+    JOIN
+        mesas m ON p.id_mesa = m.id
+    JOIN
+        usuarios u ON p.id_usuario_mozo = u.id
+    ORDER BY
+        p.fecha_creacion DESC;
+END$$
+
+-- Obtener la información de la cabecera de un pedido específico
+CREATE PROCEDURE sp_getOrderDetail(IN p_id_pedido INT)
+BEGIN
+    SELECT
+        p.id,
+        p.id_mesa,
+        m.numero_mesa,
+        p.id_usuario_mozo,
+        u.nombre_completo AS nombre_mozo,
+        p.estado,
+        p.total,
+        p.fecha_creacion,
+        p.fecha_actualizacion
+    FROM
+        pedidos p
+    JOIN
+        mesas m ON p.id_mesa = m.id
+    JOIN
+        usuarios u ON p.id_usuario_mozo = u.id
+    WHERE
+        p.id = p_id_pedido;
+END$$
+
+-- Obtener los items (detalles) de un pedido específico
+CREATE PROCEDURE sp_getOrderItems(IN p_id_pedido INT)
+BEGIN
+    SELECT
+        dp.id_producto,
+        pr.nombre AS nombre_producto,
+        dp.cantidad,
+        dp.precio_unitario,
+        dp.subtotal
+    FROM
+        detalle_pedidos dp
+    JOIN
+        productos pr ON dp.id_producto = pr.id
+    WHERE
+        dp.id_pedido = p_id_pedido;
+END$$
+
 DELIMITER ;
 
 -- -----------------------------------------------------
