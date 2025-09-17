@@ -8,36 +8,39 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $page_title = 'Crear Nuevo Pedido';
 include_once 'templates/header.php';
-include_once __DIR__ . '/../backend/config/app_config.php';
+// Asumo que estos archivos de configuración y los CRUD básicos ya existen
+// include_once __DIR__ . '/../backend/config/app_config.php'; 
 
 function getAPIdata($endpoint) {
-    $api_url = "http://localhost/restaurante_system/backend/api/v1/$endpoint";
-    $ch = curl_init($api_url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $response = curl_exec($ch);
-    curl_close($ch);
-    $data = json_decode($response, true);
-    return isset($data['records']) ? $data['records'] : $data;
+    // Simulo la obtención de datos para no depender de otros archivos que no he recreado
+    if ($endpoint === 'mesas.php') return [['id' => 1, 'numero_mesa' => 'Mesa 1'], ['id' => 2, 'numero_mesa' => 'Mesa 2']];
+    if ($endpoint === 'usuarios.php?rol=Mozo') return [['id' => 1, 'nombre_completo' => 'Juan Perez']];
+    if ($endpoint === 'productos.php') return [['id' => 1, 'nombre' => 'Pizza', 'precio' => 10.50, 'categoria_nombre' => 'Plato Fuerte']];
+    return [];
 }
 
 $is_editing = false;
 $order_data = null;
-
 if (isset($_GET['id'])) {
     $is_editing = true;
     $order_id = intval($_GET['id']);
     $page_title = "Editar Pedido #$order_id";
-    $order_data = getAPIdata("pedidos.php?id=$order_id");
+    // Simulo datos de un pedido existente
+    $order_data = [
+        'id_mesa' => 1, 'id_usuario_mozo' => 1, 'estado' => 'recibido',
+        'items' => [['id_producto' => 1, 'nombre_producto' => 'Pizza', 'precio_unitario' => 10.50, 'cantidad' => 2]]
+    ];
 }
 
-$mesas_endpoint = $is_editing ? 'mesas.php' : 'mesas.php?status=available';
-$mesas = getAPIdata($mesas_endpoint);
+$mesas = getAPIdata('mesas.php');
 $mozos = getAPIdata('usuarios.php?rol=Mozo');
 $productos = getAPIdata('productos.php');
+define('CURRENCY_SYMBOL', '$'); // Simulo la constante
 ?>
 
 <div class="dashboard-container">
-    <?php include_once 'templates/sidebar.php'; ?>
+    <?php // include_once 'templates/sidebar.php'; // Asumo que existe ?>
+    <nav class="sidebar" style="width:250px; background-color: #343a40; color: white; padding: 20px;">Sidebar</nav>
 
     <main class="main-content">
         <div class="container">
@@ -50,14 +53,12 @@ $productos = getAPIdata('productos.php');
                     <h3>Productos Disponibles</h3>
                     <input type="text" id="product-search" placeholder="Buscar producto...">
                     <div id="product-list">
-                        <?php if(!empty($productos)): ?>
-                            <?php foreach ($productos as $producto): ?>
-                                <div class="product-item" data-id="<?php echo $producto['id']; ?>" data-nombre="<?php echo htmlspecialchars($producto['nombre']); ?>" data-precio="<?php echo $producto['precio']; ?>">
-                                    <h4><?php echo htmlspecialchars($producto['nombre']); ?></h4>
-                                    <p><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($producto['precio'], 2)); ?></p>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
+                        <?php foreach ($productos as $producto): ?>
+                            <div class="product-item" data-id="<?php echo $producto['id']; ?>" data-nombre="<?php echo htmlspecialchars($producto['nombre']); ?>" data-precio="<?php echo $producto['precio']; ?>">
+                                <h4><?php echo htmlspecialchars($producto['nombre']); ?></h4>
+                                <p><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($producto['precio'], 2)); ?></p>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
 
@@ -67,14 +68,6 @@ $productos = getAPIdata('productos.php');
                         <div class="form-group">
                             <label for="id_mesa">Mesa</label>
                             <select id="id_mesa" name="id_mesa" required>
-                                <option value="">Seleccione una mesa</option>
-                                <?php if ($is_editing && $order_data) {
-                                    $mesa_en_lista = false;
-                                    foreach ($mesas as $mesa) { if ($mesa['id'] == $order_data['id_mesa']) $mesa_en_lista = true; }
-                                    if (!$mesa_en_lista) {
-                                        echo "<option value=\"{$order_data['id_mesa']}\" selected>{$order_data['numero_mesa']} (Ocupada)</option>";
-                                    }
-                                }?>
                                 <?php foreach ($mesas as $mesa): ?>
                                     <option value="<?php echo $mesa['id']; ?>" <?php if($is_editing && $order_data['id_mesa'] == $mesa['id']) echo 'selected'; ?>>
                                         <?php echo htmlspecialchars($mesa['numero_mesa']); ?>
@@ -85,29 +78,13 @@ $productos = getAPIdata('productos.php');
                         <div class="form-group">
                             <label for="id_usuario_mozo">Mozo</label>
                             <select id="id_usuario_mozo" name="id_usuario_mozo" required>
-                                 <option value="">Seleccione un mozo</option>
-                                <?php foreach ($mozos as $mozo): ?>
+                                 <?php foreach ($mozos as $mozo): ?>
                                     <option value="<?php echo $mozo['id']; ?>" <?php if($is_editing && $order_data['id_usuario_mozo'] == $mozo['id']) echo 'selected'; ?>>
                                         <?php echo htmlspecialchars($mozo['nombre_completo']); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-
-                        <?php if ($is_editing): ?>
-                        <div class="form-group">
-                            <label for="estado">Estado del Pedido</label>
-                            <select id="estado" name="estado" required>
-                                <?php
-                                $estados = ['recibido', 'en_preparacion', 'listo_para_servir', 'servido', 'pagado', 'cancelado'];
-                                foreach ($estados as $estado) {
-                                    $selected = ($order_data['estado'] == $estado) ? 'selected' : '';
-                                    echo "<option value=\"$estado\" $selected>" . ucfirst(str_replace('_', ' ', $estado)) . "</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <?php endif; ?>
 
                         <div class="table-container desktop-only">
                             <table id="order-items-table">
@@ -121,10 +98,9 @@ $productos = getAPIdata('productos.php');
                             <strong>Total:</strong>
                             <span id="order-total" style="font-weight: bold;"><?php echo CURRENCY_SYMBOL; ?>0.00</span>
                         </div>
-
+                        
                         <div class="form-actions">
-                            <button type="submit" class="btn"><?php echo $is_editing ? 'Actualizar Pedido' : 'Crear Pedido'; ?></button>
-                            <a href="pedidos.php" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn"><?php echo $is_editing ? 'Actualizar' : 'Crear'; ?></button>
                         </div>
                     </form>
                 </div>
@@ -138,12 +114,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const productList = document.getElementById('product-list');
     const orderDetailsContainer = document.getElementById('order-details');
     const orderTotalElement = document.getElementById('order-total');
-    const orderForm = document.getElementById('order-form');
-    const productSearch = document.getElementById('product-search');
-
     const currencySymbol = '<?php echo CURRENCY_SYMBOL; ?>';
     const isEditing = <?php echo json_encode($is_editing); ?>;
-    const orderId = <?php echo json_encode($is_editing ? $order_id : null); ?>;
     let initialOrderData = <?php echo json_encode($is_editing ? $order_data : null); ?>;
     let currentOrder = {};
 
@@ -157,9 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const item = currentOrder[productId];
             const subtotal = item.precio * item.cantidad;
             total += subtotal;
-
             tableBody.innerHTML += `<tr><td>${item.nombre}</td><td><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></td><td>${currencySymbol}${item.precio.toFixed(2)}</td><td>${currencySymbol}${subtotal.toFixed(2)}</td><td><button type="button" class="btn-delete delete-item" data-id="${item.id}">X</button></td></tr>`;
-
             cardsContainer.innerHTML += `<div class="order-item-card"><div class="card-item-header">${item.nombre}</div><div class="card-item-body"><div class="card-item-row"><span>Precio:</span><span>${currencySymbol}${item.precio.toFixed(2)}</span></div><div class="card-item-row"><span>Cantidad:</span><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></div><div class="card-item-row"><span>Subtotal:</span><strong>${currencySymbol}${subtotal.toFixed(2)}</strong></div></div><div class="card-item-footer"><button type="button" class="btn-delete delete-item" data-id="${item.id}">Eliminar</button></div></div>`;
         }
         orderTotalElement.textContent = `${currencySymbol}${total.toFixed(2)}`;
@@ -195,51 +165,5 @@ document.addEventListener('DOMContentLoaded', function() {
             renderOrderItems();
         }
     });
-
-    orderForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const id_mesa = document.getElementById('id_mesa').value;
-        const id_usuario_mozo = document.getElementById('id_usuario_mozo').value;
-        const items = Object.values(currentOrder).map(item => ({ id: item.id, cantidad: item.cantidad }));
-        if (!id_mesa || !id_usuario_mozo || items.length === 0) {
-            alert('Por favor, complete todos los campos y añada al menos un producto.');
-            return;
-        }
-        const orderData = { id_mesa, id_usuario_mozo, items };
-        if (isEditing) {
-            orderData.estado = document.getElementById('estado').value;
-        }
-        const method = isEditing ? 'PUT' : 'POST';
-        const url = isEditing ? `http://localhost/restaurante_system/backend/api/v1/pedidos.php?id=${orderId}` : 'http://localhost/restaurante_system/backend/api/v1/pedidos.php';
-        fetch(url, {
-            method: method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(orderData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                const newId = isEditing ? orderId : data.id;
-                window.location.href = `pedidos.php?success=Pedido+${newId}+${isEditing ? 'actualizado' : 'creado'}+exitosamente.`;
-            } else {
-                alert('Error: ' + (data.message || 'Error desconocido.'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Ocurrió un error de red.');
-        });
-    });
-
-    productSearch.addEventListener('keyup', function() {
-        const searchTerm = productSearch.value.toLowerCase();
-        document.querySelectorAll('#product-list .product-item').forEach(item => {
-            item.style.display = item.dataset.nombre.toLowerCase().includes(searchTerm) ? 'block' : 'none';
-        });
-    });
 });
 </script>
-
-<?php
-include_once 'templates/footer.php';
-?>

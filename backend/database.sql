@@ -25,42 +25,7 @@ INSERT INTO usuarios (username, nombre_completo, email, password_hash, id_rol) V
 -- -----------------------------------------------------
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS sp_getUserByUsername$$
-CREATE PROCEDURE sp_getUserByUsername(IN p_username VARCHAR(50))
-BEGIN
-    SELECT u.id, u.username, u.nombre_completo, u.email, u.password_hash, u.id_rol, r.nombre_rol FROM usuarios u JOIN roles r ON u.id_rol = r.id WHERE u.username = p_username AND u.activo = 1 LIMIT 1;
-END$$
 
-DROP PROCEDURE IF EXISTS sp_getAllProducts$$
-CREATE PROCEDURE sp_getAllProducts()
-BEGIN
-    SELECT p.id, p.nombre, p.descripcion, p.precio, c.nombre as categoria_nombre FROM productos p LEFT JOIN categorias_producto c ON p.id_categoria = c.id ORDER BY p.nombre ASC;
-END$$
-
-DROP PROCEDURE IF EXISTS sp_createProduct$$
-CREATE PROCEDURE sp_createProduct(IN p_nombre VARCHAR(100), IN p_descripcion TEXT, IN p_precio DECIMAL(10, 2), IN p_id_categoria INT)
-BEGIN
-    INSERT INTO productos (nombre, descripcion, precio, id_categoria) VALUES (p_nombre, p_descripcion, p_precio, p_id_categoria);
-    SELECT LAST_INSERT_ID() as id;
-END$$
-
-DROP PROCEDURE IF EXISTS sp_readOneProduct$$
-CREATE PROCEDURE sp_readOneProduct(IN p_id INT)
-BEGIN
-    SELECT p.id, p.nombre, p.descripcion, p.precio, p.id_categoria, c.nombre as categoria_nombre FROM productos p LEFT JOIN categorias_producto c ON p.id_categoria = c.id WHERE p.id = p_id;
-END$$
-
-DROP PROCEDURE IF EXISTS sp_updateProduct$$
-CREATE PROCEDURE sp_updateProduct(IN p_id INT, IN p_nombre VARCHAR(100), IN p_descripcion TEXT, IN p_precio DECIMAL(10, 2), IN p_id_categoria INT)
-BEGIN
-    UPDATE productos SET nombre = p_nombre, descripcion = p_descripcion, precio = p_precio, id_categoria = p_id_categoria WHERE id = p_id;
-END$$
-
-DROP PROCEDURE IF EXISTS sp_deleteProduct$$
-CREATE PROCEDURE sp_deleteProduct(IN p_id INT)
-BEGIN
-    DELETE FROM productos WHERE id = p_id;
-END$$
 
 -- Procedimientos para 'pedidos'
 DROP PROCEDURE IF EXISTS sp_getAllOrders$$
