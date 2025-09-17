@@ -15,10 +15,7 @@ class Product {
      * @return PDOStatement
      */
     public function readAll() {
-        $query = "SELECT p.id, p.nombre, p.descripcion, p.precio, c.nombre as categoria_nombre
-                  FROM " . $this->table_name . " p
-                  LEFT JOIN categorias_producto c ON p.id_categoria = c.id
-                  ORDER BY p.nombre ASC";
+        $query = "CALL sp_getAllProducts()";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
