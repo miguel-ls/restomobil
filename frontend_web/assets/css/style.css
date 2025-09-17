@@ -118,9 +118,15 @@ body {
 }
 
 /* --- Estilos del Layout del Dashboard --- */
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
 .dashboard-container {
     display: flex;
-    min-height: 100vh;
+    flex-grow: 1;
 }
 
 .sidebar {
@@ -376,16 +382,19 @@ body.sidebar-collapsed .sidebar-footer .logout-link {
 /* --- Estilos del Footer --- */
 .main-footer {
     text-align: center;
-    padding: 15px;
+    padding: 10px 15px; /* Reducido el padding vertical */
     background-color: #e9ecef;
     border-top: 1px solid var(--border-color);
     color: var(--secondary-color);
-    font-size: 0.9em;
-    /* Asegurarse de que el footer esté dentro del main-content si se quiere que se desplace con él */
-    margin-top: auto; /* Empuja el footer al fondo si el main-content es un flex container */
+    font-size: 0.85em; /* Reducido el tamaño de fuente */
+    margin-top: auto; /* Empuja el footer al fondo del main-content */
+    flex-shrink: 0; /* Prevenir que el footer se encoja */
 }
 
 /* --- Estilos Responsivos para Móviles --- */
+.mobile-header {
+    display: none; /* Oculto en desktop */
+}
 .mobile-overlay {
     display: none;
     position: fixed;
@@ -401,31 +410,48 @@ body.sidebar-collapsed .mobile-overlay {
 }
 
 @media (max-width: 768px) {
+    .mobile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background-color: #343a40;
+        color: white;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1001;
+    }
+    #mobile-menu-toggle {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 1.8rem;
+    }
+    .desktop-toggle {
+        display: none; /* Ocultar el toggle de desktop en móvil */
+    }
+
+    .main-content {
+        padding-top: 70px; /* Dejar espacio para el mobile-header fijo */
+    }
+
     .sidebar {
         position: fixed;
         left: 0;
         top: 0;
         height: 100%;
         transform: translateX(-100%);
-        z-index: 1000;
-        width: 250px; /* Ancho completo cuando se abre */
+        z-index: 1002; /* El sidebar debe estar por encima del overlay y del mobile-header */
+        width: 280px; /* Ancho completo cuando se abre */
         transition: transform 0.3s ease-in-out;
     }
 
     /* Anula el colapso a 80px en móvil, siempre se oculta/muestra completo */
     body.sidebar-collapsed .sidebar {
-        width: 250px;
+        width: 280px;
         transform: translateX(0);
-    }
-
-    /* El botón de la cabecera del menú principal se usará para mostrar/ocultar */
-    #sidebar-toggle {
-        display: block; /* Asegurarse que el botón del sidebar sea visible */
-    }
-
-    /* Ocultar el botón que se insertaba dinámicamente en el page-header */
-    .page-header > #menu-toggle {
-        display: none;
     }
 
     .main-content {
