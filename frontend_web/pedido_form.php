@@ -61,7 +61,9 @@ $productos = getAPIdata('productos.php');
 
                 <div class="order-details" id="order-details">
                     <h3>Detalles del Pedido</h3>
-                    <form id="order-form">
+                    <form id="order-form" method="POST" action="pedido_handler.php<?php if($is_editing) echo '?id=' . $order_id; ?>">
+                        <input type="hidden" name="estado" id="estado" value="<?php echo htmlspecialchars($order_data['estado'] ?? 'recibido'); ?>">
+
                         <div class="form-group">
                             <label for="id_mesa">Mesa</label>
                             <select id="id_mesa" name="id_mesa" required>
@@ -95,9 +97,20 @@ $productos = getAPIdata('productos.php');
                             <strong>Total:</strong>
                             <span id="order-total" style="font-weight: bold;"><?php echo CURRENCY_SYMBOL; ?>0.00</span>
                         </div>
+
+                        <?php if ($is_editing): ?>
+                        <div class="form-group status-actions">
+                            <label>Acciones Rápidas de Estado</label>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-primary status-btn" data-status="entregado">Entregado</button>
+                                <button type="button" class="btn btn-outline-success status-btn" data-status="completado">Completado</button>
+                                <button type="button" class="btn btn-outline-danger status-btn" data-status="cancelado">Cancelado</button>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                         
                         <div class="form-actions">
-                            <button type="submit" class="btn"><?php echo $is_editing ? 'Actualizar' : 'Crear'; ?></button>
+                            <button type="submit" class="btn"><?php echo $is_editing ? 'Actualizar' : 'Crear'; ?> Pedido</button>
                         </div>
                     </form>
                 </div>
@@ -161,6 +174,30 @@ document.addEventListener('DOMContentLoaded', function() {
             delete currentOrder[e.target.dataset.id];
             renderOrderItems();
         }
+    });
+
+    const statusButtons = document.querySelectorAll('.status-btn');
+    const estadoInput = document.getElementById('estado');
+    const orderForm = document.getElementById('order-form');
+
+    statusButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const newStatus = this.dataset.status;
+            if (confirm(`¿Estás seguro de que quieres cambiar el estado a "${newStatus}"?`)) {
+                estadoInput.value = newStatus;
+                orderForm.dispatchEvent(new Event('submit', { cancelable: true }));
+            }
+        });
+    });
+
+    orderForm.addEventListener('submit', function(e) {
+        // e.preventDefault(); // Descomentar para depurar sin enviar
+        const itemsInput = document.createElement('input');
+        itemsInput.type = 'hidden';
+        itemsInput.name = 'items';
+        itemsInput.value = JSON.stringify(Object.values(currentOrder));
+        this.appendChild(itemsInput);
+        // El formulario se enviará de forma nativa
     });
 });
 </script>

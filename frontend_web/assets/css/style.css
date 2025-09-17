@@ -133,6 +133,7 @@ table th { background-color: var(--light-bg); font-weight: 600; }
 .status-recibido { background-color: #cfe2ff; color: #0a58ca; }
 .status-en_preparacion { background-color: #fff3cd; color: #664d03; }
 .status-listo_para_servir { background-color: #d1e7dd; color: #0f5132; }
+.status-entregado { background-color: #e2d9f3; color: #49258a; }
 .status-completado { background-color: #d4edda; color: #155724; }
 .status-cancelado { background-color: #f8d7da; color: #842029; }
 
@@ -145,3 +146,21 @@ table th { background-color: var(--light-bg); font-weight: 600; }
 /* Usuarios */
 .status-active, .status-activo { background-color: #d1e7dd; color: #0f5132; }
 .status-inactive, .status-inactivo { background-color: #f8d7da; color: #842029; }
+
+/* Grupo de botones para acciones de estado */
+.status-actions .btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-group .btn {
+    flex-grow: 1;
+}
+
+.btn-outline-primary { border-color: var(--primary-color); color: var(--primary-color); background-color: transparent; }
+.btn-outline-primary:hover { background-color: var(--primary-color); color: var(--light-text); }
+.btn-outline-success { border-color: #198754; color: #198754; background-color: transparent; }
+.btn-outline-success:hover { background-color: #198754; color: var(--light-text); }
+.btn-outline-danger { border-color: #dc3545; color: #dc3545; background-color: transparent; }
+.btn-outline-danger:hover { background-color: #dc3545; color: var(--light-text); }
