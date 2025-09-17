@@ -41,18 +41,14 @@ if (isset($_GET['id'])) {
     $is_editing = true;
     $order_id = intval($_GET['id']);
     $page_title = "Editar Pedido #$order_id";
-    // Obtener datos reales del pedido desde la API
-    $order_data = fetchFromAPI("pedidos.php?id=$order_id");
-    if (isset($order_data['error'])) {
-        // Manejar el error, por ejemplo, mostrando un mensaje y saliendo
-        echo "Error al cargar el pedido: " . htmlspecialchars($order_data['error']);
-        // O redirigir a la lista de pedidos con un mensaje de error
-        // header('Location: pedidos.php?error=' . urlencode($order_data['error']));
-        exit;
-    }
+    // Simulo datos de un pedido existente
+    $order_data = [
+        'id_mesa' => 1, 'id_usuario_mozo' => 1, 'estado' => 'recibido',
+        'items' => [['id_producto' => 1, 'nombre_producto' => 'Pizza', 'precio_unitario' => 10.50, 'cantidad' => 2]]
+    ];
 }
 
-$mesas_data = fetchFromAPI('mesas.php');
+$mesas_data = fetchFromAPI('mesas.php?status=available');
 $mozos_data = fetchFromAPI('usuarios.php?rol=Mozo');
 $productos_data = fetchFromAPI('productos.php');
 
@@ -152,6 +148,17 @@ $productos = isset($productos_data['records']) ? $productos_data['records'] : []
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const mesas = <?php echo json_encode($mesas); ?>;
+    if (mesas.length === 0) {
+        showModal('No hay mesas disponibles', 'En este momento, todas las mesas están ocupadas o no disponibles. Por favor, inténtelo de nuevo más tarde.');
+        // Opcional: deshabilitar el formulario
+        const formContainer = document.getElementById('order-form-container');
+        if (formContainer) {
+            formContainer.style.opacity = '0.5';
+            formContainer.style.pointerEvents = 'none';
+        }
+    }
+
     const productList = document.getElementById('product-list');
     const orderDetailsContainer = document.getElementById('order-details');
     const orderTotalElement = document.getElementById('order-total');
