@@ -17,14 +17,22 @@ function getAPIdata($endpoint) {
     $response = curl_exec($ch);
     curl_close($ch);
     $data = json_decode($response, true);
-    return isset($data['records']) ? $data['records'] : [];
+    return isset($data['records']) ? $data['records'] : $data; // Devolver data si no hay 'records'
 }
 
 $mesas = getAPIdata('mesas.php');
-$mozos = getAPIdata('usuarios.php?rol=Mozo'); // Obtener solo usuarios con el rol de Mozo
-$categorias = getAPIdata('categorias.php');
+$mozos = getAPIdata('usuarios.php?rol=Mozo');
 $productos = getAPIdata('productos.php');
 
+$is_editing = false;
+$order_data = null;
+
+if (isset($_GET['id'])) {
+    $is_editing = true;
+    $order_id = intval($_GET['id']);
+    $page_title = "Editar Pedido #$order_id";
+    $order_data = getAPIdata("pedidos.php?id=$order_id");
+}
 ?>
 
 <div class="dashboard-container">
@@ -42,13 +50,15 @@ $productos = getAPIdata('productos.php');
                     <h3>Productos Disponibles</h3>
                     <input type="text" id="product-search" placeholder="Buscar producto...">
                     <div id="product-list">
-                        <?php foreach ($productos as $producto): ?>
-                            <div class="product-item" data-id="<?php echo $producto['id']; ?>" data-nombre="<?php echo htmlspecialchars($producto['nombre']); ?>" data-precio="<?php echo $producto['precio']; ?>">
-                                <h4><?php echo htmlspecialchars($producto['nombre']); ?></h4>
-                                <p>$<?php echo htmlspecialchars(number_format($producto['precio'], 2)); ?></p>
-                                <p><small>Categoría: <?php echo htmlspecialchars($producto['categoria_nombre']); ?></small></p>
-                            </div>
-                        <?php endforeach; ?>
+                        <?php if(!empty($productos)): ?>
+                            <?php foreach ($productos as $producto): ?>
+                                <div class="product-item" data-id="<?php echo $producto['id']; ?>" data-nombre="<?php echo htmlspecialchars($producto['nombre']); ?>" data-precio="<?php echo $producto['precio']; ?>">
+                                    <h4><?php echo htmlspecialchars($producto['nombre']); ?></h4>
+                                    <p>$<?php echo htmlspecialchars(number_format($producto['precio'], 2)); ?></p>
+                                    <p><small>Categoría: <?php echo htmlspecialchars($producto['categoria_nombre']); ?></small></p>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -61,9 +71,9 @@ $productos = getAPIdata('productos.php');
                             <select id="id_mesa" name="id_mesa" required>
                                 <option value="">Seleccione una mesa</option>
                                 <?php foreach ($mesas as $mesa): ?>
-                                    <?php if ($mesa['estado'] === 'disponible'): ?>
-                                        <option value="<?php echo $mesa['id']; ?>"><?php echo htmlspecialchars($mesa['numero_mesa']); ?></option>
-                                    <?php endif; ?>
+                                    <option value="<?php echo $mesa['id']; ?>" <?php if($is_editing && $order_data['id_mesa'] == $mesa['id']) echo 'selected'; ?>>
+                                        <?php echo htmlspecialchars($mesa['numero_mesa']); ?>
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -72,9 +82,9 @@ $productos = getAPIdata('productos.php');
                             <select id="id_usuario_mozo" name="id_usuario_mozo" required>
                                 <option value="">Seleccione un mozo</option>
                                 <?php foreach ($mozos as $mozo): ?>
-                                    <?php if ($mozo['activo']): ?>
-                                        <option value="<?php echo $mozo['id']; ?>"><?php echo htmlspecialchars($mozo['nombre_completo']); ?></option>
-                                    <?php endif; ?>
+                                    <option value="<?php echo $mozo['id']; ?>" <?php if($is_editing && $order_data['id_usuario_mozo'] == $mozo['id']) echo 'selected'; ?>>
+                                        <?php echo htmlspecialchars($mozo['nombre_completo']); ?>
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -90,9 +100,7 @@ $productos = getAPIdata('productos.php');
                                         <th></th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <!-- Los items del pedido se añadirán aquí con JS -->
-                                </tbody>
+                                <tbody></tbody>
                                 <tfoot>
                                     <tr>
                                         <td colspan="3" style="text-align: right;"><strong>Total:</strong></td>
@@ -104,7 +112,7 @@ $productos = getAPIdata('productos.php');
                         </div>
 
                         <div class="form-actions" style="margin-top: 20px;">
-                            <button type="submit" class="btn">Crear Pedido</button>
+                            <button type="submit" class="btn"><?php echo $is_editing ? 'Actualizar Pedido' : 'Crear Pedido'; ?></button>
                         </div>
                     </form>
                 </div>
@@ -114,120 +122,120 @@ $productos = getAPIdata('productos.php');
 </div>
 
 <style>
-.order-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 25px;
-}
-.product-list-container {
-    background: #fff;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    max-height: 70vh;
-    overflow-y: auto;
-}
-#product-search {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-}
-.product-item {
-    padding: 10px;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-.product-item:hover {
-    background-color: var(--hover-light);
-}
-.product-item h4, .product-item p {
-    margin: 0;
-}
-.order-details {
-    background: #fff;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-#order-items-table input[type="number"] {
-    width: 60px;
-    padding: 5px;
-}
+/* Estilos (sin cambios, omitidos por brevedad) */
+.order-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+.product-list-container { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); max-height: 70vh; overflow-y: auto; }
+#product-search { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 5px; }
+.product-item { padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; margin-bottom: 10px; cursor: pointer; transition: background-color 0.2s; }
+.product-item:hover { background-color: var(--hover-light); }
+.product-item h4, .product-item p { margin: 0; }
+.order-details { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+#order-items-table input[type="number"] { width: 60px; padding: 5px; }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // --- Variables y referencias del DOM ---
     const productList = document.getElementById('product-list');
     const orderItemsTableBody = document.querySelector('#order-items-table tbody');
     const orderTotalElement = document.getElementById('order-total');
     const orderForm = document.getElementById('order-form');
     const productSearch = document.getElementById('product-search');
 
-    let currentOrder = {}; // Objeto para mantener los items del pedido: { productId: { ... } }
+    const isEditing = <?php echo json_encode($is_editing); ?>;
+    const orderId = <?php echo json_encode($is_editing ? $order_id : null); ?>;
+    let initialOrderData = <?php echo json_encode($is_editing ? $order_data : null); ?>;
 
-    // 1. Añadir producto al pedido
+    let currentOrder = {};
+
+    // --- Lógica de Inicialización ---
+    if (isEditing && initialOrderData && initialOrderData.items) {
+        initialOrderData.items.forEach(item => {
+            currentOrder[item.id_producto] = {
+                id: item.id_producto,
+                nombre: item.nombre_producto,
+                precio: parseFloat(item.precio_unitario),
+                cantidad: parseInt(item.cantidad, 10)
+            };
+        });
+        renderOrderTable();
+    }
+
+    // --- Lógica de Eventos ---
+
+    orderForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const id_mesa = document.getElementById('id_mesa').value;
+        const id_usuario_mozo = document.getElementById('id_usuario_mozo').value;
+        const items = Object.values(currentOrder).map(item => ({ id: item.id, cantidad: item.cantidad }));
+
+        if (!id_mesa || !id_usuario_mozo || items.length === 0) {
+            alert('Por favor, complete todos los campos y añada al menos un producto.');
+            return;
+        }
+
+        const orderData = { id_mesa, id_usuario_mozo, items };
+        const method = isEditing ? 'PUT' : 'POST';
+        const url = isEditing
+            ? `http://localhost/restaurante_system/backend/api/v1/pedidos.php?id=${orderId}`
+            : 'http://localhost/restaurante_system/backend/api/v1/pedidos.php';
+
+        fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                const newId = isEditing ? orderId : data.id;
+                window.location.href = `pedidos.php?success=Pedido+${newId}+${isEditing ? 'actualizado' : 'creado'}+exitosamente.`;
+            } else {
+                alert('Error: ' + (data.message || 'Error desconocido.'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ocurrió un error de red.');
+        });
+    });
+
+    // Re-pegar las funciones que no cambiaron para que el script esté completo
     productList.addEventListener('click', function(e) {
         const productItem = e.target.closest('.product-item');
         if (!productItem) return;
-
         const productId = productItem.dataset.id;
-
         if (currentOrder[productId]) {
-            // Si el producto ya está en el pedido, incrementa la cantidad
             currentOrder[productId].cantidad++;
         } else {
-            // Si es nuevo, añadirlo al pedido
-            currentOrder[productId] = {
-                id: productId,
-                nombre: productItem.dataset.nombre,
-                precio: parseFloat(productItem.dataset.precio),
-                cantidad: 1
-            };
+            currentOrder[productId] = { id: productId, nombre: productItem.dataset.nombre, precio: parseFloat(productItem.dataset.precio), cantidad: 1 };
         }
         renderOrderTable();
     });
-
-    // 2. Manejar cambios en la tabla de pedido (cantidad, eliminar)
     orderItemsTableBody.addEventListener('click', function(e) {
-        const target = e.target;
-        const productId = target.dataset.id;
-
-        if (target.classList.contains('delete-item')) {
-            delete currentOrder[productId];
+        if (e.target.classList.contains('delete-item')) {
+            delete currentOrder[e.target.dataset.id];
+            renderOrderTable();
         }
-        renderOrderTable();
     });
-
     orderItemsTableBody.addEventListener('input', function(e) {
-        const target = e.target;
-        const productId = target.dataset.id;
-
-        if (target.classList.contains('item-quantity')) {
-            const newQuantity = parseInt(target.value, 10);
+        if (e.target.classList.contains('item-quantity')) {
+            const newQuantity = parseInt(e.target.value, 10);
             if (newQuantity > 0) {
-                currentOrder[productId].cantidad = newQuantity;
+                currentOrder[e.target.dataset.id].cantidad = newQuantity;
             } else {
-                delete currentOrder[productId];
+                delete currentOrder[e.target.dataset.id];
             }
+            renderOrderTable();
         }
-        renderOrderTable();
     });
-
-    // 3. Renderizar (o re-renderizar) la tabla de items del pedido
     function renderOrderTable() {
         orderItemsTableBody.innerHTML = '';
         let total = 0;
-
         for (const productId in currentOrder) {
             const item = currentOrder[productId];
             const subtotal = item.precio * item.cantidad;
             total += subtotal;
-
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${item.nombre}</td>
@@ -240,63 +248,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         orderTotalElement.textContent = `$${total.toFixed(2)}`;
     }
-
-    // 4. Filtrar la lista de productos
     productSearch.addEventListener('keyup', function() {
         const searchTerm = productSearch.value.toLowerCase();
-        const allProducts = document.querySelectorAll('#product-list .product-item');
-        allProducts.forEach(item => {
-            const nombre = item.dataset.nombre.toLowerCase();
-            if (nombre.includes(searchTerm)) {
-                item.style.display = 'block';
-            } else {
-                item.style.display = 'none';
-            }
-        });
-    });
-
-    // 5. Enviar el formulario
-    orderForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const id_mesa = document.getElementById('id_mesa').value;
-        const id_usuario_mozo = document.getElementById('id_usuario_mozo').value;
-        const items = Object.values(currentOrder).map(item => ({ id: item.id, cantidad: item.cantidad }));
-
-        if (!id_mesa || !id_usuario_mozo) {
-            alert('Por favor, seleccione una mesa y un mozo.');
-            return;
-        }
-
-        if (items.length === 0) {
-            alert('El pedido está vacío. Por favor, añada al menos un producto.');
-            return;
-        }
-
-        const orderData = {
-            id_mesa: id_mesa,
-            id_usuario_mozo: id_usuario_mozo,
-            items: items
-        };
-
-        fetch('http://localhost/restaurante_system/backend/api/v1/pedidos.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(orderData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.id) {
-                window.location.href = `pedidos.php?success=Pedido+${data.id}+creado+exitosamente.`;
-            } else {
-                alert('Error al crear el pedido: ' + (data.message || 'Error desconocido.'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Ocurrió un error de red al intentar crear el pedido.');
+        document.querySelectorAll('#product-list .product-item').forEach(item => {
+            item.style.display = item.dataset.nombre.toLowerCase().includes(searchTerm) ? 'block' : 'none';
         });
     });
 });
