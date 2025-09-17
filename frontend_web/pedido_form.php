@@ -211,7 +211,9 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const newStatus = this.dataset.status;
             estadoInput.value = newStatus;
-            orderForm.dispatchEvent(new Event('submit', { cancelable: true }));
+            // requestSubmit() es una forma más robusta de activar el envío del formulario
+            // programáticamente, asegurando que el evento 'submit' se dispare.
+            orderForm.requestSubmit();
         });
     });
 
