@@ -1,0 +1,21 @@
+# Reglas de Apache para manejar CORS (Cross-Origin Resource Sharing)
+
+<IfModule mod_headers.c>
+    # Permitir peticiones desde cualquier origen.
+    # Para mayor seguridad en producción, se podría reemplazar '*' con el dominio específico del frontend.
+    Header set Access-Control-Allow-Origin "*"
+
+    # Permitir los métodos HTTP que la API utiliza.
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+
+    # Permitir las cabeceras que el cliente (Flutter web) puede enviar.
+    Header set Access-Control-Allow-Headers "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
+</IfModule>
+
+# Manejar las peticiones "preflight" de tipo OPTIONS
+# El navegador envía estas peticiones antes de las peticiones reales (POST, PUT, DELETE) para verificar los permisos CORS.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ $1 [R=200,L]
+</IfModule>
