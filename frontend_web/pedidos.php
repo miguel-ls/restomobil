@@ -8,6 +8,18 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $page_title = 'Gestión de Pedidos';
 include_once 'templates/header.php';
+
+function getOrders() {
+    $api_url = 'http://localhost/restaurante_system/backend/api/v1/pedidos.php';
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $api_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    return json_decode($response, true);
+}
+
+$orders_data = getOrders();
 ?>
 
 <div class="dashboard-container">
@@ -16,30 +28,78 @@ include_once 'templates/header.php';
     <main class="main-content">
         <div class="container">
             <div class="page-header">
-                <h1>Gestión de Pedidos</h1>
+                <h1>Historial de Pedidos</h1>
+                <a href="pedido_form.php" class="btn">Crear Pedido Nuevo</a>
             </div>
 
-            <div class="placeholder-content">
-                <h2>Módulo en Construcción</h2>
-                <p>La funcionalidad para gestionar pedidos estará disponible próximamente.</p>
+            <?php
+            if (isset($_GET['success'])) {
+                echo '<p class="success-message">' . htmlspecialchars($_GET['success']) . '</p>';
+            }
+            if (isset($_GET['error'])) {
+                echo '<p class="error-message">' . htmlspecialchars($_GET['error']) . '</p>';
+            }
+            ?>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Pedido</th>
+                            <th>Mesa</th>
+                            <th>Mozo</th>
+                            <th>Estado</th>
+                            <th>Total</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (isset($orders_data['records']) && !empty($orders_data['records'])): ?>
+                            <?php foreach ($orders_data['records'] as $order): ?>
+                                <tr>
+                                    <td>#<?php echo htmlspecialchars($order['id']); ?></td>
+                                    <td><?php echo htmlspecialchars($order['numero_mesa']); ?></td>
+                                    <td><?php echo htmlspecialchars($order['nombre_mozo']); ?></td>
+                                    <td>
+                                        <span class="status status-<?php echo htmlspecialchars($order['estado']); ?>">
+                                            <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $order['estado']))); ?>
+                                        </span>
+                                    </td>
+                                    <td>$<?php echo htmlspecialchars(number_format($order['total'], 2)); ?></td>
+                                    <td><?php echo htmlspecialchars(date("d/m/Y H:i", strtotime($order['fecha_creacion']))); ?></td>
+                                    <td class="actions-cell">
+                                        <a href="pedido_detalle.php?id=<?php echo $order['id']; ?>" class="btn-edit">Ver Detalle</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="7">No se encontraron pedidos.</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
 </div>
 
 <style>
-.placeholder-content {
-    text-align: center;
-    padding: 50px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    margin-top: 20px;
+.status {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    text-transform: capitalize;
 }
-.placeholder-content h2 {
-    color: var(--primary-color);
-    margin-bottom: 10px;
-}
+.status-recibido { background-color: #0d6efd; } /* Azul */
+.status-en_preparacion { background-color: #ffc107; color: #000; } /* Amarillo */
+.status-listo_para_servir { background-color: #fd7e14; } /* Naranja */
+.status-servido { background-color: #198754; } /* Verde */
+.status-pagado { background-color: #20c997; } /* Turquesa */
+.status-cancelado { background-color: #dc3545; } /* Rojo */
 </style>
 
 <?php
