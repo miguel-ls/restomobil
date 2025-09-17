@@ -24,11 +24,7 @@ class User {
      * @return bool True si el usuario existe, False si no.
      */
     public function findByEmail($email) {
-        $query = "SELECT u.id, u.nombre_completo, u.email, u.password_hash, u.id_rol, r.nombre_rol
-                  FROM " . $this->table_name . " u
-                  JOIN roles r ON u.id_rol = r.id
-                  WHERE u.email = :email AND u.activo = 1
-                  LIMIT 0,1";
+        $query = "CALL sp_getUserByEmail(:email)";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':email', $email);

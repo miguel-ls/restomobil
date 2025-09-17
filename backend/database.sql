@@ -98,3 +98,49 @@ CREATE TABLE reservas (
 
 -- Insertar roles iniciales
 INSERT INTO roles (nombre_rol) VALUES ('Administrador'), ('Cajero'), ('Mozo');
+
+
+-- -----------------------------------------------------
+-- Procedimientos Almacenados
+-- -----------------------------------------------------
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_getUserByEmail(
+    IN p_email VARCHAR(100)
+)
+BEGIN
+    SELECT
+        u.id,
+        u.nombre_completo,
+        u.email,
+        u.password_hash,
+        u.id_rol,
+        r.nombre_rol
+    FROM
+        usuarios u
+    JOIN
+        roles r ON u.id_rol = r.id
+    WHERE
+        u.email = p_email AND u.activo = 1
+    LIMIT 1;
+END$$
+
+
+CREATE PROCEDURE sp_getAllProducts()
+BEGIN
+    SELECT
+        p.id,
+        p.nombre,
+        p.descripcion,
+        p.precio,
+        c.nombre as categoria_nombre
+    FROM
+        productos p
+    LEFT JOIN
+        categorias_producto c ON p.id_categoria = c.id
+    ORDER BY
+        p.nombre ASC;
+END$$
+
+DELIMITER ;
