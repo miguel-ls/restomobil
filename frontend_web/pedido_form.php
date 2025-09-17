@@ -249,11 +249,11 @@ document.addEventListener('DOMContentLoaded', function() {
             total += subtotal;
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${item.nombre}</td>
-                <td><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></td>
-                <td>${currencySymbol}${item.precio.toFixed(2)}</td>
-                <td>${currencySymbol}${subtotal.toFixed(2)}</td>
-                <td><button type="button" class="btn-delete delete-item" data-id="${item.id}">X</button></td>
+                <td data-label="Producto">${item.nombre}</td>
+                <td data-label="Cantidad"><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></td>
+                <td data-label="Precio">${currencySymbol}${item.precio.toFixed(2)}</td>
+                <td data-label="Subtotal">${currencySymbol}${subtotal.toFixed(2)}</td>
+                <td data-label="Acción"><button type="button" class="btn-delete delete-item" data-id="${item.id}">X</button></td>
             `;
             orderItemsTableBody.appendChild(row);
         }
