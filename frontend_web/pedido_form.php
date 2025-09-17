@@ -9,7 +9,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $page_title = 'Crear Nuevo Pedido';
 include_once 'templates/header.php';
 // Asumo que estos archivos de configuración y los CRUD básicos ya existen
-// include_once __DIR__ . '/../backend/config/app_config.php';
+// include_once __DIR__ . '/../backend/config/app_config.php'; 
 
 function getAPIdata($endpoint) {
     // Simulo la obtención de datos para no depender de otros archivos que no he recreado
@@ -98,7 +98,7 @@ define('CURRENCY_SYMBOL', '$'); // Simulo la constante
                             <strong>Total:</strong>
                             <span id="order-total" style="font-weight: bold;"><?php echo CURRENCY_SYMBOL; ?>0.00</span>
                         </div>
-
+                        
                         <div class="form-actions">
                             <button type="submit" class="btn"><?php echo $is_editing ? 'Actualizar' : 'Crear'; ?></button>
                         </div>

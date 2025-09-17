@@ -25,72 +25,77 @@ INSERT INTO usuarios (username, nombre_completo, email, password_hash, id_rol) V
 -- -----------------------------------------------------
 DELIMITER $$
 
--- --- PRODUCTOS ---
-DROP PROCEDURE IF EXISTS sp_getUserByUsername$$
-CREATE PROCEDURE sp_getUserByUsername(IN p_username VARCHAR(50)) BEGIN SELECT u.id, u.username, u.nombre_completo, u.email, u.password_hash, u.id_rol, r.nombre_rol FROM usuarios u JOIN roles r ON u.id_rol = r.id WHERE u.username = p_username AND u.activo = 1 LIMIT 1; END$$
-DROP PROCEDURE IF EXISTS sp_getAllProducts$$
-CREATE PROCEDURE sp_getAllProducts() BEGIN SELECT p.id, p.nombre, p.descripcion, p.precio, c.nombre as categoria_nombre FROM productos p LEFT JOIN categorias_producto c ON p.id_categoria = c.id ORDER BY p.nombre ASC; END$$
-DROP PROCEDURE IF EXISTS sp_createProduct$$
-CREATE PROCEDURE sp_createProduct(IN p_nombre VARCHAR(100), IN p_descripcion TEXT, IN p_precio DECIMAL(10, 2), IN p_id_categoria INT) BEGIN INSERT INTO productos (nombre, descripcion, precio, id_categoria) VALUES (p_nombre, p_descripcion, p_precio, p_id_categoria); SELECT LAST_INSERT_ID() as id; END$$
-DROP PROCEDURE IF EXISTS sp_readOneProduct$$
-CREATE PROCEDURE sp_readOneProduct(IN p_id INT) BEGIN SELECT p.id, p.nombre, p.descripcion, p.precio, p.id_categoria, c.nombre as categoria_nombre FROM productos p LEFT JOIN categorias_producto c ON p.id_categoria = c.id WHERE p.id = p_id; END$$
-DROP PROCEDURE IF EXISTS sp_updateProduct$$
-CREATE PROCEDURE sp_updateProduct(IN p_id INT, IN p_nombre VARCHAR(100), IN p_descripcion TEXT, IN p_precio DECIMAL(10, 2), IN p_id_categoria INT) BEGIN UPDATE productos SET nombre = p_nombre, descripcion = p_descripcion, precio = p_precio, id_categoria = p_id_categoria WHERE id = p_id; END$$
-DROP PROCEDURE IF EXISTS sp_deleteProduct$$
-CREATE PROCEDURE sp_deleteProduct(IN p_id INT) BEGIN DELETE FROM productos WHERE id = p_id; END$$
 
--- --- CATEGORIAS ---
-DROP PROCEDURE IF EXISTS sp_getAllCategories$$
-CREATE PROCEDURE sp_getAllCategories() BEGIN SELECT id, nombre, descripcion FROM categorias_producto ORDER BY nombre ASC; END$$
-DROP PROCEDURE IF EXISTS sp_createCategory$$
-CREATE PROCEDURE sp_createCategory(IN p_nombre VARCHAR(100), IN p_descripcion TEXT) BEGIN INSERT INTO categorias_producto (nombre, descripcion) VALUES (p_nombre, p_descripcion); SELECT LAST_INSERT_ID() as id; END$$
-DROP PROCEDURE IF EXISTS sp_readOneCategory$$
-CREATE PROCEDURE sp_readOneCategory(IN p_id INT) BEGIN SELECT id, nombre, descripcion FROM categorias_producto WHERE id = p_id; END$$
-DROP PROCEDURE IF EXISTS sp_updateCategory$$
-CREATE PROCEDURE sp_updateCategory(IN p_id INT, IN p_nombre VARCHAR(100), IN p_descripcion TEXT) BEGIN UPDATE categorias_producto SET nombre = p_nombre, descripcion = p_descripcion WHERE id = p_id; END$$
-DROP PROCEDURE IF EXISTS sp_deleteCategory$$
-CREATE PROCEDURE sp_deleteCategory(IN p_id INT) BEGIN DELETE FROM categorias_producto WHERE id = p_id; END$$
 
--- --- MESAS ---
-DROP PROCEDURE IF EXISTS sp_getAllTables$$
-CREATE PROCEDURE sp_getAllTables() BEGIN SELECT id, numero_mesa, capacidad, estado FROM mesas ORDER BY numero_mesa ASC; END$$
-DROP PROCEDURE IF EXISTS sp_getAvailableTables$$
-CREATE PROCEDURE sp_getAvailableTables() BEGIN SELECT m.* FROM mesas m WHERE m.id NOT IN (SELECT p.id_mesa FROM pedidos p WHERE p.estado NOT IN ('pagado', 'cancelado')); END$$
-DROP PROCEDURE IF EXISTS sp_createTable$$
-CREATE PROCEDURE sp_createTable(IN p_numero_mesa VARCHAR(10), IN p_capacidad INT, IN p_estado ENUM('disponible', 'ocupada', 'reservada', 'mantenimiento')) BEGIN INSERT INTO mesas (numero_mesa, capacidad, estado) VALUES (p_numero_mesa, p_capacidad, p_estado); SELECT LAST_INSERT_ID() as id; END$$
-DROP PROCEDURE IF EXISTS sp_readOneTable$$
-CREATE PROCEDURE sp_readOneTable(IN p_id INT) BEGIN SELECT id, numero_mesa, capacidad, estado FROM mesas WHERE id = p_id; END$$
-DROP PROCEDURE IF EXISTS sp_updateTable$$
-CREATE PROCEDURE sp_updateTable(IN p_id INT, IN p_numero_mesa VARCHAR(10), IN p_capacidad INT, IN p_estado ENUM('disponible', 'ocupada', 'reservada', 'mantenimiento')) BEGIN UPDATE mesas SET numero_mesa = p_numero_mesa, capacidad = p_capacidad, estado = p_estado WHERE id = p_id; END$$
-DROP PROCEDURE IF EXISTS sp_deleteTable$$
-CREATE PROCEDURE sp_deleteTable(IN p_id INT) BEGIN DELETE FROM mesas WHERE id = p_id; END$$
-
--- --- USUARIOS Y ROLES ---
-DROP PROCEDURE IF EXISTS sp_getAllRoles$$
-CREATE PROCEDURE sp_getAllRoles() BEGIN SELECT id, nombre_rol FROM roles ORDER BY nombre_rol ASC; END$$
-DROP PROCEDURE IF EXISTS sp_getAllUsers$$
-CREATE PROCEDURE sp_getAllUsers() BEGIN SELECT u.id, u.username, u.nombre_completo, u.email, u.id_rol, r.nombre_rol, u.activo FROM usuarios u JOIN roles r ON u.id_rol = r.id ORDER BY u.nombre_completo ASC; END$$
-DROP PROCEDURE IF EXISTS sp_getUsersByRole$$
-CREATE PROCEDURE sp_getUsersByRole(IN p_role_name VARCHAR(50)) BEGIN SELECT u.id, u.username, u.nombre_completo, u.email, u.id_rol, r.nombre_rol, u.activo FROM usuarios u JOIN roles r ON u.id_rol = r.id WHERE r.nombre_rol = p_role_name AND u.activo = 1; END$$
-DROP PROCEDURE IF EXISTS sp_createUser$$
-CREATE PROCEDURE sp_createUser(IN p_username VARCHAR(50), IN p_nombre_completo VARCHAR(100), IN p_email VARCHAR(100), IN p_password_hash VARCHAR(255), IN p_id_rol INT) BEGIN INSERT INTO usuarios (username, nombre_completo, email, password_hash, id_rol) VALUES (p_username, p_nombre_completo, p_email, p_password_hash, p_id_rol); SELECT LAST_INSERT_ID() as id; END$$
-DROP PROCEDURE IF EXISTS sp_readOneUser$$
-CREATE PROCEDURE sp_readOneUser(IN p_id INT) BEGIN SELECT id, username, nombre_completo, email, id_rol, activo FROM usuarios WHERE id = p_id; END$$
-DROP PROCEDURE IF EXISTS sp_updateUser$$
-CREATE PROCEDURE sp_updateUser(IN p_id INT, IN p_nombre_completo VARCHAR(100), IN p_email VARCHAR(100), IN p_id_rol INT, IN p_activo BOOLEAN, IN p_password_hash VARCHAR(255)) BEGIN UPDATE usuarios SET nombre_completo = p_nombre_completo, email = p_email, id_rol = p_id_rol, activo = p_activo, password_hash = IF(p_password_hash IS NOT NULL AND p_password_hash != '', p_password_hash, password_hash) WHERE id = p_id; END$$
-DROP PROCEDURE IF EXISTS sp_deleteUser$$
-CREATE PROCEDURE sp_deleteUser(IN p_id INT) BEGIN UPDATE usuarios SET activo = 0 WHERE id = p_id; END$$
-
--- --- PEDIDOS ---
+-- Procedimientos para 'pedidos'
 DROP PROCEDURE IF EXISTS sp_getAllOrders$$
-CREATE PROCEDURE sp_getAllOrders() BEGIN SELECT p.id, p.id_mesa, m.numero_mesa, p.id_usuario_mozo, u.nombre_completo AS nombre_mozo, p.estado, p.total, p.fecha_creacion FROM pedidos p LEFT JOIN mesas m ON p.id_mesa = m.id LEFT JOIN usuarios u ON p.id_usuario_mozo = u.id ORDER BY p.fecha_creacion DESC; END$$
+CREATE PROCEDURE sp_getAllOrders()
+BEGIN
+    SELECT p.id, p.id_mesa, m.numero_mesa, p.id_usuario_mozo, u.nombre_completo AS nombre_mozo, p.estado, p.total, p.fecha_creacion FROM pedidos p LEFT JOIN mesas m ON p.id_mesa = m.id LEFT JOIN usuarios u ON p.id_usuario_mozo = u.id ORDER BY p.fecha_creacion DESC;
+END$$
+
 DROP PROCEDURE IF EXISTS sp_getOrderDetail$$
-CREATE PROCEDURE sp_getOrderDetail(IN p_id_pedido INT) BEGIN SELECT p.id, p.id_mesa, m.numero_mesa, p.id_usuario_mozo, u.nombre_completo AS nombre_mozo, p.estado, p.total, p.fecha_creacion, p.fecha_actualizacion FROM pedidos p LEFT JOIN mesas m ON p.id_mesa = m.id LEFT JOIN usuarios u ON p.id_usuario_mozo = u.id WHERE p.id = p_id_pedido; END$$
+CREATE PROCEDURE sp_getOrderDetail(IN p_id_pedido INT)
+BEGIN
+    SELECT p.id, p.id_mesa, m.numero_mesa, p.id_usuario_mozo, u.nombre_completo AS nombre_mozo, p.estado, p.total, p.fecha_creacion, p.fecha_actualizacion FROM pedidos p LEFT JOIN mesas m ON p.id_mesa = m.id LEFT JOIN usuarios u ON p.id_usuario_mozo = u.id WHERE p.id = p_id_pedido;
+END$$
+
 DROP PROCEDURE IF EXISTS sp_getOrderItems$$
-CREATE PROCEDURE sp_getOrderItems(IN p_id_pedido INT) BEGIN SELECT dp.id_producto, pr.nombre AS nombre_producto, dp.cantidad, dp.precio_unitario, dp.subtotal FROM detalle_pedidos dp JOIN productos pr ON dp.id_producto = pr.id WHERE dp.id_pedido = p_id_pedido; END$$
+CREATE PROCEDURE sp_getOrderItems(IN p_id_pedido INT)
+BEGIN
+    SELECT dp.id_producto, pr.nombre AS nombre_producto, dp.cantidad, dp.precio_unitario, dp.subtotal FROM detalle_pedidos dp JOIN productos pr ON dp.id_producto = pr.id WHERE dp.id_pedido = p_id_pedido;
+END$$
+
 DROP PROCEDURE IF EXISTS sp_createOrder$$
-CREATE PROCEDURE sp_createOrder(IN p_id_mesa INT, IN p_id_usuario_mozo INT, IN p_items_json JSON) BEGIN DECLARE v_id_pedido INT; DECLARE v_total_calculado DECIMAL(10, 2) DEFAULT 0; DECLARE v_item JSON; DECLARE v_id_producto INT; DECLARE v_cantidad INT; DECLARE v_precio_unitario DECIMAL(10, 2); DECLARE i INT DEFAULT 0; START TRANSACTION; INSERT INTO pedidos (id_mesa, id_usuario_mozo, total) VALUES (p_id_mesa, p_id_usuario_mozo, 0); SET v_id_pedido = LAST_INSERT_ID(); WHILE i < JSON_LENGTH(p_items_json) DO SET v_item = JSON_EXTRACT(p_items_json, CONCAT('$[', i, ']')); SET v_id_producto = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.id')); SET v_cantidad = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.cantidad')); SELECT precio INTO v_precio_unitario FROM productos WHERE id = v_id_producto; INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario) VALUES (v_id_pedido, v_id_producto, v_cantidad, v_precio_unitario); SET v_total_calculado = v_total_calculado + (v_cantidad * v_precio_unitario); SET i = i + 1; END WHILE; UPDATE pedidos SET total = v_total_calculado WHERE id = v_id_pedido; COMMIT; SELECT v_id_pedido as id; END$$
+CREATE PROCEDURE sp_createOrder(IN p_id_mesa INT, IN p_id_usuario_mozo INT, IN p_items_json JSON)
+BEGIN
+    DECLARE v_id_pedido INT;
+    DECLARE v_total_calculado DECIMAL(10, 2) DEFAULT 0;
+    DECLARE v_item JSON;
+    DECLARE v_id_producto INT;
+    DECLARE v_cantidad INT;
+    DECLARE v_precio_unitario DECIMAL(10, 2);
+    DECLARE i INT DEFAULT 0;
+    START TRANSACTION;
+    INSERT INTO pedidos (id_mesa, id_usuario_mozo, total) VALUES (p_id_mesa, p_id_usuario_mozo, 0);
+    SET v_id_pedido = LAST_INSERT_ID();
+    WHILE i < JSON_LENGTH(p_items_json) DO
+        SET v_item = JSON_EXTRACT(p_items_json, CONCAT('$[', i, ']'));
+        SET v_id_producto = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.id'));
+        SET v_cantidad = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.cantidad'));
+        SELECT precio INTO v_precio_unitario FROM productos WHERE id = v_id_producto;
+        INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario) VALUES (v_id_pedido, v_id_producto, v_cantidad, v_precio_unitario);
+        SET v_total_calculado = v_total_calculado + (v_cantidad * v_precio_unitario);
+        SET i = i + 1;
+    END WHILE;
+    UPDATE pedidos SET total = v_total_calculado WHERE id = v_id_pedido;
+    COMMIT;
+    SELECT v_id_pedido as id;
+END$$
+
 DROP PROCEDURE IF EXISTS sp_updateOrder$$
-CREATE PROCEDURE sp_updateOrder(IN p_id_pedido INT, IN p_id_mesa INT, IN p_id_usuario_mozo INT, IN p_estado ENUM('recibido', 'en_preparacion', 'listo_para_servir', 'servido', 'pagado', 'cancelado'), IN p_items_json JSON) BEGIN DECLARE v_total_calculado DECIMAL(10, 2) DEFAULT 0; DECLARE v_item JSON; DECLARE v_id_producto INT; DECLARE v_cantidad INT; DECLARE v_precio_unitario DECIMAL(10, 2); DECLARE i INT DEFAULT 0; START TRANSACTION; DELETE FROM detalle_pedidos WHERE id_pedido = p_id_pedido; WHILE i < JSON_LENGTH(p_items_json) DO SET v_item = JSON_EXTRACT(p_items_json, CONCAT('$[', i, ']')); SET v_id_producto = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.id')); SET v_cantidad = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.cantidad')); SELECT precio INTO v_precio_unitario FROM productos WHERE id = v_id_producto; INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario) VALUES (p_id_pedido, v_id_producto, v_cantidad, v_precio_unitario); SET v_total_calculado = v_total_calculado + (v_cantidad * v_precio_unitario); SET i = i + 1; END WHILE; UPDATE pedidos SET id_mesa = p_id_mesa, id_usuario_mozo = p_id_usuario_mozo, estado = p_estado, total = v_total_calculado, fecha_actualizacion = CURRENT_TIMESTAMP WHERE id = p_id_pedido; COMMIT; END$$
+CREATE PROCEDURE sp_updateOrder(IN p_id_pedido INT, IN p_id_mesa INT, IN p_id_usuario_mozo INT, IN p_estado ENUM('recibido', 'en_preparacion', 'listo_para_servir', 'servido', 'pagado', 'cancelado'), IN p_items_json JSON)
+BEGIN
+    DECLARE v_total_calculado DECIMAL(10, 2) DEFAULT 0;
+    DECLARE v_item JSON;
+    DECLARE v_id_producto INT;
+    DECLARE v_cantidad INT;
+    DECLARE v_precio_unitario DECIMAL(10, 2);
+    DECLARE i INT DEFAULT 0;
+    START TRANSACTION;
+    DELETE FROM detalle_pedidos WHERE id_pedido = p_id_pedido;
+    WHILE i < JSON_LENGTH(p_items_json) DO
+        SET v_item = JSON_EXTRACT(p_items_json, CONCAT('$[', i, ']'));
+        SET v_id_producto = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.id'));
+        SET v_cantidad = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.cantidad'));
+        SELECT precio INTO v_precio_unitario FROM productos WHERE id = v_id_producto;
+        INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario)
+        VALUES (p_id_pedido, v_id_producto, v_cantidad, v_precio_unitario);
+        SET v_total_calculado = v_total_calculado + (v_cantidad * v_precio_unitario);
+        SET i = i + 1;
+    END WHILE;
+    UPDATE pedidos SET id_mesa = p_id_mesa, id_usuario_mozo = p_id_usuario_mozo, estado = p_estado, total = v_total_calculado, fecha_actualizacion = CURRENT_TIMESTAMP WHERE id = p_id_pedido;
+    COMMIT;
+END$$
 
 DELIMITER ;
