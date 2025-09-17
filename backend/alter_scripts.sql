@@ -154,8 +154,8 @@ CREATE PROCEDURE sp_getAllOrders()
 BEGIN
     SELECT p.id, p.id_mesa, m.numero_mesa, p.id_usuario_mozo, u.nombre_completo AS nombre_mozo, p.estado, p.total, p.fecha_creacion
     FROM pedidos p
-    JOIN mesas m ON p.id_mesa = m.id
-    JOIN usuarios u ON p.id_usuario_mozo = u.id
+    LEFT JOIN mesas m ON p.id_mesa = m.id
+    LEFT JOIN usuarios u ON p.id_usuario_mozo = u.id
     ORDER BY p.fecha_creacion DESC;
 END$$
 
@@ -164,8 +164,8 @@ CREATE PROCEDURE sp_getOrderDetail(IN p_id_pedido INT)
 BEGIN
     SELECT p.id, p.id_mesa, m.numero_mesa, p.id_usuario_mozo, u.nombre_completo AS nombre_mozo, p.estado, p.total, p.fecha_creacion, p.fecha_actualizacion
     FROM pedidos p
-    JOIN mesas m ON p.id_mesa = m.id
-    JOIN usuarios u ON p.id_usuario_mozo = u.id
+    LEFT JOIN mesas m ON p.id_mesa = m.id
+    LEFT JOIN usuarios u ON p.id_usuario_mozo = u.id
     WHERE p.id = p_id_pedido;
 END$$
 

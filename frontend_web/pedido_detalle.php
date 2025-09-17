@@ -48,8 +48,8 @@ $order = getOrderDetails($order_id);
                 <div class="order-details-container">
                     <div class="order-header">
                         <h3>Información General</h3>
-                        <p><strong>Mesa:</strong> <?php echo htmlspecialchars($order['numero_mesa']); ?></p>
-                        <p><strong>Mozo:</strong> <?php echo htmlspecialchars($order['nombre_mozo']); ?></p>
+                        <p><strong>Mesa:</strong> <?php echo htmlspecialchars($order['numero_mesa'] ?? 'N/A'); ?></p>
+                        <p><strong>Mozo:</strong> <?php echo htmlspecialchars($order['nombre_mozo'] ?? 'N/A'); ?></p>
                         <p><strong>Estado:</strong>
                             <span class="status status-<?php echo htmlspecialchars($order['estado']); ?>">
                                 <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $order['estado']))); ?>
