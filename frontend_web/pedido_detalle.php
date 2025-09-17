@@ -64,7 +64,7 @@ $order = getOrderDetails($order_id);
                     <div class="order-items">
                         <h3>Items del Pedido</h3>
                         <div class="table-container">
-                            <table>
+                            <table id="order-detail-items-table">
                                 <thead>
                                     <tr>
                                         <th>Producto</th>
@@ -76,10 +76,10 @@ $order = getOrderDetails($order_id);
                                 <tbody>
                                     <?php foreach ($order['items'] as $item): ?>
                                         <tr>
-                                            <td><?php echo htmlspecialchars($item['nombre_producto']); ?></td>
-                                            <td><?php echo htmlspecialchars($item['cantidad']); ?></td>
-                                            <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['precio_unitario'], 2)); ?></td>
-                                            <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['subtotal'], 2)); ?></td>
+                                            <td data-label="Producto"><?php echo htmlspecialchars($item['nombre_producto']); ?></td>
+                                            <td data-label="Cantidad"><?php echo htmlspecialchars($item['cantidad']); ?></td>
+                                            <td data-label="Precio Unit."><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['precio_unitario'], 2)); ?></td>
+                                            <td data-label="Subtotal"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['subtotal'], 2)); ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
