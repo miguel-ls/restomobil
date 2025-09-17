@@ -496,4 +496,39 @@ body.sidebar-collapsed .mobile-overlay {
         text-align: left;
         padding-right: 1rem;
     }
+
+    /* Patrón de tabla responsive para el detalle de pedido */
+    #order-detail-items-table {
+        border: none;
+    }
+    #order-detail-items-table thead {
+        display: none;
+    }
+    #order-detail-items-table, #order-detail-items-table tbody, #order-detail-items-table tr, #order-detail-items-table td {
+        display: block;
+        width: 100%;
+    }
+    #order-detail-items-table tr {
+        margin-bottom: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+    }
+    #order-detail-items-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right;
+        border: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 10px 15px;
+    }
+    #order-detail-items-table td:last-child {
+        border-bottom: none;
+    }
+    #order-detail-items-table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        text-align: left;
+        padding-right: 1rem;
+    }
 }
