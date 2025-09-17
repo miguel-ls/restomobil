@@ -6,4 +6,4 @@
     <title><?php echo isset($page_title) ? $page_title : 'Sistema de Restaurante'; ?></title>
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
 </head>
-<body>
+<body id="page-body">
