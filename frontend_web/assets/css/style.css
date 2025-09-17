@@ -129,19 +129,27 @@ body {
     color: var(--light-text);
     padding: 20px;
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
 }
-
-.sidebar h3 {
-    color: var(--light-text);
-    text-align: center;
-    border-bottom: 1px solid #495057;
-    padding-bottom: 15px;
+.logo {
+    text-decoration: none;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.logo .bi {
+    font-size: 2rem;
 }
 
 .sidebar ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
+    flex-grow: 1;
 }
 
 .sidebar ul li a {
@@ -157,11 +165,37 @@ body {
 .sidebar ul li a:hover {
     background-color: #495057;
 }
+.sidebar-footer {
+    border-top: 1px solid #495057;
+    padding-top: 15px;
+}
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background-color: #495057;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+.logout-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: white;
+    background-color: var(--secondary-color);
+    padding: 10px;
+    border-radius: 5px;
+}
+
 
 .main-content {
     flex-grow: 1;
     padding: 20px;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 /* --- Estilos de las Tablas de Datos --- */
@@ -228,6 +262,7 @@ table tr:hover {
     align-items: center;
     padding-bottom: 15px;
     border-bottom: 1px solid #495057;
+    margin-bottom: 15px;
 }
 .sidebar-header h3 {
     border-bottom: none;
@@ -246,6 +281,8 @@ table tr:hover {
 .sidebar ul li a .icon {
     margin-right: 10px;
     font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
 }
 .sidebar ul li a .text {
     transition: opacity 0.3s ease;
@@ -255,8 +292,9 @@ table tr:hover {
 body.sidebar-collapsed .sidebar {
     width: 80px;
 }
-body.sidebar-collapsed .sidebar-header h3,
-body.sidebar-collapsed .sidebar ul li a .text {
+body.sidebar-collapsed .sidebar-header .logo .text,
+body.sidebar-collapsed .sidebar ul li a .text,
+body.sidebar-collapsed .sidebar-footer .text {
     opacity: 0;
     width: 0;
     overflow: hidden;
@@ -266,6 +304,12 @@ body.sidebar-collapsed .sidebar ul li a {
 }
 body.sidebar-collapsed .sidebar ul li a .icon {
     margin-right: 0;
+}
+body.sidebar-collapsed .sidebar-footer .user-info {
+    justify-content: center;
+}
+body.sidebar-collapsed .sidebar-footer .logout-link {
+    justify-content: center;
 }
 
 .sidebar {
@@ -339,4 +383,56 @@ body.sidebar-collapsed .sidebar ul li a .icon {
     font-size: 0.9em;
     /* Asegurarse de que el footer esté dentro del main-content si se quiere que se desplace con él */
     margin-top: auto; /* Empuja el footer al fondo si el main-content es un flex container */
+}
+
+/* --- Estilos Responsivos para Móviles --- */
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999; /* Debajo del sidebar */
+}
+body.sidebar-collapsed .mobile-overlay {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        z-index: 1000;
+        width: 250px; /* Ancho completo cuando se abre */
+        transition: transform 0.3s ease-in-out;
+    }
+
+    /* Anula el colapso a 80px en móvil, siempre se oculta/muestra completo */
+    body.sidebar-collapsed .sidebar {
+        width: 250px;
+        transform: translateX(0);
+    }
+
+    /* El botón de la cabecera del menú principal se usará para mostrar/ocultar */
+    #sidebar-toggle {
+        display: block; /* Asegurarse que el botón del sidebar sea visible */
+    }
+
+    /* Ocultar el botón que se insertaba dinámicamente en el page-header */
+    .page-header > #menu-toggle {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0; /* El contenido principal ocupa todo el ancho */
+    }
+
+    .order-grid {
+        grid-template-columns: 1fr; /* Apilar las columnas en móvil */
+    }
 }
