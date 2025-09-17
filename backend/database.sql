@@ -5,6 +5,16 @@
 -- -----------------------------------------------------
 -- Definición de Tablas
 -- -----------------------------------------------------
+
+DROP TABLE IF EXISTS `detalle_pedidos`;
+DROP TABLE IF EXISTS `pedidos`;
+DROP TABLE IF EXISTS `productos`;
+DROP TABLE IF EXISTS `categorias_producto`;
+DROP TABLE IF EXISTS `reservas`;
+DROP TABLE IF EXISTS `mesas`;
+DROP TABLE IF EXISTS `usuarios`;
+DROP TABLE IF EXISTS `roles`;
+
 CREATE TABLE roles ( id INT AUTO_INCREMENT PRIMARY KEY, nombre_rol VARCHAR(50) NOT NULL UNIQUE );
 CREATE TABLE usuarios ( id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(50) NOT NULL UNIQUE, nombre_completo VARCHAR(100) NOT NULL, email VARCHAR(100) NOT NULL, password_hash VARCHAR(255) NOT NULL, id_rol INT NOT NULL, activo BOOLEAN DEFAULT TRUE, fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (id_rol) REFERENCES roles(id) );
 CREATE TABLE mesas ( id INT AUTO_INCREMENT PRIMARY KEY, numero_mesa VARCHAR(10) NOT NULL, capacidad INT NOT NULL DEFAULT 4, estado ENUM('disponible', 'ocupada', 'reservada', 'mantenimiento') NOT NULL DEFAULT 'disponible' );
