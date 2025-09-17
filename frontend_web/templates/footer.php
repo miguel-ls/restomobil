@@ -4,9 +4,20 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const toggleButton = document.getElementById('sidebar-toggle');
-    if (toggleButton) {
+    const body = document.getElementById('page-body');
+
+    // Crear el overlay para cerrar el menú en móvil
+    const overlay = document.createElement('div');
+    overlay.className = 'mobile-overlay';
+    document.body.appendChild(overlay);
+
+    if (toggleButton && body) {
         toggleButton.addEventListener('click', function() {
-            document.getElementById('page-body').classList.toggle('sidebar-collapsed');
+            body.classList.toggle('sidebar-collapsed');
+        });
+
+        overlay.addEventListener('click', function() {
+            body.classList.remove('sidebar-collapsed');
         });
     }
 });
