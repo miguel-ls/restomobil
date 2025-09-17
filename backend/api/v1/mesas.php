@@ -100,8 +100,8 @@ function handleGetAllTables($table) {
         http_response_code(200);
         echo json_encode($tables_arr);
     } else {
-        http_response_code(404);
-        echo json_encode(["message" => "No se encontraron mesas."]);
+        http_response_code(200); // OK
+        echo json_encode(["records" => []]);
     }
 }
 ?>
