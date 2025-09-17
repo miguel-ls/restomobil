@@ -65,5 +65,12 @@ class Table {
         $stmt->bindParam(':id', $id);
         return $stmt->execute();
     }
+
+    public function getAvailableTables() {
+        $query = "CALL sp_getAvailableTables()";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
 }
 ?>

@@ -21,7 +21,9 @@ function getAPIdata($endpoint) {
     return isset($data['records']) ? $data['records'] : $data; // Devolver data si no hay 'records'
 }
 
-$mesas = getAPIdata('mesas.php');
+// Solo obtener mesas disponibles para pedidos nuevos. Para editar, se necesitan todas.
+$mesas_endpoint = isset($_GET['id']) ? 'mesas.php' : 'mesas.php?status=available';
+$mesas = getAPIdata($mesas_endpoint);
 $mozos = getAPIdata('usuarios.php?rol=Mozo');
 $productos = getAPIdata('productos.php');
 
@@ -89,6 +91,21 @@ if (isset($_GET['id'])) {
                                 <?php endforeach; ?>
                             </select>
                         </div>
+
+                        <?php if ($is_editing): ?>
+                        <div class="form-group">
+                            <label for="estado">Estado del Pedido</label>
+                            <select id="estado" name="estado" required>
+                                <?php
+                                $estados = ['recibido', 'en_preparacion', 'listo_para_servir', 'servido', 'pagado', 'cancelado'];
+                                foreach ($estados as $estado) {
+                                    $selected = ($order_data['estado'] == $estado) ? 'selected' : '';
+                                    echo "<option value=\"$estado\" $selected>" . ucfirst(str_replace('_', ' ', $estado)) . "</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <?php endif; ?>
 
                         <div class="table-container">
                             <table id="order-items-table">
@@ -166,6 +183,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const orderData = { id_mesa, id_usuario_mozo, items };
+        if (isEditing) {
+            orderData.estado = document.getElementById('estado').value;
+        }
         const method = isEditing ? 'PUT' : 'POST';
         const url = isEditing
             ? `http://localhost/restaurante_system/backend/api/v1/pedidos.php?id=${orderId}`

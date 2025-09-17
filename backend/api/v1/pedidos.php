@@ -60,8 +60,8 @@ switch ($request_method) {
 
         // Si se envían items, es una actualización completa del pedido
         if (!empty($data->items) && is_array($data->items)) {
-            if (!empty($data->id_mesa) && !empty($data->id_usuario_mozo)) {
-                if ($order->update($order_id, $data->id_mesa, $data->id_usuario_mozo, $data->items)) {
+            if (!empty($data->id_mesa) && !empty($data->id_usuario_mozo) && !empty($data->estado)) {
+                if ($order->update($order_id, $data->id_mesa, $data->id_usuario_mozo, $data->estado, $data->items)) {
                     http_response_code(200);
                     echo json_encode(["message" => "Pedido actualizado exitosamente."]);
                 } else {

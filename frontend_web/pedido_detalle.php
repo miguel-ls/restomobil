@@ -60,40 +60,6 @@ $order = getOrderDetails($order_id);
                         <p><strong>Última Actualización:</strong> <?php echo htmlspecialchars(date("d/m/Y H:i:s", strtotime($order['fecha_actualizacion']))); ?></p>
                     </div>
 
-                    <div class="order-actions">
-                        <h3>Gestionar Pedido</h3>
-                        <?php
-                        $current_status = $order['estado'];
-                        $is_final_status = in_array($current_status, ['pagado', 'cancelado']);
-                        if (!$is_final_status):
-                        ?>
-                            <form action="pedido_status_handler.php" method="POST" class="status-form">
-                                <input type="hidden" name="id_pedido" value="<?php echo $order_id; ?>">
-                                <div class="form-group">
-                                    <label for="nuevo_estado">Cambiar Estado a:</label>
-                                    <select name="nuevo_estado" id="nuevo_estado">
-                                        <?php
-                                        // Lógica simple de flujo de trabajo de estados
-                                        $status_options = [
-                                            'recibido' => ['en_preparacion', 'cancelado'],
-                                            'en_preparacion' => ['listo_para_servir', 'cancelado'],
-                                            'listo_para_servir' => ['servido'],
-                                            'servido' => ['pagado']
-                                        ];
-                                        if (isset($status_options[$current_status])) {
-                                            foreach ($status_options[$current_status] as $status) {
-                                                echo "<option value=\"$status\">" . ucfirst(str_replace('_', ' ', $status)) . "</option>";
-                                            }
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                                <button type="submit" class="btn">Actualizar Estado</button>
-                            </form>
-                        <?php else: ?>
-                            <p>Este pedido ya ha sido completado o cancelado.</p>
-                        <?php endif; ?>
-                    </div>
 
                     <div class="order-items">
                         <h3>Items del Pedido</h3>
