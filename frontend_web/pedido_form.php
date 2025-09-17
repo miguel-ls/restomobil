@@ -190,10 +190,8 @@ document.addEventListener('DOMContentLoaded', function() {
     statusButtons.forEach(button => {
         button.addEventListener('click', function() {
             const newStatus = this.dataset.status;
-            if (confirm(`¿Estás seguro de que quieres cambiar el estado a "${newStatus}"?`)) {
-                estadoInput.value = newStatus;
-                orderForm.dispatchEvent(new Event('submit', { cancelable: true }));
-            }
+            estadoInput.value = newStatus;
+            orderForm.dispatchEvent(new Event('submit', { cancelable: true }));
         });
     });
 
