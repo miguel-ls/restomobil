@@ -2,7 +2,7 @@
 session_start();
 
 // Validar que se recibieron los datos del formulario
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['email']) && isset($_POST['password'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($_POST['password'])) {
 
     // URL del endpoint de la API de login
     // Esta URL podría necesitar ser ajustada dependiendo del entorno
@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['email']) && isset($_PO
 
     // Datos a enviar a la API
     $data = array(
-        'email' => $_POST['email'],
+        'username' => $_POST['username'],
         'password' => $_POST['password']
     );
 
@@ -37,6 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['email']) && isset($_PO
         // Guardar la información del usuario en la sesión
         $_SESSION['user_id'] = $result['user']['id'];
         $_SESSION['user_nombre'] = $result['user']['nombre'];
+        $_SESSION['user_username'] = $result['user']['username'];
         $_SESSION['user_email'] = $result['user']['email'];
         $_SESSION['user_rol'] = $result['user']['rol'];
         $_SESSION['loggedin'] = true;

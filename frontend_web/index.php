@@ -13,8 +13,8 @@ include_once 'templates/header.php';
         ?>
         <form action="login_handler.php" method="POST">
             <div class="form-group">
-                <label for="email">Correo Electrónico</label>
-                <input type="email" id="email" name="email" required>
+                <label for="username">Nombre de Usuario</label>
+                <input type="text" id="username" name="username" required>
             </div>
             <div class="form-group">
                 <label for="password">Contraseña</label>

@@ -11,7 +11,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final ApiService _apiService = ApiService();
 
@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       final user = await _apiService.login(
-        _emailController.text,
+        _usernameController.text,
         _passwordController.text,
       );
 
@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -82,15 +82,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 30),
                 TextFormField(
-                  controller: _emailController,
+                  controller: _usernameController,
                   decoration: const InputDecoration(
-                    labelText: 'Correo Electrónico',
-                    prefixIcon: Icon(Icons.email),
+                    labelText: 'Nombre de Usuario',
+                    prefixIcon: Icon(Icons.person),
                   ),
-                  keyboardType: TextInputType.emailAddress,
+                  keyboardType: TextInputType.text,
                   validator: (value) {
-                    if (value == null || value.isEmpty || !value.contains('@')) {
-                      return 'Por favor, ingrese un email válido.';
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, ingrese su nombre de usuario.';
                     }
                     return null;
                   },

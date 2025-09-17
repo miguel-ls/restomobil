@@ -18,16 +18,16 @@ class User {
     }
 
     /**
-     * Busca un usuario por su dirección de email.
+     * Busca un usuario por su nombre de usuario.
      *
-     * @param string $email El email del usuario a buscar.
+     * @param string $username El nombre de usuario a buscar.
      * @return bool True si el usuario existe, False si no.
      */
-    public function findByEmail($email) {
-        $query = "CALL sp_getUserByEmail(:email)";
+    public function findByUsername($username) {
+        $query = "CALL sp_getUserByUsername(:username)";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':username', $username);
         $stmt->execute();
 
         if ($stmt->rowCount() > 0) {
@@ -35,11 +35,12 @@ class User {
 
             // Asignar valores a las propiedades del objeto
             $this->id = $row['id'];
+            $this->username = $row['username'];
             $this->nombre_completo = $row['nombre_completo'];
             $this->email = $row['email'];
             $this->password_hash = $row['password_hash'];
             $this->id_rol = $row['id_rol'];
-            $this->nombre_rol = $row['nombre_rol']; // Propiedad añadida para conveniencia
+            $this->nombre_rol = $row['nombre_rol'];
 
             return true;
         }

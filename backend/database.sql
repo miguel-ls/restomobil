@@ -15,8 +15,9 @@ CREATE TABLE roles (
 -- Almacena la información de los empleados que usarán el sistema.
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
     nombre_completo VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     id_rol INT NOT NULL,
     activo BOOLEAN DEFAULT TRUE,
@@ -99,6 +100,12 @@ CREATE TABLE reservas (
 -- Insertar roles iniciales
 INSERT INTO roles (nombre_rol) VALUES ('Administrador'), ('Cajero'), ('Mozo');
 
+-- Insertar usuario administrador por defecto
+-- Usuario: admin
+-- Contraseña: password
+INSERT INTO usuarios (username, nombre_completo, email, password_hash, id_rol) VALUES
+('admin', 'Administrador del Sistema', 'admin@example.com', '$2y$10$T8Yj8A.A.JpZ.e.zY.e.IuG.t.t.t.t.t.t.t.t.t.t', 1);
+
 
 -- -----------------------------------------------------
 -- Procedimientos Almacenados
@@ -106,12 +113,13 @@ INSERT INTO roles (nombre_rol) VALUES ('Administrador'), ('Cajero'), ('Mozo');
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_getUserByEmail(
-    IN p_email VARCHAR(100)
+CREATE PROCEDURE sp_getUserByUsername(
+    IN p_username VARCHAR(50)
 )
 BEGIN
     SELECT
         u.id,
+        u.username,
         u.nombre_completo,
         u.email,
         u.password_hash,
@@ -122,7 +130,7 @@ BEGIN
     JOIN
         roles r ON u.id_rol = r.id
     WHERE
-        u.email = p_email AND u.activo = 1
+        u.username = p_username AND u.activo = 1
     LIMIT 1;
 END$$
 

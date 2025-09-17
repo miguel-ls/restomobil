@@ -18,16 +18,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $data = json_decode(file_get_contents("php://input"));
 
 // Validar que se recibieron los datos necesarios
-if (empty($data->email) || empty($data->password)) {
+if (empty($data->username) || empty($data->password)) {
     http_response_code(400); // Bad Request
-    echo json_encode(array("message" => "No se pudo iniciar sesión. Faltan datos."));
+    echo json_encode(array("message" => "No se pudo iniciar sesión. Faltan el nombre de usuario o la contraseña."));
     exit();
 }
 
 $user = new User();
 
-// Buscar usuario por email
-if ($user->findByEmail($data->email)) {
+// Buscar usuario por nombre de usuario
+if ($user->findByUsername($data->username)) {
     // Verificar la contraseña
     if ($user->verifyPassword($data->password)) {
 
@@ -39,6 +39,7 @@ if ($user->findByEmail($data->email)) {
             "message" => "Inicio de sesión exitoso.",
             "user" => array(
                 "id" => $user->id,
+                "username" => $user->username,
                 "nombre" => $user->nombre_completo,
                 "email" => $user->email,
                 "rol" => $user->nombre_rol

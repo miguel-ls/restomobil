@@ -14,11 +14,11 @@ class ApiService {
 
   /**
    * Intenta iniciar sesión en el sistema.
-   * @param email El correo del usuario.
+   * @param username El nombre de usuario.
    * @param password La contraseña del usuario.
    * @return Un Map con los datos del usuario si el login es exitoso, o null si falla.
    */
-  Future<Map<String, dynamic>?> login(String email, String password) async {
+  Future<Map<String, dynamic>?> login(String username, String password) async {
     final url = Uri.parse('$_baseUrl/login.php');
 
     try {
@@ -28,7 +28,7 @@ class ApiService {
           'Content-Type': 'application/json; charset=UTF-T',
         },
         body: json.encode({
-          'email': email,
+          'username': username,
           'password': password,
         }),
       );
