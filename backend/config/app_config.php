@@ -7,7 +7,7 @@
 
 // Define el símbolo de la moneda que se usará en toda la aplicación.
 // Ejemplos: '$', '€', 'S/'
-define('CURRENCY_SYMBOL', '$');
+define('CURRENCY_SYMBOL', 'S/.');
 
 // Aquí se pueden añadir otras configuraciones globales en el futuro.
 ?>
