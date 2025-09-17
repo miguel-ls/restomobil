@@ -8,8 +8,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Main Stylesheet -->
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="assets/css/modal.css?v=<?php echo time(); ?>">
 </head>
 <body id="page-body">
+<?php include_once 'modal_alert.php'; ?>
 <div class="page-wrapper">
 <header class="mobile-header">
     <a href="dashboard.php" class="logo">
