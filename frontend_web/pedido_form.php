@@ -9,7 +9,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $page_title = 'Crear Nuevo Pedido';
 include_once 'templates/header.php';
 // Asumo que estos archivos de configuración y los CRUD básicos ya existen
-// include_once __DIR__ . '/../backend/config/app_config.php'; 
+include_once __DIR__ . '/../backend/config/app_config.php';
 
 function getAPIdata($endpoint) {
     // Simulo la obtención de datos para no depender de otros archivos que no he recreado
@@ -35,13 +35,10 @@ if (isset($_GET['id'])) {
 $mesas = getAPIdata('mesas.php');
 $mozos = getAPIdata('usuarios.php?rol=Mozo');
 $productos = getAPIdata('productos.php');
-define('CURRENCY_SYMBOL', '$'); // Simulo la constante
 ?>
 
 <div class="dashboard-container">
-    <?php // include_once 'templates/sidebar.php'; // Asumo que existe ?>
-    <nav class="sidebar" style="width:250px; background-color: #343a40; color: white; padding: 20px;">Sidebar</nav>
-
+    <?php include_once 'templates/sidebar.php'; ?>
     <main class="main-content">
         <div class="container">
             <div class="page-header">

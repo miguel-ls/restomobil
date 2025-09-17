@@ -46,8 +46,8 @@ $categories_data = getCategories();
                                     <td><?php echo htmlspecialchars($category['nombre']); ?></td>
                                     <td><?php echo htmlspecialchars($category['descripcion']); ?></td>
                                     <td class="actions-cell">
-                                        <a href="categoria_form.php?id=<?php echo $category['id']; ?>" class="btn-edit">Editar</a>
-                                        <a href="categoria_delete_handler.php?id=<?php echo $category['id']; ?>" class="btn-delete" onclick="return confirm('¿Estás seguro?');">Eliminar</a>
+                                        <a href="categoria_form.php?id=<?php echo $category['id']; ?>" class="btn btn-edit">Editar</a>
+                                        <a href="categoria_delete_handler.php?id=<?php echo $category['id']; ?>" class="btn btn-delete" onclick="return confirm('¿Estás seguro?');">Eliminar</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
