@@ -3,6 +3,7 @@
     <ul>
         <li><a href="dashboard.php">Inicio</a></li>
         <li><a href="productos.php">Productos</a></li>
+        <li><a href="categorias.php">Categorías</a></li>
         <li><a href="mesas.php">Mesas</a></li>
         <li><a href="pedidos.php">Pedidos</a></li>
         <li><a href="reservas.php">Reservas</a></li>
