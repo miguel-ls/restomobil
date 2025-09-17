@@ -22,8 +22,8 @@ class MyApp extends StatelessWidget {
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            primary: const Color(0xFF0D6EFD), // Azul principal
-            onPrimary: Colors.white, // Texto blanco
+            backgroundColor: const Color(0xFF0D6EFD), // Azul principal
+            foregroundColor: Colors.white, // Texto blanco
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
