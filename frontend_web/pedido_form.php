@@ -99,14 +99,14 @@ $productos = getAPIdata('productos.php');
                         </div>
 
                         <?php if ($is_editing): ?>
-                        <div class="form-group status-actions">
-                            <label>Acciones Rápidas de Estado</label>
+                        <fieldset class="status-actions-frame">
+                            <legend>Acciones Rápidas de Estado</legend>
                             <div class="btn-group">
-                                <button type="button" class="btn btn-outline-primary status-btn" data-status="entregado">Entregado</button>
-                                <button type="button" class="btn btn-outline-success status-btn" data-status="completado">Completado</button>
-                                <button type="button" class="btn btn-outline-danger status-btn" data-status="cancelado">Cancelado</button>
+                                <button type="button" class="btn btn-entregado status-btn" data-status="entregado">Entregado</button>
+                                <button type="button" class="btn btn-completado status-btn" data-status="completado">Completado</button>
+                                <button type="button" class="btn btn-cancelado status-btn" data-status="cancelado">Cancelado</button>
                             </div>
-                        </div>
+                        </fieldset>
                         <?php endif; ?>
                         
                         <div class="form-actions">
