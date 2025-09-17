@@ -59,8 +59,8 @@ $orders_data = getOrders();
                             <?php foreach ($orders_data['records'] as $order): ?>
                                 <tr>
                                     <td>#<?php echo htmlspecialchars($order['id']); ?></td>
-                                    <td><?php echo htmlspecialchars($order['numero_mesa']); ?></td>
-                                    <td><?php echo htmlspecialchars($order['nombre_mozo']); ?></td>
+                                    <td><?php echo htmlspecialchars($order['numero_mesa'] ?? 'N/A'); ?></td>
+                                    <td><?php echo htmlspecialchars($order['nombre_mozo'] ?? 'N/A'); ?></td>
                                     <td>
                                         <span class="status status-<?php echo htmlspecialchars($order['estado']); ?>">
                                             <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $order['estado']))); ?>
