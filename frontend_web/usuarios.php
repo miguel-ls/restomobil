@@ -52,9 +52,9 @@ $users_data = getUsers();
                                     <td><?php echo htmlspecialchars($user['nombre_rol']); ?></td>
                                     <td><span class="status <?php echo $user['activo'] ? 'status-active' : 'status-inactive'; ?>"><?php echo $user['activo'] ? 'Activo' : 'Inactivo'; ?></span></td>
                                     <td class="actions-cell">
-                                        <a href="usuario_form.php?id=<?php echo $user['id']; ?>" class="btn-edit">Editar</a>
+                                        <a href="usuario_form.php?id=<?php echo $user['id']; ?>" class="btn btn-edit">Editar</a>
                                         <?php if ($user['id'] != 1): ?>
-                                            <a href="usuario_delete_handler.php?id=<?php echo $user['id']; ?>" class="btn-delete" onclick="return confirm('¿Estás seguro?');">Desactivar</a>
+                                            <a href="usuario_delete_handler.php?id=<?php echo $user['id']; ?>" class="btn btn-delete" onclick="return confirm('¿Estás seguro?');">Desactivar</a>
                                         <?php endif; ?>
                                     </td>
                                 </tr>

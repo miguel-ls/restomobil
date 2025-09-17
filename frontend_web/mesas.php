@@ -52,8 +52,8 @@ $tables_data = getTables();
                                         </span>
                                     </td>
                                     <td class="actions-cell">
-                                        <a href="mesa_form.php?id=<?php echo $table['id']; ?>" class="btn-edit">Editar</a>
-                                        <a href="mesa_delete_handler.php?id=<?php echo $table['id']; ?>" class="btn-delete" onclick="return confirm('¿Estás seguro?');">Eliminar</a>
+                                        <a href="mesa_form.php?id=<?php echo $table['id']; ?>" class="btn btn-edit">Editar</a>
+                                        <a href="mesa_delete_handler.php?id=<?php echo $table['id']; ?>" class="btn btn-delete" onclick="return confirm('¿Estás seguro?');">Eliminar</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
