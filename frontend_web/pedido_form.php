@@ -1,0 +1,169 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header('Location: index.php?error=Por+favor+inicie+sesión');
+    exit();
+}
+
+$page_title = 'Crear Nuevo Pedido';
+include_once 'templates/header.php';
+// Asumo que estos archivos de configuración y los CRUD básicos ya existen
+// include_once __DIR__ . '/../backend/config/app_config.php';
+
+function getAPIdata($endpoint) {
+    // Simulo la obtención de datos para no depender de otros archivos que no he recreado
+    if ($endpoint === 'mesas.php') return [['id' => 1, 'numero_mesa' => 'Mesa 1'], ['id' => 2, 'numero_mesa' => 'Mesa 2']];
+    if ($endpoint === 'usuarios.php?rol=Mozo') return [['id' => 1, 'nombre_completo' => 'Juan Perez']];
+    if ($endpoint === 'productos.php') return [['id' => 1, 'nombre' => 'Pizza', 'precio' => 10.50, 'categoria_nombre' => 'Plato Fuerte']];
+    return [];
+}
+
+$is_editing = false;
+$order_data = null;
+if (isset($_GET['id'])) {
+    $is_editing = true;
+    $order_id = intval($_GET['id']);
+    $page_title = "Editar Pedido #$order_id";
+    // Simulo datos de un pedido existente
+    $order_data = [
+        'id_mesa' => 1, 'id_usuario_mozo' => 1, 'estado' => 'recibido',
+        'items' => [['id_producto' => 1, 'nombre_producto' => 'Pizza', 'precio_unitario' => 10.50, 'cantidad' => 2]]
+    ];
+}
+
+$mesas = getAPIdata('mesas.php');
+$mozos = getAPIdata('usuarios.php?rol=Mozo');
+$productos = getAPIdata('productos.php');
+define('CURRENCY_SYMBOL', '$'); // Simulo la constante
+?>
+
+<div class="dashboard-container">
+    <?php // include_once 'templates/sidebar.php'; // Asumo que existe ?>
+    <nav class="sidebar" style="width:250px; background-color: #343a40; color: white; padding: 20px;">Sidebar</nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1><?php echo $page_title; ?></h1>
+            </div>
+
+            <div id="order-form-container" class="order-grid">
+                <div class="product-list-container">
+                    <h3>Productos Disponibles</h3>
+                    <input type="text" id="product-search" placeholder="Buscar producto...">
+                    <div id="product-list">
+                        <?php foreach ($productos as $producto): ?>
+                            <div class="product-item" data-id="<?php echo $producto['id']; ?>" data-nombre="<?php echo htmlspecialchars($producto['nombre']); ?>" data-precio="<?php echo $producto['precio']; ?>">
+                                <h4><?php echo htmlspecialchars($producto['nombre']); ?></h4>
+                                <p><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($producto['precio'], 2)); ?></p>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <div class="order-details" id="order-details">
+                    <h3>Detalles del Pedido</h3>
+                    <form id="order-form">
+                        <div class="form-group">
+                            <label for="id_mesa">Mesa</label>
+                            <select id="id_mesa" name="id_mesa" required>
+                                <?php foreach ($mesas as $mesa): ?>
+                                    <option value="<?php echo $mesa['id']; ?>" <?php if($is_editing && $order_data['id_mesa'] == $mesa['id']) echo 'selected'; ?>>
+                                        <?php echo htmlspecialchars($mesa['numero_mesa']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_usuario_mozo">Mozo</label>
+                            <select id="id_usuario_mozo" name="id_usuario_mozo" required>
+                                 <?php foreach ($mozos as $mozo): ?>
+                                    <option value="<?php echo $mozo['id']; ?>" <?php if($is_editing && $order_data['id_usuario_mozo'] == $mozo['id']) echo 'selected'; ?>>
+                                        <?php echo htmlspecialchars($mozo['nombre_completo']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="table-container desktop-only">
+                            <table id="order-items-table">
+                                <thead><tr><th>Producto</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th><th></th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <div id="order-items-cards" class="mobile-only"></div>
+
+                        <div class="order-total-container">
+                            <strong>Total:</strong>
+                            <span id="order-total" style="font-weight: bold;"><?php echo CURRENCY_SYMBOL; ?>0.00</span>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn"><?php echo $is_editing ? 'Actualizar' : 'Crear'; ?></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const productList = document.getElementById('product-list');
+    const orderDetailsContainer = document.getElementById('order-details');
+    const orderTotalElement = document.getElementById('order-total');
+    const currencySymbol = '<?php echo CURRENCY_SYMBOL; ?>';
+    const isEditing = <?php echo json_encode($is_editing); ?>;
+    let initialOrderData = <?php echo json_encode($is_editing ? $order_data : null); ?>;
+    let currentOrder = {};
+
+    function renderOrderItems() {
+        const tableBody = document.querySelector('#order-items-table tbody');
+        const cardsContainer = document.getElementById('order-items-cards');
+        tableBody.innerHTML = '';
+        cardsContainer.innerHTML = '';
+        let total = 0;
+        for (const productId in currentOrder) {
+            const item = currentOrder[productId];
+            const subtotal = item.precio * item.cantidad;
+            total += subtotal;
+            tableBody.innerHTML += `<tr><td>${item.nombre}</td><td><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></td><td>${currencySymbol}${item.precio.toFixed(2)}</td><td>${currencySymbol}${subtotal.toFixed(2)}</td><td><button type="button" class="btn-delete delete-item" data-id="${item.id}">X</button></td></tr>`;
+            cardsContainer.innerHTML += `<div class="order-item-card"><div class="card-item-header">${item.nombre}</div><div class="card-item-body"><div class="card-item-row"><span>Precio:</span><span>${currencySymbol}${item.precio.toFixed(2)}</span></div><div class="card-item-row"><span>Cantidad:</span><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></div><div class="card-item-row"><span>Subtotal:</span><strong>${currencySymbol}${subtotal.toFixed(2)}</strong></div></div><div class="card-item-footer"><button type="button" class="btn-delete delete-item" data-id="${item.id}">Eliminar</button></div></div>`;
+        }
+        orderTotalElement.textContent = `${currencySymbol}${total.toFixed(2)}`;
+    }
+
+    if (isEditing && initialOrderData && initialOrderData.items) {
+        initialOrderData.items.forEach(item => {
+            currentOrder[item.id_producto] = { id: item.id_producto, nombre: item.nombre_producto, precio: parseFloat(item.precio_unitario), cantidad: parseInt(item.cantidad, 10) };
+        });
+        renderOrderItems();
+    }
+
+    productList.addEventListener('click', function(e) {
+        const productItem = e.target.closest('.product-item');
+        if (!productItem) return;
+        const productId = productItem.dataset.id;
+        if (currentOrder[productId]) { currentOrder[productId].cantidad++; } else { currentOrder[productId] = { id: productId, nombre: productItem.dataset.nombre, precio: parseFloat(productItem.dataset.precio), cantidad: 1 }; }
+        renderOrderItems();
+    });
+
+    orderDetailsContainer.addEventListener('input', function(e) {
+        if (e.target.classList.contains('item-quantity')) {
+            const newQuantity = parseInt(e.target.value, 10);
+            const productId = e.target.dataset.id;
+            if (newQuantity > 0) { currentOrder[productId].cantidad = newQuantity; } else { delete currentOrder[productId]; }
+            renderOrderItems();
+        }
+    });
+
+    orderDetailsContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-item')) {
+            delete currentOrder[e.target.dataset.id];
+            renderOrderItems();
+        }
+    });
+});
+</script>
