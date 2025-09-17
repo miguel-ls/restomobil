@@ -1,5 +1,6 @@
-<!-- Aquí se podrían añadir scripts de JavaScript en el futuro -->
-    <!-- <script src="assets/js/main.js"></script> -->
+<footer class="main-footer">
+    <p>&copy; <?php echo date("Y"); ?> - Sistema de Restaurante. Todos los derechos reservados.</p>
+</footer>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const toggleButton = document.getElementById('sidebar-toggle');
