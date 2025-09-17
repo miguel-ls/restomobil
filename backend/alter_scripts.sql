@@ -43,6 +43,89 @@ END$$
 DELIMITER ;
 
 -- -----------------------------------------------------
+-- Procedimientos para 'reservas'
+-- -----------------------------------------------------
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS sp_getAllReservations$$
+CREATE PROCEDURE sp_getAllReservations()
+BEGIN
+    SELECT
+        r.id,
+        r.id_mesa,
+        m.numero_mesa,
+        r.nombre_cliente,
+        r.fecha_reserva,
+        r.cantidad_personas,
+        r.estado
+    FROM
+        reservas r
+    LEFT JOIN
+        mesas m ON r.id_mesa = m.id
+    ORDER BY
+        r.fecha_reserva DESC;
+END$$
+
+DROP PROCEDURE IF EXISTS sp_createReservation$$
+CREATE PROCEDURE sp_createReservation(
+    IN p_id_mesa INT,
+    IN p_nombre_cliente VARCHAR(100),
+    IN p_telefono_cliente VARCHAR(20),
+    IN p_email_cliente VARCHAR(100),
+    IN p_fecha_reserva DATETIME,
+    IN p_cantidad_personas INT,
+    IN p_observaciones TEXT
+)
+BEGIN
+    INSERT INTO reservas (id_mesa, nombre_cliente, telefono_cliente, email_cliente, fecha_reserva, cantidad_personas, observaciones)
+    VALUES (p_id_mesa, p_nombre_cliente, p_telefono_cliente, p_email_cliente, p_fecha_reserva, p_cantidad_personas, p_observaciones);
+    SELECT LAST_INSERT_ID() as id;
+END$$
+
+DROP PROCEDURE IF EXISTS sp_readOneReservation$$
+CREATE PROCEDURE sp_readOneReservation(IN p_id INT)
+BEGIN
+    SELECT id, id_mesa, nombre_cliente, telefono_cliente, email_cliente, fecha_reserva, cantidad_personas, estado, observaciones
+    FROM reservas
+    WHERE id = p_id;
+END$$
+
+DROP PROCEDURE IF EXISTS sp_updateReservation$$
+CREATE PROCEDURE sp_updateReservation(
+    IN p_id INT,
+    IN p_id_mesa INT,
+    IN p_nombre_cliente VARCHAR(100),
+    IN p_telefono_cliente VARCHAR(20),
+    IN p_email_cliente VARCHAR(100),
+    IN p_fecha_reserva DATETIME,
+    IN p_cantidad_personas INT,
+    IN p_estado ENUM('confirmada', 'cancelada', 'completada'),
+    IN p_observaciones TEXT
+)
+BEGIN
+    UPDATE reservas
+    SET
+        id_mesa = p_id_mesa,
+        nombre_cliente = p_nombre_cliente,
+        telefono_cliente = p_telefono_cliente,
+        email_cliente = p_email_cliente,
+        fecha_reserva = p_fecha_reserva,
+        cantidad_personas = p_cantidad_personas,
+        estado = p_estado,
+        observaciones = p_observaciones
+    WHERE
+        id = p_id;
+END$$
+
+DROP PROCEDURE IF EXISTS sp_cancelReservation$$
+CREATE PROCEDURE sp_cancelReservation(IN p_id INT)
+BEGIN
+    UPDATE reservas SET estado = 'cancelada' WHERE id = p_id;
+END$$
+
+DELIMITER ;
+
+-- -----------------------------------------------------
 -- Procedimientos para 'pedidos'
 -- -----------------------------------------------------
 DELIMITER $$
