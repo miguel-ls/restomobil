@@ -13,6 +13,7 @@ define('DB_DSN', 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8
 $pdo_options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
+    // Se establece a true para resolver problemas con múltiples llamadas a SP en algunas configuraciones de MySQL/PHP
+    PDO::ATTR_EMULATE_PREPARES   => true,
 ];
 ?>
