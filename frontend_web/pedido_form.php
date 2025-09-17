@@ -114,6 +114,7 @@ if (isset($_GET['id'])) {
 
                         <div class="form-actions" style="margin-top: 20px;">
                             <button type="submit" class="btn"><?php echo $is_editing ? 'Actualizar Pedido' : 'Crear Pedido'; ?></button>
+                            <a href="pedidos.php" class="btn btn-secondary">Cancelar</a>
                         </div>
                     </form>
                 </div>
@@ -121,18 +122,6 @@ if (isset($_GET['id'])) {
         </div>
     </main>
 </div>
-
-<style>
-/* Estilos (sin cambios, omitidos por brevedad) */
-.order-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-.product-list-container { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); max-height: 70vh; overflow-y: auto; }
-#product-search { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 5px; }
-.product-item { padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; margin-bottom: 10px; cursor: pointer; transition: background-color 0.2s; }
-.product-item:hover { background-color: var(--hover-light); }
-.product-item h4, .product-item p { margin: 0; }
-.order-details { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-#order-items-table input[type="number"] { width: 60px; padding: 5px; }
-</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
