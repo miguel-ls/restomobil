@@ -11,12 +11,28 @@ include_once 'templates/header.php';
 // Asumo que estos archivos de configuración y los CRUD básicos ya existen
 include_once __DIR__ . '/../backend/config/app_config.php';
 
-function getAPIdata($endpoint) {
-    // Simulo la obtención de datos para no depender de otros archivos que no he recreado
-    if ($endpoint === 'mesas.php') return [['id' => 1, 'numero_mesa' => 'Mesa 1'], ['id' => 2, 'numero_mesa' => 'Mesa 2']];
-    if ($endpoint === 'usuarios.php?rol=Mozo') return [['id' => 1, 'nombre_completo' => 'Juan Perez']];
-    if ($endpoint === 'productos.php') return [['id' => 1, 'nombre' => 'Pizza', 'precio' => 10.50, 'categoria_nombre' => 'Plato Fuerte']];
-    return [];
+// Definir API_BASE_URL si no está definida para evitar errores fatales.
+if (!defined('API_BASE_URL')) {
+    define('API_BASE_URL', 'http://localhost/restaurante_system/backend/api/v1/');
+}
+
+function fetchFromAPI($endpoint) {
+    $api_url = API_BASE_URL . $endpoint;
+    $ch = curl_init($api_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $response = curl_exec($ch);
+    if (curl_errno($ch)) {
+        error_log("cURL Error fetching $api_url: " . curl_error($ch));
+        curl_close($ch);
+        return ['error' => 'Error de comunicación con la API.'];
+    }
+    curl_close($ch);
+    $data = json_decode($response, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log("JSON Decode Error for $api_url. Response: $response");
+        return ['error' => 'Respuesta inválida de la API.'];
+    }
+    return $data;
 }
 
 $is_editing = false;
@@ -32,9 +48,13 @@ if (isset($_GET['id'])) {
     ];
 }
 
-$mesas = getAPIdata('mesas.php');
-$mozos = getAPIdata('usuarios.php?rol=Mozo');
-$productos = getAPIdata('productos.php');
+$mesas_data = fetchFromAPI('mesas.php');
+$mozos_data = fetchFromAPI('usuarios.php?rol=Mozo');
+$productos_data = fetchFromAPI('productos.php');
+
+$mesas = isset($mesas_data['records']) ? $mesas_data['records'] : [];
+$mozos = isset($mozos_data['records']) ? $mozos_data['records'] : [];
+$productos = isset($productos_data['records']) ? $productos_data['records'] : [];
 ?>
 
 <div class="dashboard-container">
