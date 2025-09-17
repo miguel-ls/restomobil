@@ -145,7 +145,8 @@ body {
 }
 
 .sidebar ul li a {
-    display: block;
+    display: flex;
+    align-items: center;
     color: var(--light-text);
     text-decoration: none;
     padding: 15px 10px;
@@ -221,32 +222,67 @@ table tr:hover {
 }
 
 /* --- Estilos para Menú Ocultable --- */
-#menu-toggle {
-    display: none; /* Se mostrará en pantallas más pequeñas si se desea */
-    background: var(--primary-color);
-    color: white;
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #495057;
+}
+.sidebar-header h3 {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin: 0;
+    transition: opacity 0.3s ease;
+}
+#sidebar-toggle {
+    background: transparent;
     border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
+    color: white;
+    font-size: 1.5rem;
     cursor: pointer;
+}
+
+.sidebar ul li a .icon {
+    margin-right: 10px;
     font-size: 1.2rem;
 }
-
-body.sidebar-collapsed .sidebar {
-    width: 0;
-    padding: 20px 0;
-    overflow: hidden;
+.sidebar ul li a .text {
+    transition: opacity 0.3s ease;
 }
 
-body.sidebar-collapsed .main-content {
-    margin-left: 0;
+/* Estado Colapsado */
+body.sidebar-collapsed .sidebar {
+    width: 80px;
+}
+body.sidebar-collapsed .sidebar-header h3,
+body.sidebar-collapsed .sidebar ul li a .text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+body.sidebar-collapsed .sidebar ul li a {
+    justify-content: center;
+}
+body.sidebar-collapsed .sidebar ul li a .icon {
+    margin-right: 0;
 }
 
 .sidebar {
-    transition: width 0.3s ease, padding 0.3s ease;
+    transition: width 0.3s ease;
 }
 
 /* --- Estilos para Formulario de Pedido --- */
+.form-actions {
+    display: flex;
+    gap: 15px;
+}
+.form-actions .btn {
+    width: auto;
+    flex-grow: 0;
+    padding: 10px 20px; /* Ajustar padding para un tamaño más pequeño */
+}
+
 .order-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
