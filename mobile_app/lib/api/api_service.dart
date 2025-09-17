@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   // Ajusta esta URL a la dirección de tu backend.
-  static const String _baseUrl = 'http://172.16.50.176/restaurante_system/backend/api/v1';
+  static const String _baseUrl = 'http://localhost/restaurante_system/backend/api/v1';
   // Nota: 10.0.2.2 es la IP que el emulador de Android usa para referirse al localhost de la máquina anfitriona.
 
   /**
@@ -25,7 +25,7 @@ class ApiService {
       final response = await http.post(
         url,
         headers: {
-          'Content-Type': 'application/json; charset=UTF-T',
+          'Content-Type': 'application/json; charset=UTF-8',
         },
         body: json.encode({
           'username': username,
