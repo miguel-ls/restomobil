@@ -10,14 +10,30 @@ class Product {
     }
 
     /**
-     * Lee todos los productos de la base de datos, con opción de filtrar por estado.
+     * Lee todos los productos de la base de datos, con opción de filtrar por múltiples campos.
      *
      * @return PDOStatement
      */
-    public function readAll($estado = null) {
-        $query = "CALL sp_getAllProducts(:estado)";
+    public function readAll($filters = []) {
+        $query = "CALL sp_getAllProducts(:id, :nombre, :descripcion, :precio, :categoria_nombre, :estado)";
         $stmt = $this->conn->prepare($query);
+
+        // Asignar valores de los filtros, usando null si no están definidos
+        $id = $filters['id'] ?? null;
+        $nombre = $filters['nombre'] ?? null;
+        $descripcion = $filters['descripcion'] ?? null;
+        $precio = $filters['precio'] ?? null;
+        $categoria_nombre = $filters['categoria_nombre'] ?? null;
+        $estado = $filters['estado'] ?? null;
+
+        // Enlazar parámetros
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':nombre', $nombre, PDO::PARAM_STR);
+        $stmt->bindParam(':descripcion', $descripcion, PDO::PARAM_STR);
+        $stmt->bindParam(':precio', $precio, PDO::PARAM_STR);
+        $stmt->bindParam(':categoria_nombre', $categoria_nombre, PDO::PARAM_STR);
         $stmt->bindParam(':estado', $estado, PDO::PARAM_STR);
+
         $stmt->execute();
         return $stmt;
     }

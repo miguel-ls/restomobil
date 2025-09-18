@@ -8,12 +8,25 @@ CHANGE COLUMN `disponible` `estado` ENUM('activo', 'inactivo') NOT NULL DEFAULT 
 DELIMITER $$
 
 DROP PROCEDURE IF EXISTS sp_getAllProducts$$
-CREATE PROCEDURE sp_getAllProducts(IN p_estado VARCHAR(10))
+CREATE PROCEDURE sp_getAllProducts(
+    IN p_id INT,
+    IN p_nombre VARCHAR(100),
+    IN p_descripcion TEXT,
+    IN p_precio DECIMAL(10, 2),
+    IN p_categoria_nombre VARCHAR(100),
+    IN p_estado VARCHAR(10)
+)
 BEGIN
     SELECT p.id, p.nombre, p.descripcion, p.precio, p.estado, c.nombre as categoria_nombre
     FROM productos p
     LEFT JOIN categorias_producto c ON p.id_categoria = c.id
-    WHERE (p_estado IS NULL OR p.estado = p_estado)
+    WHERE
+        (p_id IS NULL OR p.id = p_id) AND
+        (p_nombre IS NULL OR p.nombre LIKE CONCAT('%', p_nombre, '%')) AND
+        (p_descripcion IS NULL OR p.descripcion LIKE CONCAT('%', p_descripcion, '%')) AND
+        (p_precio IS NULL OR p.precio = p_precio) AND
+        (p_categoria_nombre IS NULL OR c.nombre LIKE CONCAT('%', p_categoria_nombre, '%')) AND
+        (p_estado IS NULL OR p.estado = p_estado)
     ORDER BY p.nombre;
 END$$
 

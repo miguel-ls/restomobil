@@ -191,3 +191,31 @@ table th { background-color: var(--light-bg); font-weight: 600; }
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 15px;
 }
+
+/* Estilos para el contenedor de filtros */
+.filter-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    align-items: center;
+}
+
+.filters input,
+.filters select {
+    width: 100%;
+    padding: 8px 12px;
+}
+
+.filters .btn {
+    padding: 8px 12px;
+    grid-column: -1; /* Alinea el botón a la última columna */
+    justify-self: end;
+}
