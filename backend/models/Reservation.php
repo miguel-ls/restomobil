@@ -70,6 +70,8 @@ class Reservation {
         if($stmt->execute()) {
             return true;
         }
+        // Log error if execution fails
+        error_log("Database error on create: " . implode(" - ", $stmt->errorInfo()));
         return false;
     }
 
@@ -110,6 +112,8 @@ class Reservation {
         if($stmt->execute()) {
             return true;
         }
+        // Log error if execution fails
+        error_log("Database error on update: " . implode(" - ", $stmt->errorInfo()));
         return false;
     }
 
