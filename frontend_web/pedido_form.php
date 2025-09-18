@@ -11,11 +11,6 @@ include_once 'templates/header.php';
 // Asumo que estos archivos de configuración y los CRUD básicos ya existen
 include_once __DIR__ . '/../backend/config/app_config.php';
 
-// Definir API_BASE_URL si no está definida para evitar errores fatales.
-if (!defined('API_BASE_URL')) {
-    define('API_BASE_URL', 'http://localhost/restaurante_system/backend/api/v1/');
-}
-
 function fetchFromAPI($endpoint) {
     $api_url = API_BASE_URL . $endpoint;
     $ch = curl_init($api_url);

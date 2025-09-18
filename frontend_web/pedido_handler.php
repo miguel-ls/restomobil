@@ -33,7 +33,9 @@ $api_data = [
     'items' => $items
 ];
 
-$api_url = 'http://localhost/restaurante_system/backend/api/v1/pedidos.php';
+// Incluir configuración de la API
+require_once '../backend/config/app_config.php';
+$api_url = API_BASE_URL . 'pedidos.php';
 $method = 'POST';
 
 if ($is_editing) {

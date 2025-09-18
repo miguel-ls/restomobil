@@ -7,8 +7,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Incluir configuración de la API
+    require_once '../backend/config/app_config.php';
     $action = $_POST['action'] ?? '';
-    $api_url = 'http://localhost/restaurante_system/backend/api/v1/productos.php';
+    $api_url = API_BASE_URL . 'productos.php';
     $data = [
         'nombre' => $_POST['nombre'] ?? '',
         'descripcion' => $_POST['descripcion'] ?? '',

@@ -6,9 +6,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION
 }
 
 include_once 'templates/header.php';
+include_once __DIR__ . '/../backend/config/app_config.php';
 
 function getAPIdata($endpoint) {
-    $api_url = "http://localhost/restaurante_system/backend/api/v1/$endpoint";
+    $api_url = API_BASE_URL . $endpoint;
     $response = @file_get_contents($api_url);
     $data = json_decode($response, true);
     return isset($data['records']) ? $data['records'] : $data;

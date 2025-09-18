@@ -8,10 +8,6 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 include_once 'templates/header.php';
 include_once __DIR__ . '/../backend/config/app_config.php';
 
-if (!defined('API_BASE_URL')) {
-    define('API_BASE_URL', 'http://localhost/restaurante_system/backend/api/v1/');
-}
-
 function fetchFromAPI($endpoint) {
     $api_url = API_BASE_URL . $endpoint;
     $ch = curl_init($api_url);

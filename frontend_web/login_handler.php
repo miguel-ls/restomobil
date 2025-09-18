@@ -4,9 +4,9 @@ session_start();
 // Validar que se recibieron los datos del formulario
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($_POST['password'])) {
 
-    // URL del endpoint de la API de login
-    // Esta URL podría necesitar ser ajustada dependiendo del entorno
-    $api_url = 'http://localhost/restaurante_system/backend/api/v1/login.php';
+    // Incluir configuración de la API
+    require_once '../backend/config/app_config.php';
+    $api_url = API_BASE_URL . 'login.php';
 
     // Datos a enviar a la API
     $data = array(

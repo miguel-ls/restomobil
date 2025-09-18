@@ -6,11 +6,11 @@
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:mobile_app/config/api_config.dart'; // Importar la configuración
 
 class ApiService {
-  // Ajusta esta URL a la dirección de tu backend.
-  static const String _baseUrl = 'http://localhost/restaurante_system/backend/api/v1';
-  // Nota: 10.0.2.2 es la IP que el emulador de Android usa para referirse al localhost de la máquina anfitriona.
+  // La URL base ahora se gestiona en `config/api_config.dart`.
+  static const String _baseUrl = baseUrl;
 
   /**
    * Intenta iniciar sesión en el sistema.

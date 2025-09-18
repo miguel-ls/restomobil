@@ -13,7 +13,7 @@ include_once __DIR__ . '/../backend/config/app_config.php';
 
 // Función para obtener productos desde la API con filtros
 function getProducts($filters = []) {
-    $api_url = 'http://localhost/restaurante_system/backend/api/v1/productos.php';
+    $api_url = API_BASE_URL . 'productos.php';
     if (!empty($filters)) {
         $api_url .= '?' . http_build_query($filters);
     }
@@ -51,7 +51,7 @@ $products_data = getProducts($filters);
 $pagination = $products_data['pagination'] ?? null;
 
 function getCategories() {
-    $api_url = 'http://localhost/restaurante_system/backend/api/v1/categorias.php';
+    $api_url = API_BASE_URL . 'categorias.php';
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $response = curl_exec($ch);

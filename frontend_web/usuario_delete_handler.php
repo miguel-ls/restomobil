@@ -7,7 +7,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION
 
 if (isset($_GET['id'])) {
     $user_id = intval($_GET['id']);
-    $api_url = "http://localhost/restaurante_system/backend/api/v1/usuarios.php?id=$user_id";
+
+    // Incluir configuración de la API
+    require_once '../backend/config/app_config.php';
+    $api_url = API_BASE_URL . "usuarios.php?id=$user_id";
 
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

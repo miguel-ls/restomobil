@@ -17,7 +17,7 @@ include_once 'templates/header.php';
 include_once __DIR__ . '/../backend/config/app_config.php';
 
 function getOrderDetails($id) {
-    $api_url = "http://localhost/restaurante_system/backend/api/v1/pedidos.php?id=$id";
+    $api_url = API_BASE_URL . "pedidos.php?id=$id";
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $response = curl_exec($ch);

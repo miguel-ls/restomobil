@@ -14,7 +14,7 @@ include_once __DIR__ . '/../backend/config/app_config.php';
 
 // Función para obtener los pedidos desde la API
 function getOrders() {
-    $api_url = 'http://localhost/restaurante_system/backend/api/v1/pedidos.php';
+    $api_url = API_BASE_URL . 'pedidos.php';
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $response = curl_exec($ch);

@@ -14,7 +14,9 @@ if (isset($_GET['id'])) {
     $table_id = intval($_GET['id']);
     $page_title = 'Editar Mesa';
 
-    $api_url = "http://localhost/restaurante_system/backend/api/v1/mesas.php?id=$table_id";
+    // Incluir configuración de la API
+    require_once '../backend/config/app_config.php';
+    $api_url = API_BASE_URL . "mesas.php?id=$table_id";
     $response = @file_get_contents($api_url);
     if ($response) {
         $table_data = json_decode($response, true);

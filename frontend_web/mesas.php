@@ -9,7 +9,9 @@ $page_title = 'Gestión de Mesas';
 include_once 'templates/header.php';
 
 function getTables() {
-    $api_url = 'http://localhost/restaurante_system/backend/api/v1/mesas.php';
+    // Incluir configuración de la API
+    require_once '../backend/config/app_config.php';
+    $api_url = API_BASE_URL . 'mesas.php';
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $response = curl_exec($ch);

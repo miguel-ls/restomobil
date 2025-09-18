@@ -27,13 +27,13 @@ Antes de empezar, asegúrate de tener instalado lo siguiente:
       ```
 
 3.  **Verificar la URL del Backend (¡Paso Crítico!)**:
-    -   Abre el archivo `mobile_app/lib/api/api_service.dart`.
-    -   Busca la línea que dice `static const String _baseUrl = ...`.
+    -   Abre el archivo `mobile_app/lib/config/api_config.dart`.
+    -   Busca la línea que dice `const String baseUrl = ...`.
     -   **Asegúrate de que tu servidor local (XAMPP, etc.) donde corre el backend PHP esté en ejecución.**
-    -   La URL debe ser la correcta para tu caso:
-        -   **Si usas un Emulador de Android**: La URL que puse (`http://10.0.2.2/...`) debería funcionar, ya que es la dirección que usa el emulador para conectarse al `localhost` de tu computadora.
-        -   **Si usas un Simulador de iOS**: Debes cambiar `10.0.2.2` por `localhost`. La URL sería `http://localhost/restaurante_system/backend/api/v1`.
-        -   **Si usas un teléfono físico**: Debes usar la dirección IP de tu computadora en la red local. Por ejemplo: `http://192.168.1.10/...`. (Puedes encontrar tu IP local con `ipconfig` en Windows o `ifconfig` en Mac/Linux).
+    -   La URL debe ser la correcta para tu caso. He dejado la URL por defecto para el emulador de Android.
+        -   **Emulador de Android**: `http://10.0.2.2/restaurante_system/backend/api/v1` (ya está configurada).
+        -   **Simulador de iOS**: Cambia `10.0.2.2` por `localhost`.
+        -   **Teléfono físico**: Usa la IP de tu computadora en la red local (ej. `http://192.168.1.100/...`).
 
 4.  **Seleccionar tu dispositivo**:
     -   En la esquina inferior derecha de la barra de estado de VS Code, verás el nombre de un dispositivo (o dirá "No Device"). Haz clic ahí.
