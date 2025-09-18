@@ -34,8 +34,8 @@ El backend es el componente más crítico y debe ser desplegado primero.
 ### **2. Despliegue del Frontend Web**
 
 1.  **Configurar el Código:**
-    -   Abre los archivos del frontend que realizan llamadas a la API (empezando por `frontend_web/login_handler.php` y `frontend_web/productos.php`).
-    -   Cambia la variable `$api_url` de la URL local (`http://localhost/...`) a la URL de producción de tu backend (ej. `https://api.mi-restaurante.com/api/v1/...`).
+    -   Abre el archivo `backend/config/app_config.php`.
+    -   Actualiza la constante `API_BASE_URL` para que apunte a la URL de producción de tu backend (ej. `https://api.mi-restaurante.com/api/v1/`).
 
 2.  **Subir los Archivos:**
     -   Sube todo el contenido del directorio `frontend_web` a la raíz del dominio principal de tu sitio web (ej. `public_html` o `www`).
@@ -45,8 +45,8 @@ El backend es el componente más crítico y debe ser desplegado primero.
 ### **3. Despliegue de la Aplicación Móvil (Flutter)**
 
 1.  **Configurar el Código:**
-    -   Abre el archivo `mobile_app/lib/api/api_service.dart`.
-    -   Actualiza la constante `_baseUrl` para que apunte a la URL de producción de tu API (ej. `https://api.mi-restaurante.com/api/v1`).
+    -   Abre el archivo `mobile_app/lib/config/api_config.dart`.
+    -   Actualiza la constante `baseUrl` para que apunte a la URL de producción de tu API (ej. `https://api.mi-restaurante.com/api/v1`).
 
 2.  **Compilar la Aplicación para Producción:**
     -   Asegúrate de tener el SDK de Flutter y las herramientas de construcción de Android/iOS instaladas.

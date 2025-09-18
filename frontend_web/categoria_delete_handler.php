@@ -7,7 +7,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 if (isset($_GET['id'])) {
     $category_id = intval($_GET['id']);
-    $api_url = "http://localhost/restaurante_system/backend/api/v1/categorias.php?id=$category_id";
+
+    // Incluir configuración de la API
+    require_once '../backend/config/app_config.php';
+    $api_url = API_BASE_URL . "categorias.php?id=$category_id";
 
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

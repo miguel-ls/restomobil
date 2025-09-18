@@ -9,7 +9,9 @@ $page_title = 'Gestión de Usuarios';
 include_once 'templates/header.php';
 
 function getUsers() {
-    $api_url = 'http://localhost/restaurante_system/backend/api/v1/usuarios.php';
+    // Incluir configuración de la API
+    require_once '../backend/config/app_config.php';
+    $api_url = API_BASE_URL . 'usuarios.php';
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $response = curl_exec($ch);

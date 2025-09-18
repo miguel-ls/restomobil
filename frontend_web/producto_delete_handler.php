@@ -8,7 +8,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 if (isset($_GET['id'])) {
     $product_id = intval($_GET['id']);
-    $api_url = "http://localhost/restaurante_system/backend/api/v1/productos.php?id=" . $product_id;
+
+    // Incluir configuración de la API
+    require_once '../backend/config/app_config.php';
+    $api_url = API_BASE_URL . "productos.php?id=" . $product_id;
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $api_url);

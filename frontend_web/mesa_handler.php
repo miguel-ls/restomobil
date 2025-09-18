@@ -6,8 +6,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Incluir configuración de la API
+    require_once '../backend/config/app_config.php';
     $is_editing = !empty($_POST['id']);
-    $api_url = 'http://localhost/restaurante_system/backend/api/v1/mesas.php';
+    $api_url = API_BASE_URL . 'mesas.php';
     if ($is_editing) {
         $api_url .= '?id=' . intval($_POST['id']);
     }

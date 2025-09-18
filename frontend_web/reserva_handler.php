@@ -7,11 +7,6 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 include_once __DIR__ . '/../backend/config/app_config.php';
 
-// Salvaguarda por si la constante no está definida en el archivo de configuración.
-if (!defined('API_BASE_URL')) {
-    define('API_BASE_URL', 'http://localhost/restaurante_system/backend/api/v1/');
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $api_url = API_BASE_URL . 'reservas.php';
     $is_editing = isset($_POST['id']) && !empty($_POST['id']);
