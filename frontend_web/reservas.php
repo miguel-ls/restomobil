@@ -26,8 +26,7 @@ $reservations_data = getReservations();
         <div class="container">
             <div class="page-header">
                 <h1>Gestión de Reservas</h1>
-                <!-- Futuro botón para crear reserva -->
-                <!-- <a href="reserva_form.php" class="btn">Crear Reserva</a> -->
+                <a href="reserva_form.php" class="btn">Crear Reserva</a>
             </div>
             <div class="table-container">
                 <table>
@@ -57,9 +56,8 @@ $reservations_data = getReservations();
                                         </span>
                                     </td>
                                     <td class="actions-cell">
-                                        <!-- Futuros botones de acción -->
-                                        <!-- <a href="reserva_form.php?id=<?php echo $reservation['id']; ?>" class="btn btn-edit">Editar</a> -->
-                                        <!-- <a href="reserva_delete_handler.php?id=<?php echo $reservation['id']; ?>" class="btn btn-delete" onclick="return confirm('¿Estás seguro?');">Cancelar</a> -->
+                                        <a href="reserva_form.php?id=<?php echo $reservation['id']; ?>" class="btn btn-edit">Editar</a>
+                                        <a href="reserva_delete_handler.php?id=<?php echo $reservation['id']; ?>" class="btn btn-delete" onclick="return confirm('¿Estás seguro?');">Cancelar</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
