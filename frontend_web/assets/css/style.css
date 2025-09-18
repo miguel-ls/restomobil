@@ -216,6 +216,9 @@ table th { background-color: var(--light-bg); font-weight: 600; }
 
 .filters .btn {
     padding: 8px 12px;
-    grid-column: -1; /* Alinea el botón a la última columna */
-    justify-self: end;
+}
+
+.filter-actions {
+    margin-top: 15px;
+    text-align: right;
 }
