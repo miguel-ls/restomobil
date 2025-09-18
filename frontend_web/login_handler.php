@@ -24,18 +24,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($
     // Ejecutar la petición y obtener la respuesta
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-    // --- INICIO DEPURACIÓN cURL ---
-    if (curl_errno($ch)) {
-        $error_log_file = '/tmp/curl_errors.log';
-        $timestamp = date('Y-m-d H:i:s');
-        $log_message = "--- ERROR cURL [$timestamp] ---\n";
-        $log_message .= "Error: " . curl_error($ch) . "\n";
-        $log_message .= "URL: " . $api_url . "\n\n";
-        file_put_contents($error_log_file, $log_message, FILE_APPEND);
-    }
-    // --- FIN DEPURACIÓN cURL ---
-
     curl_close($ch);
 
     // Decodificar la respuesta JSON

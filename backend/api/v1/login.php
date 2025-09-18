@@ -14,40 +14,26 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// --- INICIO CÓDIGO DE DEPURACIÓN ---
-$debug_log_file = '/tmp/login_debug.log'; // Usar un directorio temporal escribible
-$raw_input = file_get_contents("php://input");
-$post_data = print_r($_POST, true);
-$timestamp = date('Y-m-d H:i:s');
-$log_message = "--- INICIO DEPURACIÓN [$timestamp] ---\n";
-$log_message .= "RAW INPUT:\n" . $raw_input . "\n\n";
-$log_message .= "DATOS \$_POST:\n" . $post_data . "\n\n";
-// --- FIN CÓDIGO DE DEPURACIÓN ---
-
 // Obtener los datos enviados
 // Primero intenta decodificar el cuerpo JSON
-$data = json_decode($raw_input);
+$data = json_decode(file_get_contents("php://input"));
 
 // Si el cuerpo JSON está vacío o no es un objeto, intenta obtener los datos de $_POST
-// Esto da flexibilidad para aceptar tanto application/json como application/x-www-form-urlencoded
 if (!is_object($data) && isset($_POST['username'])) {
     // Convertir el array $_POST a un objeto para mantener una estructura de datos consistente
     $data = (object)$_POST;
 }
 
-// --- INICIO CÓDIGO DE DEPURACIÓN (PARTE 2) ---
-$final_data = print_r($data, true);
-$log_message .= "DATOS FINALES (\$data):\n" . $final_data . "\n\n";
-$log_message .= "--- FIN DEPURACIÓN ---\n\n";
-file_put_contents($debug_log_file, $log_message, FILE_APPEND);
-// --- FIN CÓDIGO DE DEPURACIÓN (PARTE 2) ---
-
-// Validar que se recibieron los datos necesarios
+// Validar que se recibieron los datos necesarios y limpiarlos
 if (empty($data->username) || empty($data->password)) {
     http_response_code(400); // Bad Request
     echo json_encode(array("message" => "No se pudo iniciar sesión. Faltan el nombre de usuario o la contraseña."));
     exit();
 }
+
+// Limpiar los datos de entrada para eliminar espacios en blanco accidentales
+$data->username = trim($data->username);
+$data->password = trim($data->password);
 
 $user = new User();
 
