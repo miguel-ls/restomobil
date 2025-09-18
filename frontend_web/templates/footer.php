@@ -26,6 +26,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-<script src="assets/js/modal.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>
