@@ -14,8 +14,7 @@ class Reservation {
     public $observaciones;
 
     public function __construct() {
-        $database = new Database();
-        $this->conn = $database->getConnection();
+        $this->conn = Database::getInstance();
     }
 
     function readAll() {
