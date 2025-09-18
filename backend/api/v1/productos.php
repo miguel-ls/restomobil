@@ -27,9 +27,16 @@ switch ($request_method) {
                 echo json_encode(array("message" => "Producto no encontrado."));
             }
         } else {
-            // Obtener todos los productos con filtro opcional por estado
-            $estado = isset($_GET['estado']) ? $_GET['estado'] : null;
-            handleGetAllProducts($product, $estado);
+            // Obtener todos los productos con filtros opcionales
+            $filters = [];
+            if (!empty($_GET['id'])) $filters['id'] = $_GET['id'];
+            if (!empty($_GET['nombre'])) $filters['nombre'] = $_GET['nombre'];
+            if (!empty($_GET['descripcion'])) $filters['descripcion'] = $_GET['descripcion'];
+            if (!empty($_GET['precio'])) $filters['precio'] = $_GET['precio'];
+            if (!empty($_GET['categoria_nombre'])) $filters['categoria_nombre'] = $_GET['categoria_nombre'];
+            if (!empty($_GET['estado'])) $filters['estado'] = $_GET['estado'];
+
+            handleGetAllProducts($product, $filters);
         }
         break;
 
@@ -90,8 +97,8 @@ switch ($request_method) {
         break;
 }
 
-function handleGetAllProducts($product, $estado = null) {
-    $stmt = $product->readAll($estado);
+function handleGetAllProducts($product, $filters = []) {
+    $stmt = $product->readAll($filters);
     $num = $stmt->rowCount();
 
     if ($num > 0) {

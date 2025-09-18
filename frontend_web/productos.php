@@ -66,7 +66,7 @@ $products_data = getProducts($filters);
             }
             ?>
 
-            <div class="table-container">
+            <div class="filter-container">
                 <form method="GET" action="productos.php">
                     <div class="filters">
                         <input type="text" name="id" placeholder="Filtrar por ID" value="<?php echo htmlspecialchars($_GET['id'] ?? ''); ?>">
@@ -82,6 +82,8 @@ $products_data = getProducts($filters);
                         <button type="submit" class="btn">Filtrar</button>
                     </div>
                 </form>
+            </div>
+            <div class="table-container">
                 <table>
                     <thead>
                         <tr>
@@ -103,7 +105,11 @@ $products_data = getProducts($filters);
                                     <td><?php echo htmlspecialchars($product['descripcion']); ?></td>
                                     <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($product['precio'], 2)); ?></td>
                                     <td><?php echo htmlspecialchars($product['categoria_nombre']); ?></td>
-                                    <td><?php echo htmlspecialchars($product['estado']); ?></td>
+                                    <td>
+                                        <span class="status status-<?php echo htmlspecialchars(strtolower($product['estado'])); ?>">
+                                            <?php echo htmlspecialchars($product['estado']); ?>
+                                        </span>
+                                    </td>
                                     <td class="actions-cell">
                                         <a href="producto_form.php?id=<?php echo $product['id']; ?>" class="btn btn-edit">Editar</a>
                                         <a href="producto_delete_handler.php?id=<?php echo $product['id']; ?>" class="btn btn-delete" onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?');">Eliminar</a>
