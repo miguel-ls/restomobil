@@ -110,6 +110,55 @@ table th { background-color: var(--light-bg); font-weight: 600; }
     body.sidebar-collapsed .mobile-overlay { display: block; }
     .order-grid { grid-template-columns: 1fr; }
 
+    /* Filtros responsivos */
+    .filters {
+        grid-template-columns: 1fr; /* Una sola columna */
+    }
+    .filters .btn {
+        grid-column: 1 / -1; /* Ocupa todo el ancho */
+        justify-self: stretch;
+        text-align: center;
+    }
+
+    /* Tabla responsiva (productos, usuarios, etc.) a tarjetas */
+    .table-container table thead {
+        display: none; /* Ocultar cabeceras en móvil */
+    }
+    .table-container table tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .table-container table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 5px;
+        border-bottom: 1px dotted var(--border-color);
+    }
+    .table-container table td:last-child {
+        border-bottom: none;
+    }
+    .table-container table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        margin-right: 15px;
+    }
+    .actions-cell {
+        justify-content: flex-start !important; /* Anular el space-between */
+        gap: 10px;
+    }
+    .actions-cell::before {
+        margin-bottom: 5px; /* Espacio para los botones */
+    }
+    .actions-cell .btn {
+        flex-grow: 1;
+    }
+
+
     /* Estilos de Tarjetas para Items de Pedido en Móvil */
     .order-item-card { background-color: #fdfdfd; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 10px; }
     .card-item-header { font-size: 1.1em; font-weight: bold; margin-bottom: 10px; }
