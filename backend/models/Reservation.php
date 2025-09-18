@@ -42,5 +42,86 @@ class Reservation {
 
         return $stmt;
     }
+
+    function create() {
+        $query = "INSERT INTO " . $this->table_name . " SET id_mesa=:id_mesa, nombre_cliente=:nombre_cliente, telefono_cliente=:telefono_cliente, email_cliente=:email_cliente, fecha_reserva=:fecha_reserva, cantidad_personas=:cantidad_personas, estado=:estado, observaciones=:observaciones";
+        $stmt = $this->conn->prepare($query);
+
+        // Sanitize
+        $this->id_mesa=htmlspecialchars(strip_tags($this->id_mesa));
+        $this->nombre_cliente=htmlspecialchars(strip_tags($this->nombre_cliente));
+        $this->telefono_cliente=htmlspecialchars(strip_tags($this->telefono_cliente));
+        $this->email_cliente=htmlspecialchars(strip_tags($this->email_cliente));
+        $this->fecha_reserva=htmlspecialchars(strip_tags($this->fecha_reserva));
+        $this->cantidad_personas=htmlspecialchars(strip_tags($this->cantidad_personas));
+        $this->estado=htmlspecialchars(strip_tags($this->estado));
+        $this->observaciones=htmlspecialchars(strip_tags($this->observaciones));
+
+        // Bind values
+        $stmt->bindParam(":id_mesa", $this->id_mesa);
+        $stmt->bindParam(":nombre_cliente", $this->nombre_cliente);
+        $stmt->bindParam(":telefono_cliente", $this->telefono_cliente);
+        $stmt->bindParam(":email_cliente", $this->email_cliente);
+        $stmt->bindParam(":fecha_reserva", $this->fecha_reserva);
+        $stmt->bindParam(":cantidad_personas", $this->cantidad_personas);
+        $stmt->bindParam(":estado", $this->estado);
+        $stmt->bindParam(":observaciones", $this->observaciones);
+
+        if($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
+
+    function readOne() {
+        $query = "SELECT r.*, m.numero_mesa FROM " . $this->table_name . " r LEFT JOIN mesas m ON r.id_mesa = m.id WHERE r.id = ? LIMIT 0,1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $this->id);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    function update() {
+        $query = "UPDATE " . $this->table_name . " SET id_mesa = :id_mesa, nombre_cliente = :nombre_cliente, telefono_cliente = :telefono_cliente, email_cliente = :email_cliente, fecha_reserva = :fecha_reserva, cantidad_personas = :cantidad_personas, estado = :estado, observaciones = :observaciones WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+
+        // Sanitize
+        $this->id=htmlspecialchars(strip_tags($this->id));
+        $this->id_mesa=htmlspecialchars(strip_tags($this->id_mesa));
+        $this->nombre_cliente=htmlspecialchars(strip_tags($this->nombre_cliente));
+        $this->telefono_cliente=htmlspecialchars(strip_tags($this->telefono_cliente));
+        $this->email_cliente=htmlspecialchars(strip_tags($this->email_cliente));
+        $this->fecha_reserva=htmlspecialchars(strip_tags($this->fecha_reserva));
+        $this->cantidad_personas=htmlspecialchars(strip_tags($this->cantidad_personas));
+        $this->estado=htmlspecialchars(strip_tags($this->estado));
+        $this->observaciones=htmlspecialchars(strip_tags($this->observaciones));
+
+        // Bind values
+        $stmt->bindParam(':id', $this->id);
+        $stmt->bindParam(":id_mesa", $this->id_mesa);
+        $stmt->bindParam(":nombre_cliente", $this->nombre_cliente);
+        $stmt->bindParam(":telefono_cliente", $this->telefono_cliente);
+        $stmt->bindParam(":email_cliente", $this->email_cliente);
+        $stmt->bindParam(":fecha_reserva", $this->fecha_reserva);
+        $stmt->bindParam(":cantidad_personas", $this->cantidad_personas);
+        $stmt->bindParam(":estado", $this->estado);
+        $stmt->bindParam(":observaciones", $this->observaciones);
+
+        if($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
+
+    function delete() {
+        $query = "DELETE FROM " . $this->table_name . " WHERE id = ?";
+        $stmt = $this->conn->prepare($query);
+        $this->id=htmlspecialchars(strip_tags($this->id));
+        $stmt->bindParam(1, $this->id);
+        if($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
 }
 ?>
