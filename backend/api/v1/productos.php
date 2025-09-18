@@ -98,12 +98,23 @@ switch ($request_method) {
 }
 
 function handleGetAllProducts($product, $filters = []) {
-    $stmt = $product->readAll($filters);
+    $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+    $page_size = 12; // 12 filas por página
+
+    $stmt = $product->readAll($filters, $page, $page_size);
+    $total_records = $product->countAll($filters);
+    $total_pages = ceil($total_records / $page_size);
+
     $num = $stmt->rowCount();
 
     if ($num > 0) {
-        $products_arr = array();
-        $products_arr["records"] = array();
+        $products_arr = [];
+        $products_arr["records"] = [];
+        $products_arr["pagination"] = [
+            "page" => $page,
+            "total_pages" => $total_pages,
+            "total_records" => $total_records
+        ];
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             extract($row);

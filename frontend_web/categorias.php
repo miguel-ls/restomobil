@@ -61,4 +61,3 @@ $categories_data = getCategories();
     </main>
 </div>
 
-<?php include_once 'templates/footer.php'; ?>

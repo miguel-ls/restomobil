@@ -69,4 +69,3 @@ $users_data = getUsers();
     </main>
 </div>
 
-<?php include_once 'templates/footer.php'; ?>

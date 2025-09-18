@@ -84,4 +84,3 @@ if (isset($_GET['id'])) {
     </main>
 </div>
 
-<?php include_once 'templates/footer.php'; ?>
