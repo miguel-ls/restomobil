@@ -71,4 +71,3 @@ $reservations_data = getReservations();
     </main>
 </div>
 
-<?php include_once 'templates/footer.php'; ?>

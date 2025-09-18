@@ -122,4 +122,3 @@ $reservation_states = ['confirmada', 'completada', 'cancelada'];
     </main>
 </div>
 
-<?php include_once 'templates/footer.php'; ?>

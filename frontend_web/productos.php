@@ -43,8 +43,23 @@ if (!empty($_GET['categoria_nombre'])) {
 if (!empty($_GET['estado'])) {
     $filters['estado'] = $_GET['estado'];
 }
+if (!empty($_GET['page'])) {
+    $filters['page'] = $_GET['page'];
+}
 
 $products_data = getProducts($filters);
+$pagination = $products_data['pagination'] ?? null;
+
+function getCategories() {
+    $api_url = 'http://localhost/restaurante_system/backend/api/v1/categorias.php';
+    $ch = curl_init($api_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    $data = json_decode($response, true);
+    return $data['records'] ?? [];
+}
+$categories = getCategories();
 ?>
 
 <div class="dashboard-container">
@@ -73,7 +88,14 @@ $products_data = getProducts($filters);
                         <input type="text" name="nombre" placeholder="Filtrar por Nombre" value="<?php echo htmlspecialchars($_GET['nombre'] ?? ''); ?>">
                         <input type="text" name="descripcion" placeholder="Filtrar por Descripción" value="<?php echo htmlspecialchars($_GET['descripcion'] ?? ''); ?>">
                         <input type="text" name="precio" placeholder="Filtrar por Precio" value="<?php echo htmlspecialchars($_GET['precio'] ?? ''); ?>">
-                        <input type="text" name="categoria_nombre" placeholder="Filtrar por Categoría" value="<?php echo htmlspecialchars($_GET['categoria_nombre'] ?? ''); ?>">
+                        <select name="categoria_nombre">
+                            <option value="">Todas las categorías</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?php echo htmlspecialchars($category['nombre']); ?>" <?php echo (isset($_GET['categoria_nombre']) && $_GET['categoria_nombre'] == $category['nombre']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($category['nombre']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                         <select name="estado">
                             <option value="">Todos los estados</option>
                             <option value="activo" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'activo') ? 'selected' : ''; ?>>Activo</option>
@@ -123,11 +145,35 @@ $products_data = getProducts($filters);
                         <?php endif; ?>
                     </tbody>
                 </table>
+                <?php if ($pagination && $pagination['total_pages'] > 1): ?>
+                    <div class="pagination">
+                        <?php
+                        // Mantener los filtros actuales en los enlaces de paginación
+                        $queryParams = $_GET;
+
+                        // Página anterior
+                        if ($pagination['page'] > 1) {
+                            $queryParams['page'] = $pagination['page'] - 1;
+                            echo '<a href="?' . http_build_query($queryParams) . '">&laquo; Anterior</a>';
+                        }
+
+                        // Números de página
+                        for ($i = 1; $i <= $pagination['total_pages']; $i++) {
+                            $queryParams['page'] = $i;
+                            $activeClass = ($i == $pagination['page']) ? 'active' : '';
+                            echo '<a href="?' . http_build_query($queryParams) . '" class="' . $activeClass . '">' . $i . '</a>';
+                        }
+
+                        // Página siguiente
+                        if ($pagination['page'] < $pagination['total_pages']) {
+                            $queryParams['page'] = $pagination['page'] + 1;
+                            echo '<a href="?' . http_build_query($queryParams) . '">Siguiente &raquo;</a>';
+                        }
+                        ?>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </main>
 </div>
 
-<?php
-include_once 'templates/footer.php';
-?>

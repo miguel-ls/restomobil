@@ -63,4 +63,3 @@ $estados = ['disponible', 'ocupada', 'reservada', 'mantenimiento'];
     </main>
 </div>
 
-<?php include_once 'templates/footer.php'; ?>
