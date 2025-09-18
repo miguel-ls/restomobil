@@ -101,39 +101,38 @@ function handleGetAllProducts($product, $filters = []) {
     $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
     $page_size = 12; // 12 filas por página
 
+    // Primero, obtenemos los registros de la página actual
     $stmt = $product->readAll($filters, $page, $page_size);
+    $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->closeCursor(); // Importante: cerrar el cursor antes de la siguiente llamada
+
+    // Luego, obtenemos el conteo total de registros para la paginación
     $total_records = $product->countAll($filters);
     $total_pages = ceil($total_records / $page_size);
 
-    $num = $stmt->rowCount();
+    $num = count($records);
 
     if ($num > 0) {
-        $products_arr = [];
-        $products_arr["records"] = [];
-        $products_arr["pagination"] = [
-            "page" => $page,
-            "total_pages" => $total_pages,
-            "total_records" => $total_records
-        ];
+        // Asegurarse de que la descripción se decodifique correctamente
+        $decoded_records = array_map(function($row) {
+            $row['descripcion'] = html_entity_decode($row['descripcion']);
+            return $row;
+        }, $records);
 
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            extract($row);
-            $product_item = array(
-                "id" => $id,
-                "nombre" => $nombre,
-                "descripcion" => html_entity_decode($descripcion),
-                "precio" => $precio,
-                "estado" => $estado,
-                "categoria_nombre" => $categoria_nombre
-            );
-            array_push($products_arr["records"], $product_item);
-        }
+        $products_arr = [
+            "records" => $decoded_records,
+            "pagination" => [
+                "page" => $page,
+                "total_pages" => $total_pages,
+                "total_records" => $total_records
+            ]
+        ];
 
         http_response_code(200);
         echo json_encode($products_arr);
     } else {
         http_response_code(404);
-        echo json_encode(array("message" => "No se encontraron productos."));
+        echo json_encode(["message" => "No se encontraron productos."]);
     }
 }
 ?>
