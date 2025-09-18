@@ -6,7 +6,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION
 }
 
 include_once 'templates/header.php';
-include_once __DIR__ . '/../backend/config/app_config.php';
+include_once __DIR__ . '/config.php';
 
 function getAPIdata($endpoint) {
     $api_url = API_BASE_URL . $endpoint;

@@ -5,10 +5,10 @@ session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($_POST['password'])) {
 
     // Incluir configuración de la API
-    require_once '../backend/config/app_config.php';
+    require_once 'config.php';
     $api_url = API_BASE_URL . 'login.php';
 
-    // Datos a enviar a la API
+    // Datos a enviar a la API en formato de formulario
     $data = array(
         'username' => $_POST['username'],
         'password' => $_POST['password']
@@ -18,11 +18,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        'Content-Type: application/json',
-        'Content-Length: ' . strlen(json_encode($data))
-    ));
+    // Enviar los datos como un array asociativo hace que cURL use 'application/x-www-form-urlencoded'
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
     // Ejecutar la petición y obtener la respuesta
     $response = curl_exec($ch);

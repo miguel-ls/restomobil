@@ -10,7 +10,7 @@ include_once 'templates/header.php';
 
 function getCategories() {
     // Incluir configuración de la API
-    require_once '../backend/config/app_config.php';
+    require_once 'config.php';
     $api_url = API_BASE_URL . 'categorias.php';
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

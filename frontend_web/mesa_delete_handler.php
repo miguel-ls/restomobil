@@ -9,7 +9,7 @@ if (isset($_GET['id'])) {
     $table_id = intval($_GET['id']);
 
     // Incluir configuración de la API
-    require_once '../backend/config/app_config.php';
+    require_once 'config.php';
     $api_url = API_BASE_URL . "mesas.php?id=$table_id";
 
     $ch = curl_init($api_url);
