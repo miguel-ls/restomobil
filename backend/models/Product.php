@@ -10,16 +10,15 @@ class Product {
     }
 
     /**
-     * Lee todos los productos de la base de datos.
+     * Lee todos los productos de la base de datos, con opción de filtrar por estado.
      *
      * @return PDOStatement
      */
-    public function readAll() {
-        $query = "CALL sp_getAllProducts()";
-
+    public function readAll($estado = null) {
+        $query = "CALL sp_getAllProducts(:estado)";
         $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':estado', $estado, PDO::PARAM_STR);
         $stmt->execute();
-
         return $stmt;
     }
 
@@ -27,8 +26,8 @@ class Product {
      * Crea un nuevo producto.
      * @return PDOStatement|false
      */
-    public function create($nombre, $descripcion, $precio, $id_categoria) {
-        $query = "CALL sp_createProduct(:nombre, :descripcion, :precio, :id_categoria)";
+    public function create($nombre, $descripcion, $precio, $id_categoria, $estado) {
+        $query = "CALL sp_createProduct(:nombre, :descripcion, :precio, :id_categoria, :estado)";
         $stmt = $this->conn->prepare($query);
 
         // Limpiar datos
@@ -36,12 +35,14 @@ class Product {
         $descripcion = htmlspecialchars(strip_tags($descripcion));
         $precio = htmlspecialchars(strip_tags($precio));
         $id_categoria = htmlspecialchars(strip_tags($id_categoria));
+        $estado = htmlspecialchars(strip_tags($estado));
 
         // Enlazar parámetros
         $stmt->bindParam(':nombre', $nombre);
         $stmt->bindParam(':descripcion', $descripcion);
         $stmt->bindParam(':precio', $precio);
         $stmt->bindParam(':id_categoria', $id_categoria);
+        $stmt->bindParam(':estado', $estado);
 
         if ($stmt->execute()) {
             return $stmt;
@@ -65,8 +66,8 @@ class Product {
      * Actualiza un producto existente.
      * @return bool
      */
-    public function update($id, $nombre, $descripcion, $precio, $id_categoria) {
-        $query = "CALL sp_updateProduct(:id, :nombre, :descripcion, :precio, :id_categoria)";
+    public function update($id, $nombre, $descripcion, $precio, $id_categoria, $estado) {
+        $query = "CALL sp_updateProduct(:id, :nombre, :descripcion, :precio, :id_categoria, :estado)";
         $stmt = $this->conn->prepare($query);
 
         // Limpiar datos
@@ -75,6 +76,7 @@ class Product {
         $descripcion = htmlspecialchars(strip_tags($descripcion));
         $precio = htmlspecialchars(strip_tags($precio));
         $id_categoria = htmlspecialchars(strip_tags($id_categoria));
+        $estado = htmlspecialchars(strip_tags($estado));
 
         // Enlazar parámetros
         $stmt->bindParam(':id', $id);
@@ -82,6 +84,7 @@ class Product {
         $stmt->bindParam(':descripcion', $descripcion);
         $stmt->bindParam(':precio', $precio);
         $stmt->bindParam(':id_categoria', $id_categoria);
+        $stmt->bindParam(':estado', $estado);
 
         if ($stmt->execute()) {
             return true;
