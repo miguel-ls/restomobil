@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // --- INICIO CÓDIGO DE DEPURACIÓN ---
-$debug_log_file = __DIR__ . '/login_debug.log';
+$debug_log_file = '/tmp/login_debug.log'; // Usar un directorio temporal escribible
 $raw_input = file_get_contents("php://input");
 $post_data = print_r($_POST, true);
 $timestamp = date('Y-m-d H:i:s');
