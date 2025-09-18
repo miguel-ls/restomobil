@@ -27,15 +27,16 @@ switch ($request_method) {
                 echo json_encode(array("message" => "Producto no encontrado."));
             }
         } else {
-            // Obtener todos los productos
-            handleGetAllProducts($product);
+            // Obtener todos los productos con filtro opcional por estado
+            $estado = isset($_GET['estado']) ? $_GET['estado'] : null;
+            handleGetAllProducts($product, $estado);
         }
         break;
 
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->nombre) && !empty($data->precio)) {
-            $stmt = $product->create($data->nombre, $data->descripcion, $data->precio, $data->id_categoria);
+        if (!empty($data->nombre) && !empty($data->precio) && !empty($data->estado)) {
+            $stmt = $product->create($data->nombre, $data->descripcion, $data->precio, $data->id_categoria, $data->estado);
             if ($stmt) {
                 $new_product = $stmt->fetch(PDO::FETCH_ASSOC);
                 http_response_code(201); // Created
@@ -52,8 +53,8 @@ switch ($request_method) {
 
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->id) && !empty($data->nombre) && !empty($data->precio)) {
-            if ($product->update($data->id, $data->nombre, $data->descripcion, $data->precio, $data->id_categoria)) {
+        if (!empty($data->id) && !empty($data->nombre) && !empty($data->precio) && !empty($data->estado)) {
+            if ($product->update($data->id, $data->nombre, $data->descripcion, $data->precio, $data->id_categoria, $data->estado)) {
                 http_response_code(200);
                 echo json_encode(array("message" => "Producto actualizado."));
             } else {
@@ -89,8 +90,8 @@ switch ($request_method) {
         break;
 }
 
-function handleGetAllProducts($product) {
-    $stmt = $product->readAll();
+function handleGetAllProducts($product, $estado = null) {
+    $stmt = $product->readAll($estado);
     $num = $stmt->rowCount();
 
     if ($num > 0) {
@@ -104,6 +105,7 @@ function handleGetAllProducts($product) {
                 "nombre" => $nombre,
                 "descripcion" => html_entity_decode($descripcion),
                 "precio" => $precio,
+                "estado" => $estado,
                 "categoria_nombre" => $categoria_nombre
             );
             array_push($products_arr["records"], $product_item);

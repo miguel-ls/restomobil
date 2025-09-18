@@ -69,6 +69,13 @@ $categories = getAPIdata('categorias.php');
                             <?php endif; ?>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select id="estado" name="estado" required>
+                            <option value="activo" <?php echo (isset($product_data['estado']) && $product_data['estado'] == 'activo') ? 'selected' : ''; ?>>Activo</option>
+                            <option value="inactivo" <?php echo (isset($product_data['estado']) && $product_data['estado'] == 'inactivo') ? 'selected' : ''; ?>>Inactivo</option>
+                        </select>
+                    </div>
                     <div class="form-actions">
                         <button type="submit" class="btn"><?php echo $is_editing ? 'Actualizar' : 'Crear'; ?></button>
                     </div>

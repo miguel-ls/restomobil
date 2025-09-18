@@ -50,7 +50,7 @@ if (isset($_GET['id'])) {
 
 $mesas_data = fetchFromAPI('mesas.php?status=available');
 $mozos_data = fetchFromAPI('usuarios.php?rol=Mozo');
-$productos_data = fetchFromAPI('productos.php');
+$productos_data = fetchFromAPI('productos.php?estado=activo');
 $categorias_data = fetchFromAPI('categorias.php');
 
 $mesas = isset($mesas_data['records']) ? $mesas_data['records'] : [];
