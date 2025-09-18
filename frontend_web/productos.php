@@ -79,8 +79,6 @@ $products_data = getProducts($filters);
                             <option value="activo" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'activo') ? 'selected' : ''; ?>>Activo</option>
                             <option value="inactivo" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'inactivo') ? 'selected' : ''; ?>>Inactivo</option>
                         </select>
-                    </div>
-                    <div class="filter-actions">
                         <button type="submit" class="btn">Filtrar</button>
                     </div>
                 </form>
