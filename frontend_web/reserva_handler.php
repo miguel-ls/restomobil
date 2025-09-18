@@ -5,7 +5,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
-include_once __DIR__ . '/../backend/config/app_config.php';
+include_once __DIR__ . '/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $api_url = API_BASE_URL . 'reservas.php';

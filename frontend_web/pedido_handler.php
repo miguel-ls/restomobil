@@ -34,7 +34,7 @@ $api_data = [
 ];
 
 // Incluir configuración de la API
-require_once '../backend/config/app_config.php';
+require_once 'config.php';
 $api_url = API_BASE_URL . 'pedidos.php';
 $method = 'POST';
 

@@ -7,7 +7,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Incluir configuración de la API
-    require_once '../backend/config/app_config.php';
+    require_once 'config.php';
     $is_editing = !empty($_POST['id']);
     $api_url = API_BASE_URL . 'usuarios.php';
     if ($is_editing) {

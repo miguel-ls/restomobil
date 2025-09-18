@@ -9,7 +9,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $page_title = 'Gestión de Productos';
 include_once 'templates/header.php';
-include_once __DIR__ . '/../backend/config/app_config.php';
+include_once __DIR__ . '/config.php';
 
 // Función para obtener productos desde la API con filtros
 function getProducts($filters = []) {

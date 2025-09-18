@@ -14,7 +14,7 @@ if (!isset($_GET['id'])) {
 $order_id = intval($_GET['id']);
 $page_title = "Detalle del Pedido #$order_id";
 include_once 'templates/header.php';
-include_once __DIR__ . '/../backend/config/app_config.php';
+include_once __DIR__ . '/config.php';
 
 function getOrderDetails($id) {
     $api_url = API_BASE_URL . "pedidos.php?id=$id";

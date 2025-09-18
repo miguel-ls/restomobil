@@ -9,7 +9,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $page_title = 'Crear Nuevo Pedido';
 include_once 'templates/header.php';
 // Asumo que estos archivos de configuración y los CRUD básicos ya existen
-include_once __DIR__ . '/../backend/config/app_config.php';
+include_once __DIR__ . '/config.php';
 
 function fetchFromAPI($endpoint) {
     $api_url = API_BASE_URL . $endpoint;

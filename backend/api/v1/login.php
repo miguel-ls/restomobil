@@ -15,7 +15,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Obtener los datos enviados
+// Primero intenta decodificar el cuerpo JSON
 $data = json_decode(file_get_contents("php://input"));
+
+// Si el cuerpo JSON está vacío o no es un objeto, intenta obtener los datos de $_POST
+// Esto da flexibilidad para aceptar tanto application/json como application/x-www-form-urlencoded
+if (!is_object($data) && isset($_POST['username'])) {
+    // Convertir el array $_POST a un objeto para mantener una estructura de datos consistente
+    $data = (object)$_POST;
+}
 
 // Validar que se recibieron los datos necesarios
 if (empty($data->username) || empty($data->password)) {

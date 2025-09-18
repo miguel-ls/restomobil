@@ -10,7 +10,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $page_title = 'Gestión de Pedidos';
 include_once 'templates/header.php';
 // Incluir configuraciones como el símbolo de la moneda
-include_once __DIR__ . '/../backend/config/app_config.php';
+include_once __DIR__ . '/config.php';
 
 // Función para obtener los pedidos desde la API
 function getOrders() {
