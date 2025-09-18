@@ -112,12 +112,15 @@ table th { background-color: var(--light-bg); font-weight: 600; }
 
     /* Filtros responsivos */
     .filters {
-        grid-template-columns: 1fr; /* Una sola columna */
+        display: flex;
+        flex-direction: column;
+        gap: 15px; /* Espacio entre los filtros */
     }
+    .filters input,
+    .filters select,
     .filters .btn {
-        grid-column: 1 / -1; /* Ocupa todo el ancho */
-        justify-self: stretch;
-        text-align: center;
+        width: 100%; /* Asegura que ocupen todo el ancho */
+        box-sizing: border-box; /* Previene que el padding/border exceda el ancho */
     }
 
     /* Tabla responsiva (productos, usuarios, etc.) a tarjetas */
