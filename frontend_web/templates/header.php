@@ -19,3 +19,22 @@
     </a>
     <button id="mobile-menu-toggle"><i class="bi bi-list"></i></button>
 </header>
+<div class="mobile-overlay" id="mobile-overlay"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.getElementById('mobile-menu-toggle');
+    const body = document.getElementById('page-body');
+    const overlay = document.getElementById('mobile-overlay');
+
+    if (menuToggle && body && overlay) {
+        menuToggle.addEventListener('click', function() {
+            body.classList.toggle('sidebar-collapsed');
+        });
+
+        overlay.addEventListener('click', function() {
+            body.classList.remove('sidebar-collapsed');
+        });
+    }
+});
+</script>
