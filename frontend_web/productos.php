@@ -122,17 +122,17 @@ $categories = getCategories();
                         <?php if (isset($products_data['records']) && !empty($products_data['records'])): ?>
                             <?php foreach ($products_data['records'] as $product): ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($product['id']); ?></td>
-                                    <td><?php echo htmlspecialchars($product['nombre']); ?></td>
-                                    <td><?php echo htmlspecialchars($product['descripcion']); ?></td>
-                                    <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($product['precio'], 2)); ?></td>
-                                    <td><?php echo htmlspecialchars($product['categoria_nombre']); ?></td>
-                                    <td>
+                                    <td data-label="ID"><?php echo htmlspecialchars($product['id']); ?></td>
+                                    <td data-label="Nombre"><?php echo htmlspecialchars($product['nombre']); ?></td>
+                                    <td data-label="Descripción"><?php echo htmlspecialchars($product['descripcion']); ?></td>
+                                    <td data-label="Precio"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($product['precio'], 2)); ?></td>
+                                    <td data-label="Categoría"><?php echo htmlspecialchars($product['categoria_nombre']); ?></td>
+                                    <td data-label="Estado">
                                         <span class="status status-<?php echo htmlspecialchars(strtolower($product['estado'])); ?>">
                                             <?php echo htmlspecialchars($product['estado']); ?>
                                         </span>
                                     </td>
-                                    <td class="actions-cell">
+                                    <td data-label="Acciones" class="actions-cell">
                                         <a href="producto_form.php?id=<?php echo $product['id']; ?>" class="btn btn-edit">Editar</a>
                                         <a href="producto_delete_handler.php?id=<?php echo $product['id']; ?>" class="btn btn-delete" onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?');">Eliminar</a>
                                     </td>
