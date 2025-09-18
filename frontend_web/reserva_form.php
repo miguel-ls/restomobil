@@ -39,7 +39,7 @@ if (isset($_GET['id'])) {
 
 $mesas_data = fetchFromAPI('mesas.php');
 $mesas = $mesas_data['records'] ?? [];
-$reservation_states = ['confirmada', 'asistió', 'cancelada', 'no-show'];
+$reservation_states = ['confirmada', 'completada', 'cancelada'];
 
 ?>
 
