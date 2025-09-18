@@ -44,7 +44,7 @@ class Reservation {
     }
 
     function create() {
-        $query = "INSERT INTO " . $this->table_name . " SET id_mesa=:id_mesa, nombre_cliente=:nombre_cliente, telefono_cliente=:telefono_cliente, email_cliente=:email_cliente, fecha_reserva=:fecha_reserva, cantidad_personas=:cantidad_personas, estado=:estado, observaciones=:observaciones";
+        $query = "INSERT INTO " . $this->table_name . " (id_mesa, nombre_cliente, telefono_cliente, email_cliente, fecha_reserva, cantidad_personas, estado, observaciones) VALUES (:id_mesa, :nombre_cliente, :telefono_cliente, :email_cliente, :fecha_reserva, :cantidad_personas, :estado, :observaciones)";
         $stmt = $this->conn->prepare($query);
 
         // Sanitize
