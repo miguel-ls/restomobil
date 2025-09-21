@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../core/Database.php';
 
-class Category {
+class IdentityDocumentType {
     private $conn;
 
     public function __construct() {
@@ -9,45 +9,45 @@ class Category {
     }
 
     public function readAll() {
-        $query = "CALL sp_getAllCategories()";
+        $query = "CALL sp_getAllIdentityDocumentTypes()";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
     }
 
     public function readOne($id) {
-        $query = "CALL sp_readOneCategory(:id)";
+        $query = "CALL sp_getOneIdentityDocumentType(:id)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function create($nombre, $descripcion, $tipo_categoria) {
-        $query = "CALL sp_createCategory(:nombre, :descripcion, :tipo_categoria)";
+    public function create($codigo, $nombre, $descripcion) {
+        $query = "CALL sp_createIdentityDocumentType(:codigo, :nombre, :descripcion)";
         $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':codigo', $codigo);
         $stmt->bindParam(':nombre', $nombre);
         $stmt->bindParam(':descripcion', $descripcion);
-        $stmt->bindParam(':tipo_categoria', $tipo_categoria);
         if ($stmt->execute()) {
             return $stmt;
         }
         return false;
     }
 
-    public function update($id, $nombre, $descripcion, $tipo_categoria, $estado) {
-        $query = "CALL sp_updateCategory(:id, :nombre, :descripcion, :tipo_categoria, :estado)";
+    public function update($id, $codigo, $nombre, $descripcion, $estado) {
+        $query = "CALL sp_updateIdentityDocumentType(:id, :codigo, :nombre, :descripcion, :estado)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':codigo', $codigo);
         $stmt->bindParam(':nombre', $nombre);
         $stmt->bindParam(':descripcion', $descripcion);
-        $stmt->bindParam(':tipo_categoria', $tipo_categoria);
         $stmt->bindParam(':estado', $estado, PDO::PARAM_BOOL);
         return $stmt->execute();
     }
 
     public function delete($id) {
-        $query = "CALL sp_deleteCategory(:id)";
+        $query = "CALL sp_deleteIdentityDocumentType(:id)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id);
         return $stmt->execute();
