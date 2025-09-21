@@ -28,8 +28,8 @@ switch ($request_method) {
 
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->id_mesa) && !empty($data->id_usuario_mozo) && !empty($data->items) && is_array($data->items)) {
-            $stmt = $order->create($data->id_mesa, $data->id_usuario_mozo, $data->items);
+        if (!empty($data->id_mesa) && !empty($data->id_usuario_mozo) && !empty($data->items) && is_array($data->items) && !empty($data->estado)) {
+            $stmt = $order->create($data->id_mesa, $data->id_usuario_mozo, $data->items, $data->estado);
             if ($stmt) {
                 $new_order = $stmt->fetch(PDO::FETCH_ASSOC);
                 http_response_code(201);

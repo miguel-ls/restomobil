@@ -52,13 +52,14 @@ class Order {
         return $order_details;
     }
 
-    public function create($id_mesa, $id_usuario_mozo, $items) {
-        $query = "CALL sp_createOrder(:id_mesa, :id_usuario_mozo, :items_json)";
+    public function create($id_mesa, $id_usuario_mozo, $items, $estado = 'recibido') {
+        $query = "CALL sp_createOrder(:id_mesa, :id_usuario_mozo, :items_json, :estado)";
         $stmt = $this->conn->prepare($query);
         $items_json = json_encode($items);
         $stmt->bindParam(':id_mesa', $id_mesa);
         $stmt->bindParam(':id_usuario_mozo', $id_usuario_mozo);
         $stmt->bindParam(':items_json', $items_json);
+        $stmt->bindParam(':estado', $estado);
         if ($stmt->execute()) {
             return $stmt;
         }
