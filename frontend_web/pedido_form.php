@@ -49,7 +49,13 @@ if (isset($_GET['id'])) {
     }
 }
 
-$mesas_data = fetchFromAPI('mesas.php?status=available');
+if ($is_editing && $order_data) {
+    // Al editar, queremos todas las mesas para poder mostrar la mesa actual del pedido aunque no esté disponible.
+    $mesas_data = fetchFromAPI('mesas.php');
+} else {
+    // Para pedidos nuevos, solo mostrar mesas disponibles.
+    $mesas_data = fetchFromAPI('mesas.php?status=available');
+}
 $mozos_data = fetchFromAPI('usuarios.php?rol=Mozo');
 $productos_data = fetchFromAPI('productos.php?estado=activo');
 $categorias_data = fetchFromAPI('categorias.php');
@@ -109,9 +115,21 @@ $categorias = isset($categorias_data['records']) ? $categorias_data['records'] :
                         <div class="form-group">
                             <label for="id_mesa">Mesa</label>
                             <select id="id_mesa" name="id_mesa" required>
-                                <?php foreach ($mesas as $mesa): ?>
-                                    <option value="<?php echo $mesa['id']; ?>" <?php if($is_editing && $order_data['id_mesa'] == $mesa['id']) echo 'selected'; ?>>
-                                        <?php echo htmlspecialchars($mesa['numero_mesa']); ?>
+                                <?php
+                                if (empty($mesas) && $is_editing && $order_data) {
+                                    // Si no hay mesas, pero estamos editando, al menos mostrar la mesa del pedido actual.
+                                    // Esto es un fallback en caso de que la API falle pero tengamos datos del pedido.
+                                    echo "<option value=\"{$order_data['id_mesa']}\" selected>Mesa {$order_data['id_mesa']} (Actual)</option>";
+                                }
+
+                                foreach ($mesas as $mesa):
+                                    $is_selected = $is_editing && isset($order_data['id_mesa']) && $order_data['id_mesa'] == $mesa['id'];
+                                    $is_available = $mesa['estado'] == 'disponible';
+                                    // La mesa se puede seleccionar si está disponible, o si es la mesa que ya está seleccionada en el pedido que se edita.
+                                    $is_selectable = $is_available || $is_selected;
+                                ?>
+                                    <option value="<?php echo $mesa['id']; ?>" <?php if ($is_selected) echo 'selected'; ?> <?php if (!$is_selectable) echo 'disabled'; ?>>
+                                        <?php echo htmlspecialchars($mesa['numero_mesa']); ?> (<?php echo htmlspecialchars(ucfirst($mesa['estado']))); ?>)
                                     </option>
                                 <?php endforeach; ?>
                             </select>
