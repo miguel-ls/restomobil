@@ -12,6 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $is_editing = isset($_GET['id']);
 $order_id = $is_editing ? intval($_GET['id']) : null;
+$view = $_GET['view'] ?? 'edit';
+$is_pago_view = $view === 'pago';
 
 // Recoger los datos del formulario
 $id_mesa = $_POST['id_mesa'] ?? null;
@@ -20,8 +22,14 @@ $estado = $_POST['estado'] ?? 'recibido';
 $items_json = $_POST['items'] ?? '[]';
 $items = json_decode($items_json);
 
+$redirect_url = $is_pago_view ? 'caja.php' : 'pedidos.php';
+
 if (!$id_mesa || !$id_usuario_mozo || empty($items)) {
-    header('Location: pedido_form.php' . ($is_editing ? "?id=$order_id" : "") . '&error=Faltan+datos+esenciales.');
+    $error_param = $is_editing ? "?id=$order_id" : "";
+    if ($is_pago_view) {
+        $error_param .= ($is_editing ? "&" : "?") . "view=pago";
+    }
+    header("Location: pedido_form.php$error_param&error=Faltan+datos+esenciales.");
     exit();
 }
 
@@ -60,6 +68,6 @@ $response_data = json_decode($response, true);
 $message_key = ($http_code >= 200 && $http_code < 300) ? 'success' : 'error';
 $message = urlencode($response_data['message'] ?? 'Ocurrió un error inesperado.');
 
-header("Location: pedidos.php?$message_key=$message");
+header("Location: $redirect_url?$message_key=$message");
 exit();
 ?>

@@ -68,7 +68,13 @@ switch ($request_method) {
 }
 
 function handleGetAllOrders($order) {
-    $stmt = $order->readAll();
+    if (!empty($_GET["estado"])) {
+        $status = htmlspecialchars(strip_tags($_GET["estado"]));
+        $stmt = $order->readByStatus($status);
+    } else {
+        $stmt = $order->readAll();
+    }
+
     $num = $stmt->rowCount();
 
     if ($num > 0) {
