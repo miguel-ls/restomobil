@@ -14,6 +14,7 @@ $is_editing = isset($_GET['id']);
 $order_id = $is_editing ? intval($_GET['id']) : null;
 $view = $_GET['view'] ?? 'edit';
 $is_pago_view = $view === 'pago';
+$is_caja_create_view = $view === 'caja_create';
 
 // Recoger los datos del formulario
 $id_mesa = $_POST['id_mesa'] ?? null;
@@ -22,12 +23,18 @@ $estado = $_POST['estado'] ?? 'recibido';
 $items_json = $_POST['items'] ?? '[]';
 $items = json_decode($items_json);
 
-$redirect_url = $is_pago_view ? 'caja.php' : 'pedidos.php';
+if ($is_pago_view || $is_caja_create_view) {
+    $redirect_url = 'caja.php';
+} else {
+    $redirect_url = 'pedidos.php';
+}
 
 if (!$id_mesa || !$id_usuario_mozo || empty($items)) {
     $error_param = $is_editing ? "?id=$order_id" : "";
     if ($is_pago_view) {
         $error_param .= ($is_editing ? "&" : "?") . "view=pago";
+    } else if ($is_caja_create_view) {
+        $error_param = "?view=caja_create";
     }
     header("Location: pedido_form.php$error_param&error=Faltan+datos+esenciales.");
     exit();

@@ -52,4 +52,12 @@ BEGIN
       );
 END$$
 
+DROP PROCEDURE IF EXISTS sp_getTablesByLibreStatus$$
+CREATE PROCEDURE sp_getTablesByLibreStatus(IN p_es_libre BOOLEAN)
+BEGIN
+    SELECT id, numero_mesa, capacidad, estado, es_libre
+    FROM mesas
+    WHERE es_libre = p_es_libre;
+END$$
+
 DELIMITER ;

@@ -29,6 +29,10 @@ switch ($request_method) {
         if (isset($_GET['status']) && $_GET['status'] == 'available') {
             $stmt = $table->getAvailableTables();
             sendRecords($stmt);
+        } elseif (isset($_GET['es_libre'])) {
+            $es_libre_val = intval($_GET['es_libre']);
+            $stmt = $table->readByLibreStatus($es_libre_val);
+            sendRecords($stmt);
         } elseif (!empty($_GET["id"])) {
             $table_id = intval($_GET["id"]);
             $table_data = $table->readOne($table_id);
