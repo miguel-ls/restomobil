@@ -29,4 +29,27 @@ BEGIN
     UPDATE mesas SET numero_mesa = p_numero_mesa, capacidad = p_capacidad, estado = p_estado, es_libre = p_es_libre WHERE id = p_id;
 END$$
 
+DROP PROCEDURE IF EXISTS sp_deleteTable$$
+CREATE PROCEDURE sp_deleteTable(IN p_id INT)
+BEGIN
+    DELETE FROM mesas WHERE id = p_id;
+END$$
+
+DROP PROCEDURE IF EXISTS sp_getAvailableTables$$
+CREATE PROCEDURE sp_getAvailableTables()
+BEGIN
+    SELECT m.id, m.numero_mesa, m.capacidad, m.estado, m.es_libre
+    FROM mesas m
+    WHERE m.es_libre = 0
+      AND (
+        NOT EXISTS (SELECT 1 FROM pedidos p WHERE p.id_mesa = m.id)
+        OR
+        (SELECT p.estado
+         FROM pedidos p
+         WHERE p.id_mesa = m.id
+         ORDER BY p.fecha_creacion DESC
+         LIMIT 1) = 'completado'
+      );
+END$$
+
 DELIMITER ;
