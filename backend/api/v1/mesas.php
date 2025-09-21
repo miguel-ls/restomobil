@@ -46,8 +46,8 @@ switch ($request_method) {
         break;
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->numero_mesa) && !empty($data->capacidad)) {
-            $stmt = $table->create($data->numero_mesa, $data->capacidad, $data->estado);
+        if (!empty($data->numero_mesa) && !empty($data->capacidad) && isset($data->estado) && isset($data->es_libre)) {
+            $stmt = $table->create($data->numero_mesa, $data->capacidad, $data->estado, $data->es_libre);
             if ($stmt) {
                 $new_table = $stmt->fetch(PDO::FETCH_ASSOC);
                 http_response_code(201);
@@ -64,8 +64,8 @@ switch ($request_method) {
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
         $table_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
-        if ($table_id && !empty($data->numero_mesa) && !empty($data->capacidad)) {
-            if ($table->update($table_id, $data->numero_mesa, $data->capacidad, $data->estado)) {
+        if ($table_id && !empty($data->numero_mesa) && !empty($data->capacidad) && isset($data->estado) && isset($data->es_libre)) {
+            if ($table->update($table_id, $data->numero_mesa, $data->capacidad, $data->estado, $data->es_libre)) {
                 http_response_code(200);
                 echo json_encode(["message" => "Mesa actualizada."]);
             } else {
