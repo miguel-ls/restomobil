@@ -36,11 +36,17 @@ if (isset($_GET['id'])) {
     $is_editing = true;
     $order_id = intval($_GET['id']);
     $page_title = "Editar Pedido #$order_id";
-    // Simulo datos de un pedido existente
-    $order_data = [
-        'id_mesa' => 1, 'id_usuario_mozo' => 1, 'estado' => 'recibido',
-        'items' => [['id_producto' => 1, 'nombre_producto' => 'Pizza', 'precio_unitario' => 10.50, 'cantidad' => 2]]
-    ];
+    $order_data = fetchFromAPI("pedidos.php?id=$order_id");
+    if (isset($order_data['error']) || !$order_data) {
+        // Redirigir o mostrar un mensaje de error amigable
+        // Por simplicidad, aquí solo mostraremos un mensaje básico.
+        $page_title = "Error";
+        // Asegúrate de que el resto de la página pueda manejar $order_data como nulo
+        $order_data = null;
+        // Opcional: podrías incluir una plantilla de error aquí y salir.
+        // include 'templates/error_view.php';
+        // exit();
+    }
 }
 
 $mesas_data = fetchFromAPI('mesas.php?status=available');
@@ -249,27 +255,60 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Lógica para el filtro de categorías
     const categoryFilters = document.getElementById('category-filters');
-    const productItems = document.querySelectorAll('.product-item');
+    const productListContainer = document.getElementById('product-list');
+    const apiBaseUrl = '<?php echo API_BASE_URL; ?>';
+    const currencySymbol = '<?php echo CURRENCY_SYMBOL; ?>';
+
+    function renderProducts(products) {
+        productListContainer.innerHTML = '';
+        if (!products || products.length === 0) {
+            productListContainer.innerHTML = '<p>No se encontraron productos para esta categoría.</p>';
+            return;
+        }
+        products.forEach(product => {
+            const productItem = document.createElement('div');
+            productItem.className = 'product-item';
+            productItem.dataset.id = product.id;
+            productItem.dataset.nombre = product.nombre;
+            productItem.dataset.precio = product.precio;
+            productItem.dataset.category = product.categoria_nombre;
+            productItem.innerHTML = `<h4>${product.nombre}</h4><p>${currencySymbol}${parseFloat(product.precio).toFixed(2)}</p>`;
+            productListContainer.appendChild(productItem);
+        });
+    }
+
+    async function fetchAndRenderProducts(category = 'all') {
+        let url = `${apiBaseUrl}productos.php?estado=activo`;
+        if (category !== 'all') {
+            url += `&categoria_nombre=${encodeURIComponent(category)}`;
+        }
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            // The API returns { "records": [...] } or { "message": "..." } on no results
+            renderProducts(data.records || []);
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            productListContainer.innerHTML = '<p>Error al cargar los productos. Intente de nuevo más tarde.</p>';
+        }
+    }
 
     categoryFilters.addEventListener('click', function(e) {
-        if (e.target.tagName !== 'BUTTON') return;
+        const targetButton = e.target.closest('button.btn-category');
+        if (!targetButton) return;
 
-        // Actualizar el estado activo del botón
         const currentActive = categoryFilters.querySelector('.active');
         if (currentActive) {
             currentActive.classList.remove('active');
         }
-        e.target.classList.add('active');
+        targetButton.classList.add('active');
 
-        const selectedCategory = e.target.dataset.category;
-
-        productItems.forEach(item => {
-            if (selectedCategory === 'all' || item.dataset.category === selectedCategory) {
-                item.style.display = 'block';
-            } else {
-                item.style.display = 'none';
-            }
-        });
+        const selectedCategory = targetButton.dataset.category;
+        fetchAndRenderProducts(selectedCategory);
     });
 });
 </script>
