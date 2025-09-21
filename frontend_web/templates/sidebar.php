@@ -16,6 +16,10 @@
                 <li><a href="productos.php"><span class="text">Productos</span></a></li>
                 <li><a href="categorias.php"><span class="text">Categorías</span></a></li>
                 <li><a href="mesas.php"><span class="text">Mesas</span></a></li>
+                <li><a href="tipos_documentos.php"><span class="text">Tipos de Documentos</span></a></li>
+                <li><a href="series_documentos.php"><span class="text">Series Documentos</span></a></li>
+                <li><a href="tipo_documento_identidad.php"><span class="text">Tipo de Documento Identidad</span></a></li>
+                <li><a href="clientes.php"><span class="text">Clientes</span></a></li>
             </ul>
         </li>
 
