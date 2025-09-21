@@ -161,8 +161,8 @@ $categorias = isset($categorias_data['records']) ? $categorias_data['records'] :
                         <?php endif; ?>
                         
                         <div class="form-actions">
-                            <a href="pedidos.php" class="btn btn-secondary">Volver a Lista</a>
                             <button type="submit" class="btn"><?php echo $is_editing ? 'Actualizar' : 'Crear'; ?> Pedido</button>
+                            <a href="pedidos.php" class="btn btn-secondary">Volver a Lista</a>
                         </div>
                     </form>
                 </div>
