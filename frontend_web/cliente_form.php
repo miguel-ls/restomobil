@@ -193,3 +193,10 @@ document.addEventListener('DOMContentLoaded', function() {
     tipoDocumentoSelect.addEventListener('change', toggleSunatButton);
 });
 </script>
+
+<?php
+// Check for error messages in the URL and display the modal
+if (isset($_GET['error'])) {
+    echo "<script>showAlert('Error de Validación', '" . htmlspecialchars($_GET['error']) . "');</script>";
+}
+?>
