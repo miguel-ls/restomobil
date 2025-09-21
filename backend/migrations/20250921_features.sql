@@ -32,20 +32,36 @@ BEGIN
     DECLARE v_id_producto INT;
     DECLARE v_cantidad INT;
     DECLARE v_precio_unitario DECIMAL(10, 2);
+    DECLARE v_observaciones TEXT;
     DECLARE i INT DEFAULT 0;
+
     START TRANSACTION;
+
     DELETE FROM detalle_pedidos WHERE id_pedido = p_id_pedido;
+
     WHILE i < JSON_LENGTH(p_items_json) DO
         SET v_item = JSON_EXTRACT(p_items_json, CONCAT('$[', i, ']'));
         SET v_id_producto = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.id'));
         SET v_cantidad = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.cantidad'));
-        SELECT precio INTO v_precio_unitario FROM productos WHERE id = v_id_producto;
-        INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario)
-        VALUES (p_id_pedido, v_id_producto, v_cantidad, v_precio_unitario);
+        SET v_precio_unitario = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.precio'));
+        SET v_observaciones = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.observaciones'));
+
+        INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario, observaciones)
+        VALUES (p_id_pedido, v_id_producto, v_cantidad, v_precio_unitario, v_observaciones);
+
         SET v_total_calculado = v_total_calculado + (v_cantidad * v_precio_unitario);
         SET i = i + 1;
     END WHILE;
-    UPDATE pedidos SET id_mesa = p_id_mesa, id_usuario_mozo = p_id_usuario_mozo, estado = p_estado, total = v_total_calculado, fecha_actualizacion = CURRENT_TIMESTAMP WHERE id = p_id_pedido;
+
+    UPDATE pedidos
+    SET
+        id_mesa = p_id_mesa,
+        id_usuario_mozo = p_id_usuario_mozo,
+        estado = p_estado,
+        total = v_total_calculado,
+        fecha_actualizacion = CURRENT_TIMESTAMP
+    WHERE id = p_id_pedido;
+
     COMMIT;
 END$$
 
