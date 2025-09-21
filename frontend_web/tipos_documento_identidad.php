@@ -5,7 +5,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
-$page_title = 'Tipos de Documento (Comprobantes)';
+$page_title = 'Tipos de Documento de Identidad';
 include_once 'templates/header.php';
 ?>
 
@@ -15,8 +15,8 @@ include_once 'templates/header.php';
     <main class="main-content">
         <div class="container">
             <div class="page-header">
-                <h1>Gestión de Tipos de Documento (Comprobantes)</h1>
-                <a href="tipos_documentos_form.php" class="btn">
+                <h1>Gestión de Tipos de Documento de Identidad</h1>
+                <a href="tipo_documento_identidad_form.php" class="btn">
                     <i class="bi bi-plus-lg"></i> Nuevo
                 </a>
             </div>
@@ -46,7 +46,7 @@ include_once 'templates/header.php';
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const API_URL = 'http://localhost/restaurante/backend/api/v1/tipos_documentos.php';
+    const API_URL = 'http://localhost/restaurante/backend/api/v1/tipos_documento_identidad.php';
     const tbody = document.getElementById('documentos-tbody');
     const searchInput = document.getElementById('search-input');
 
@@ -56,9 +56,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const url = searchTerm ? `${API_URL}?s=${encodeURIComponent(searchTerm)}` : API_URL;
 
         fetch(url)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
-                tbody.innerHTML = '';
+                tbody.innerHTML = ''; // Limpiar el cuerpo de la tabla
                 if (data && data.length > 0) {
                     data.forEach(doc => {
                         const tr = document.createElement('tr');
@@ -70,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <td data-label="Descripción">${doc.descripcion}</td>
                             <td data-label="Estado"><span class="status ${estadoClass}">${estadoText}</span></td>
                             <td class="actions-cell" data-label="Acciones">
-                                <a href="tipos_documentos_form.php?id=${doc.id}" class="btn btn-edit"><i class="bi bi-pencil-fill"></i></a>
+                                <a href="tipo_documento_identidad_form.php?id=${doc.id}" class="btn btn-edit"><i class="bi bi-pencil-fill"></i></a>
                                 <button class="btn btn-delete" data-id="${doc.id}"><i class="bi bi-trash-fill"></i></button>
                             </td>
                         `;
@@ -88,6 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
+    // Manejar el evento de clic para eliminar
     tbody.addEventListener('click', function(e) {
         if (e.target.closest('.btn-delete')) {
             const button = e.target.closest('.btn-delete');
@@ -102,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     showAlert(data.mensaje, 'success');
-                    cargarDocumentos(searchInput.value);
+                    cargarDocumentos(searchInput.value); // Recargar la lista
                 })
                 .catch(error => {
                     console.error('Error al eliminar:', error);
@@ -112,13 +118,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Manejar el filtro de búsqueda
     searchInput.addEventListener('keyup', function() {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
             cargarDocumentos(this.value);
-        }, 300);
+        }, 300); // Espera 300ms después de que el usuario deja de escribir
     });
 
+    // Carga inicial
     cargarDocumentos();
 });
 </script>

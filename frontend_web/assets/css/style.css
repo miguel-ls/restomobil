@@ -58,31 +58,6 @@ body.sidebar-collapsed .logo .text, body.sidebar-collapsed .sidebar ul li a .tex
 body.sidebar-collapsed .sidebar ul li a, body.sidebar-collapsed .sidebar-footer .user-info, body.sidebar-collapsed .sidebar-footer .logout-link { justify-content: center; }
 body.sidebar-collapsed .sidebar ul li a .icon, body.sidebar-collapsed .sidebar-footer .user-info .icon { margin-right: 0; }
 
-/* Submenu Styles */
-.sidebar ul li.has-submenu > a {
-    position: relative;
-}
-.sidebar ul li.has-submenu .arrow {
-    position: absolute;
-    right: 15px;
-    transition: transform 0.3s ease;
-}
-.sidebar ul li.has-submenu.active > a .arrow {
-    transform: rotate(180deg);
-}
-.sidebar ul .submenu {
-    list-style-type: none;
-    padding-left: 20px; /* Indentación para submenús */
-    display: none; /* Ocultos por defecto */
-}
-.sidebar ul .submenu li a {
-    padding: 10px 10px 10px 15px; /* Ajuste de padding para items de submenú */
-    font-size: 0.95em;
-}
-.sidebar ul .submenu li a .icon {
-    display: none; /* Ocultar icono en submenús */
-}
-
 /* Tabla y Tarjetas */
 .table-container { background-color: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 20px; margin-top: 20px; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
