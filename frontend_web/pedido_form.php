@@ -6,9 +6,11 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
+$view = $_GET['view'] ?? 'edit'; // 'edit' or 'pago'
+$is_pago_view = $view === 'pago';
+
 $page_title = 'Crear Nuevo Pedido';
 include_once 'templates/header.php';
-// Asumo que estos archivos de configuración y los CRUD básicos ya existen
 include_once __DIR__ . '/config.php';
 
 function fetchFromAPI($endpoint) {
@@ -35,7 +37,7 @@ $order_data = null;
 if (isset($_GET['id'])) {
     $is_editing = true;
     $order_id = intval($_GET['id']);
-    $page_title = "Editar Pedido #$order_id";
+    $page_title = $is_pago_view ? "Pagar Pedido #$order_id" : "Editar Pedido #$order_id";
     $order_data = fetchFromAPI("pedidos.php?id=$order_id");
     if (isset($order_data['error']) || !$order_data) {
         $page_title = "Error";
@@ -44,10 +46,8 @@ if (isset($_GET['id'])) {
 }
 
 if ($is_editing && $order_data) {
-    // Al editar, queremos todas las mesas para poder mostrar la mesa actual del pedido aunque no esté disponible.
     $mesas_data = fetchFromAPI('mesas.php');
 } else {
-    // Para pedidos nuevos, solo mostrar mesas disponibles.
     $mesas_data = fetchFromAPI('mesas.php?status=available');
 }
 $mozos_data = fetchFromAPI('usuarios.php?rol=Mozo');
@@ -58,6 +58,12 @@ $mesas = isset($mesas_data['records']) ? $mesas_data['records'] : [];
 $mozos = isset($mozos_data['records']) ? $mozos_data['records'] : [];
 $productos = isset($productos_data['records']) ? $productos_data['records'] : [];
 $categorias = isset($categorias_data['records']) ? $categorias_data['records'] : [];
+
+$form_action = "pedido_handler.php" . ($is_editing ? "?id=$order_id" : "");
+if ($is_pago_view) {
+    $form_action .= ($is_editing ? "&" : "?") . "view=pago";
+}
+
 ?>
 
 <div class="dashboard-container">
@@ -103,8 +109,8 @@ $categorias = isset($categorias_data['records']) ? $categorias_data['records'] :
                             </span>
                         <?php endif; ?>
                     </div>
-                    <form id="order-form" method="POST" action="pedido_handler.php<?php if($is_editing) echo '?id=' . $order_id; ?>">
-                        <input type="hidden" name="estado" id="estado" value="<?php echo htmlspecialchars($order_data['estado'] ?? 'recibido'); ?>">
+                    <form id="order-form" method="POST" action="<?php echo $form_action; ?>">
+                        <input type="hidden" name="estado" id="estado" value="<?php echo htmlspecialchars($is_pago_view ? 'pagado' : ($order_data['estado'] ?? 'recibido')); ?>">
 
                         <div class="form-group">
                             <label for="id_mesa">Mesa</label>
@@ -119,7 +125,7 @@ $categorias = isset($categorias_data['records']) ? $categorias_data['records'] :
                                     $is_available = $mesa['estado'] == 'disponible';
                                     $is_selectable = $is_available || $is_selected;
                                 ?>
-                                    <option value="<?php echo $mesa['id']; ?>" <?php if ($is_selected) echo 'selected'; ?> <?php if (!$is_selectable) echo 'disabled'; ?>>
+                                    <option value="<?php echo $mesa['id']; ?>" <?php if ($is_selected) echo 'selected'; ?> <?php if (!$is_selectable && !$is_pago_view) echo 'disabled'; ?>>
                                         <?php echo htmlspecialchars($mesa['numero_mesa'] . ' (' . ucfirst($mesa['estado']) . ')'); ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -149,7 +155,7 @@ $categorias = isset($categorias_data['records']) ? $categorias_data['records'] :
                             <span id="order-total" style="font-weight: bold;"><?php echo CURRENCY_SYMBOL; ?>0.00</span>
                         </div>
 
-                        <?php if ($is_editing): ?>
+                        <?php if ($is_editing && !$is_pago_view): ?>
                         <fieldset class="status-actions-frame">
                             <legend>Acciones Rápidas de Estado</legend>
                             <div class="btn-group">
@@ -161,8 +167,12 @@ $categorias = isset($categorias_data['records']) ? $categorias_data['records'] :
                         <?php endif; ?>
                         
                         <div class="form-actions">
-                            <button type="submit" class="btn"><?php echo $is_editing ? 'Actualizar' : 'Crear'; ?> Pedido</button>
-                            <a href="pedidos.php" class="btn btn-secondary">Volver a Lista</a>
+                            <button type="submit" class="btn" <?php if ($is_pago_view) echo 'style="background-color: #28a745; color: white;"'; ?>>
+                                <?php echo $is_pago_view ? 'Pagar' : ($is_editing ? 'Actualizar' : 'Crear') . ' Pedido'; ?>
+                            </button>
+                            <a href="<?php echo $is_pago_view ? 'caja.php' : 'pedidos.php'; ?>" class="btn btn-secondary">
+                                Volver a <?php echo $is_pago_view ? 'Caja' : 'Lista'; ?>
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -173,7 +183,6 @@ $categorias = isset($categorias_data['records']) ? $categorias_data['records'] :
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // --- VARIABLES Y CONSTANTES ---
     const productList = document.getElementById('product-list');
     const orderDetailsContainer = document.getElementById('order-details');
     const orderTotalElement = document.getElementById('order-total');
@@ -184,12 +193,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const currencySymbol = '<?php echo CURRENCY_SYMBOL; ?>';
     const apiBaseUrl = '<?php echo API_BASE_URL; ?>';
     const isEditing = <?php echo json_encode($is_editing); ?>;
+    const isPagoView = <?php echo json_encode($is_pago_view); ?>;
     const initialOrderData = <?php echo json_encode($is_editing ? $order_data : null); ?>;
     const mesas = <?php echo json_encode($mesas); ?>;
 
     let currentOrder = {};
-
-    // --- FUNCIONES ---
 
     function renderOrderItems() {
         const tableBody = document.querySelector('#order-items-table tbody');
@@ -202,9 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const item = currentOrder[productId];
             const subtotal = item.precio * item.cantidad;
             total += subtotal;
-            // Render para tabla (desktop)
             tableBody.innerHTML += `<tr><td>${item.nombre}</td><td><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></td><td>${currencySymbol}${item.precio.toFixed(2)}</td><td>${currencySymbol}${subtotal.toFixed(2)}</td><td><button type="button" class="btn-delete delete-item" data-id="${item.id}">X</button></td></tr>`;
-            // Render para tarjetas (mobile)
             cardsContainer.innerHTML += `<div class="order-item-card"><div class="card-item-header">${item.nombre}</div><div class="card-item-body"><div class="card-item-row"><span>Precio:</span><span>${currencySymbol}${item.precio.toFixed(2)}</span></div><div class="card-item-row"><span>Cantidad:</span><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></div><div class="card-item-row"><span>Subtotal:</span><strong>${currencySymbol}${subtotal.toFixed(2)}</strong></div></div><div class="card-item-footer"><button type="button" class="btn-delete delete-item" data-id="${item.id}">Eliminar</button></div></div>`;
         }
         orderTotalElement.textContent = `${currencySymbol}${total.toFixed(2)}`;
@@ -244,10 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- INICIALIZACIÓN Y EVENT LISTENERS ---
-
-    // Alerta si no hay mesas disponibles al crear un nuevo pedido
-    if (!isEditing && mesas.length === 0) {
+    if (!isEditing && mesas.length === 0 && !isPagoView) {
         showAlert('No hay mesas disponibles', 'Todas las mesas están ocupadas. Por favor, libere una mesa antes de crear un nuevo pedido.');
         const formContainer = document.getElementById('order-form-container');
         if (formContainer) {
@@ -256,7 +259,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Cargar items del pedido si estamos editando
     if (isEditing && initialOrderData && initialOrderData.items) {
         initialOrderData.items.forEach(item => {
             currentOrder[item.id_producto] = {
@@ -269,7 +271,6 @@ document.addEventListener('DOMContentLoaded', function() {
         renderOrderItems();
     }
 
-    // Listener para añadir productos al pedido
     productList.addEventListener('click', function(e) {
         const productItem = e.target.closest('.product-item');
         if (!productItem) return;
@@ -288,13 +289,13 @@ document.addEventListener('DOMContentLoaded', function() {
         renderOrderItems();
     });
 
-    // Listener para acciones en la grilla de detalles (cambiar cantidad, eliminar)
     orderDetailsContainer.addEventListener('click', function(e) {
         if (e.target.classList.contains('delete-item')) {
             delete currentOrder[e.target.dataset.id];
             renderOrderItems();
         }
     });
+
     orderDetailsContainer.addEventListener('input', function(e) {
         if (e.target.classList.contains('item-quantity')) {
             const newQuantity = parseInt(e.target.value, 10);
@@ -308,7 +309,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Listener para los botones de cambio de estado
     document.querySelectorAll('.status-btn').forEach(button => {
         button.addEventListener('click', function() {
             estadoInput.value = this.dataset.status;
@@ -316,7 +316,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Listener para el envío del formulario
     orderForm.addEventListener('submit', function(e) {
         const itemsInput = document.createElement('input');
         itemsInput.type = 'hidden';
@@ -325,7 +324,6 @@ document.addEventListener('DOMContentLoaded', function() {
         this.appendChild(itemsInput);
     });
 
-    // Listener para el filtro de categorías
     categoryFilters.addEventListener('click', function(e) {
         const targetButton = e.target.closest('button.btn-category');
         if (!targetButton) return;

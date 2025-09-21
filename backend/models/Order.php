@@ -15,6 +15,14 @@ class Order {
         return $stmt;
     }
 
+    public function readByStatus($status) {
+        $query = "CALL sp_getOrdersByStatus(:status)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':status', $status);
+        $stmt->execute();
+        return $stmt;
+    }
+
     public function readOne($id) {
         // 1. Obtener la cabecera del pedido
         $query_header = "CALL sp_getOrderDetail(:id)";
