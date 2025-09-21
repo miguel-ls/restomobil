@@ -22,7 +22,7 @@ BEGIN
     DECLARE v_offset INT;
     SET v_offset = (p_page_number - 1) * p_page_size;
 
-    SELECT p.id, p.nombre, p.descripcion, p.precio, p.estado, c.nombre as categoria_nombre, c.tipo_categoria as categoria_tipo
+    SELECT p.id, p.nombre, p.descripcion, p.precio, p.estado, c.nombre as categoria_nombre
     FROM productos p
     LEFT JOIN categorias_producto c ON p.id_categoria = c.id
     WHERE
@@ -81,7 +81,7 @@ END$$
 DROP PROCEDURE IF EXISTS sp_readOneProduct$$
 CREATE PROCEDURE sp_readOneProduct(IN p_id INT)
 BEGIN
-    SELECT p.id, p.nombre, p.descripcion, p.precio, p.id_categoria, p.estado, c.nombre as categoria_nombre, c.tipo_categoria as categoria_tipo
+    SELECT p.id, p.nombre, p.descripcion, p.precio, p.id_categoria, p.estado, c.nombre as categoria_nombre
     FROM productos p
     LEFT JOIN categorias_producto c ON p.id_categoria = c.id
     WHERE p.id = p_id;
@@ -89,7 +89,7 @@ END$$
 
 -- Update stored procedure for creating orders to only use active products
 DROP PROCEDURE IF EXISTS sp_createOrder$$
-CREATE PROCEDURE sp_createOrder(IN p_id_mesa INT, IN p_id_usuario_mozo INT, IN p_items_json JSON, IN p_estado VARCHAR(50))
+CREATE PROCEDURE sp_createOrder(IN p_id_mesa INT, IN p_id_usuario_mozo INT, IN p_items_json JSON)
 BEGIN
     DECLARE v_id_pedido INT;
     DECLARE v_total_calculado DECIMAL(10, 2) DEFAULT 0;
@@ -97,39 +97,23 @@ BEGIN
     DECLARE v_id_producto INT;
     DECLARE v_cantidad INT;
     DECLARE v_precio_unitario DECIMAL(10, 2);
-    DECLARE v_observaciones TEXT;
-    DECLARE v_is_product_active BOOLEAN;
     DECLARE i INT DEFAULT 0;
-
     START TRANSACTION;
-
-    INSERT INTO pedidos (id_mesa, id_usuario_mozo, estado, total) VALUES (p_id_mesa, p_id_usuario_mozo, p_estado, 0);
+    INSERT INTO pedidos (id_mesa, id_usuario_mozo, total) VALUES (p_id_mesa, p_id_usuario_mozo, 0);
     SET v_id_pedido = LAST_INSERT_ID();
-
     WHILE i < JSON_LENGTH(p_items_json) DO
         SET v_item = JSON_EXTRACT(p_items_json, CONCAT('$[', i, ']'));
         SET v_id_producto = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.id'));
         SET v_cantidad = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.cantidad'));
-        SET v_precio_unitario = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.precio'));
-        SET v_observaciones = JSON_UNQUOTE(JSON_EXTRACT(v_item, '$.observaciones'));
-
-        -- Verify the product is active before adding it to the order
-        SELECT (estado = 'activo') INTO v_is_product_active FROM productos WHERE id = v_id_producto;
-
-        IF v_is_product_active THEN
-            INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario, observaciones)
-            VALUES (v_id_pedido, v_id_producto, v_cantidad, v_precio_unitario, v_observaciones);
-
+        SELECT precio INTO v_precio_unitario FROM productos WHERE id = v_id_producto AND estado = 'activo';
+        IF v_precio_unitario IS NOT NULL THEN
+            INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario) VALUES (v_id_pedido, v_id_producto, v_cantidad, v_precio_unitario);
             SET v_total_calculado = v_total_calculado + (v_cantidad * v_precio_unitario);
         END IF;
-
         SET i = i + 1;
     END WHILE;
-
     UPDATE pedidos SET total = v_total_calculado WHERE id = v_id_pedido;
-
     COMMIT;
-
     SELECT v_id_pedido as id;
 END$$
 
