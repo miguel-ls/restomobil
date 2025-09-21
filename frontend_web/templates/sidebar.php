@@ -8,6 +8,8 @@
     </div>
     <ul>
         <li><a href="dashboard.php"><i class="bi bi-house-door-fill icon"></i> <span class="text">Inicio</span></a></li>
+        <li><a href="caja.php"><i class="bi bi-cash-stack icon"></i> <span class="text">Caja</span></a></li>
+        <li><a href="apertura_cierre.php"><i class="bi bi-door-closed-fill icon"></i> <span class="text">Apertura / Cierre</span></a></li>
         <li><a href="pedidos.php"><i class="bi bi-receipt-cutoff icon"></i> <span class="text">Pedidos</span></a></li>
         <li><a href="reservas.php"><i class="bi bi-calendar-check-fill icon"></i> <span class="text">Reservas</span></a></li>
         <li><a href="productos.php"><i class="bi bi-box-seam-fill icon"></i> <span class="text">Productos</span></a></li>
