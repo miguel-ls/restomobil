@@ -129,7 +129,7 @@ $categorias = isset($categorias_data['records']) ? $categorias_data['records'] :
                                     $is_selectable = $is_available || $is_selected;
                                 ?>
                                     <option value="<?php echo $mesa['id']; ?>" <?php if ($is_selected) echo 'selected'; ?> <?php if (!$is_selectable) echo 'disabled'; ?>>
-                                        <?php echo htmlspecialchars($mesa['numero_mesa']); ?> (<?php echo htmlspecialchars(ucfirst($mesa['estado']))); ?>)
+                                        <?php echo htmlspecialchars($mesa['numero_mesa'] . ' (' . ucfirst($mesa['estado']) . ')'); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
