@@ -88,7 +88,7 @@ body.sidebar-collapsed .sidebar ul li a .icon, body.sidebar-collapsed .sidebar-f
 table { width: 100%; border-collapse: collapse; }
 table th, table td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); text-align: left; }
 table th { background-color: var(--light-bg); font-weight: 600; }
-.order-cards-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; }
+.order-cards-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 15px; }
 .order-card { background-color: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; flex-direction: column; font-size: 0.85rem; }
 .card-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--border-color); }
 .card-body { padding: 12px; flex-grow: 1; }
