@@ -176,7 +176,7 @@ BEGIN
         dp.precio_unitario,
         dp.subtotal,
         dp.observaciones,
-        cp.tipo as categoria_tipo
+        cp.tipo_categoria as categoria_tipo
     FROM detalle_pedidos dp
     JOIN productos pr ON dp.id_producto = pr.id
     LEFT JOIN categorias_producto cp ON pr.id_categoria = cp.id

@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const subtotal = item.precio * item.cantidad;
             total += subtotal;
 
-            const isService = item.categoria_tipo === 'servicios';
+            const isService = item.categoria_tipo === 'Servicios';
 
             const priceInput = isService
                 ? `<input type="number" class="item-price" value="${item.precio.toFixed(2)}" data-id="${item.id}" step="0.01">`
