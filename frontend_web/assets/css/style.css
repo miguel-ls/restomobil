@@ -344,3 +344,41 @@ table th { background-color: var(--light-bg); font-weight: 600; }
 .pagination a:hover:not(.active) {
     background-color: var(--hover-light);
 }
+
+/* Tab Component Styles */
+.tab-nav {
+    display: flex;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 15px;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px; /* Align with the container's border */
+    font-size: 1rem;
+    color: var(--secondary-color);
+}
+
+.tab-button.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    font-weight: 600;
+}
+
+.tab-content .tab-pane {
+    display: none;
+    animation: fadeIn 0.5s;
+}
+
+.tab-content .tab-pane.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
