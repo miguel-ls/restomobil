@@ -22,7 +22,7 @@ BEGIN
     DECLARE v_offset INT;
     SET v_offset = (p_page_number - 1) * p_page_size;
 
-    SELECT p.id, p.nombre, p.descripcion, p.precio, p.estado, c.nombre as categoria_nombre, c.tipo as categoria_tipo
+    SELECT p.id, p.nombre, p.descripcion, p.precio, p.estado, c.nombre as categoria_nombre, c.tipo_categoria as categoria_tipo
     FROM productos p
     LEFT JOIN categorias_producto c ON p.id_categoria = c.id
     WHERE
@@ -81,7 +81,7 @@ END$$
 DROP PROCEDURE IF EXISTS sp_readOneProduct$$
 CREATE PROCEDURE sp_readOneProduct(IN p_id INT)
 BEGIN
-    SELECT p.id, p.nombre, p.descripcion, p.precio, p.id_categoria, p.estado, c.nombre as categoria_nombre, c.tipo as categoria_tipo
+    SELECT p.id, p.nombre, p.descripcion, p.precio, p.id_categoria, p.estado, c.nombre as categoria_nombre, c.tipo_categoria as categoria_tipo
     FROM productos p
     LEFT JOIN categorias_producto c ON p.id_categoria = c.id
     WHERE p.id = p_id;
