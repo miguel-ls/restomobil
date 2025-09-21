@@ -55,8 +55,8 @@ if (isset($_GET['id'])) {
 if ($is_editing && $order_data) {
     $mesas_data = fetchFromAPI('mesas.php');
 } else if ($is_caja_create_view) {
-    // For new "Caja" orders, fetch tables where es_libre = 0 (Tipo de Mesa Libre Desactivado)
-    $mesas_data = fetchFromAPI('mesas.php?es_libre=0');
+    // For new "Caja" orders, fetch tables where es_libre = 1 (Tipo de Mesa Libre Activado)
+    $mesas_data = fetchFromAPI('mesas.php?es_libre=1');
 }
 else {
     $mesas_data = fetchFromAPI('mesas.php?status=available');
@@ -125,7 +125,15 @@ if ($is_pago_view) {
                         <?php endif; ?>
                     </div>
                     <form id="order-form" method="POST" action="<?php echo $form_action; ?>">
-                        <input type="hidden" name="estado" id="estado" value="<?php echo htmlspecialchars($is_pago_view ? 'pagado' : ($order_data['estado'] ?? 'recibido')); ?>">
+                        <?php
+                            $default_estado = 'recibido';
+                            if ($is_pago_view) {
+                                $default_estado = 'pagado';
+                            } else if ($is_caja_create_view) {
+                                $default_estado = 'completado';
+                            }
+                        ?>
+                        <input type="hidden" name="estado" id="estado" value="<?php echo htmlspecialchars($order_data['estado'] ?? $default_estado); ?>">
 
                         <div class="form-group">
                             <label for="id_mesa">Mesa</label>
