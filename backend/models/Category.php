@@ -23,26 +23,23 @@ class Category {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function create($nombre, $descripcion, $tipo_categoria) {
-        $query = "CALL sp_createCategory(:nombre, :descripcion, :tipo_categoria)";
+    public function create($nombre, $descripcion) {
+        $query = "CALL sp_createCategory(:nombre, :descripcion)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':nombre', $nombre);
         $stmt->bindParam(':descripcion', $descripcion);
-        $stmt->bindParam(':tipo_categoria', $tipo_categoria);
         if ($stmt->execute()) {
             return $stmt;
         }
         return false;
     }
 
-    public function update($id, $nombre, $descripcion, $tipo_categoria, $estado) {
-        $query = "CALL sp_updateCategory(:id, :nombre, :descripcion, :tipo_categoria, :estado)";
+    public function update($id, $nombre, $descripcion) {
+        $query = "CALL sp_updateCategory(:id, :nombre, :descripcion)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':nombre', $nombre);
         $stmt->bindParam(':descripcion', $descripcion);
-        $stmt->bindParam(':tipo_categoria', $tipo_categoria);
-        $stmt->bindParam(':estado', $estado, PDO::PARAM_BOOL);
         return $stmt->execute();
     }
 
