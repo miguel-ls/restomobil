@@ -56,6 +56,12 @@ $estados = ['disponible', 'ocupada', 'reservada', 'mantenimiento'];
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label for="es_libre">
+                            <input type="checkbox" id="es_libre" name="es_libre" value="1" <?php echo ($table_data['es_libre'] ?? true) ? 'checked' : ''; ?>>
+                            Mesa de Servicio Libre
+                        </label>
+                    </div>
                     <div class="form-actions">
                         <button type="submit" class="btn"><?php echo $is_editing ? 'Actualizar' : 'Crear'; ?></button>
                     </div>

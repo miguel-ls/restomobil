@@ -17,7 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = [
         'numero_mesa' => $_POST['numero_mesa'],
         'capacidad' => $_POST['capacidad'],
-        'estado' => $_POST['estado']
+        'estado' => $_POST['estado'],
+        'es_libre' => isset($_POST['es_libre']) ? 1 : 0
     ];
 
     $ch = curl_init($api_url);

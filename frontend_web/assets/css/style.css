@@ -262,6 +262,13 @@ table th { background-color: var(--light-bg); font-weight: 600; }
 .btn-cancelado { background-color: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
 .btn-cancelado:hover { background-color: #f5c6cb; border-color: #f1b9c0; }
 
+/* Estilos para formularios deshabilitados (ej. pedido pagado) */
+.is-paid .product-list-container,
+.is-paid .order-details .form-group {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
 /* Encabezado de detalles del pedido */
 .order-details-header {
     display: flex;
