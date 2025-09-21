@@ -42,7 +42,7 @@ switch ($request_method) {
 
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->nombre) && !empty($data->precio) && !empty($data->estado)) {
+        if (!empty($data->nombre) && isset($data->precio) && !empty($data->estado)) {
             $stmt = $product->create($data->nombre, $data->descripcion, $data->precio, $data->id_categoria, $data->estado);
             if ($stmt) {
                 $new_product = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -60,7 +60,7 @@ switch ($request_method) {
 
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->id) && !empty($data->nombre) && !empty($data->precio) && !empty($data->estado)) {
+        if (!empty($data->id) && !empty($data->nombre) && isset($data->precio) && !empty($data->estado)) {
             if ($product->update($data->id, $data->nombre, $data->descripcion, $data->precio, $data->id_categoria, $data->estado)) {
                 http_response_code(200);
                 echo json_encode(array("message" => "Producto actualizado."));

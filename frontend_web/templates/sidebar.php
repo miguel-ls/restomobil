@@ -13,7 +13,6 @@
         <li class="has-submenu">
             <a href="#" class="menu-toggle"><i class="bi bi-folder-fill icon"></i> <span class="text">Maestros</span><i class="bi bi-chevron-down arrow"></i></a>
             <ul class="submenu">
-                <li><a href="empresas.php"><span class="text">Empresa</span></a></li>
                 <li><a href="productos.php"><span class="text">Productos</span></a></li>
                 <li><a href="categorias.php"><span class="text">Categorías</span></a></li>
                 <li><a href="mesas.php"><span class="text">Mesas</span></a></li>

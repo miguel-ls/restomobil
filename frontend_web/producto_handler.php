@@ -15,7 +15,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         'nombre' => $_POST['nombre'] ?? '',
         'descripcion' => $_POST['descripcion'] ?? '',
         'precio' => $_POST['precio'] ?? '',
-        'id_categoria' => $_POST['id_categoria'] ?? null
+        'id_categoria' => $_POST['id_categoria'] ?? null,
+        'estado' => $_POST['estado'] ?? ''
     ];
 
     $ch = curl_init();
