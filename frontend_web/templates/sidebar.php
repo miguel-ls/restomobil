@@ -15,6 +15,7 @@
         <li><a href="productos.php"><i class="bi bi-box-seam-fill icon"></i> <span class="text">Productos</span></a></li>
         <li><a href="categorias.php"><i class="bi bi-tag-fill icon"></i> <span class="text">Categorías</span></a></li>
         <li><a href="mesas.php"><i class="bi bi-tablet-landscape-fill icon"></i> <span class="text">Mesas</span></a></li>
+        <li><a href="reportes_dinamicos.php"><i class="bi bi-file-earmark-bar-graph-fill icon"></i> <span class="text">Reportes Dinamicos</span></a></li>
         <?php if (isset($_SESSION['user_rol']) && $_SESSION['user_rol'] == 'Administrador'): ?>
             <li><a href="usuarios.php"><i class="bi bi-people-fill icon"></i> <span class="text">Usuarios</span></a></li>
         <?php endif; ?>
