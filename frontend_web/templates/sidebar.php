@@ -24,9 +24,11 @@
             <a href="#" class="menu-toggle"><i class="bi bi-gear-fill icon"></i> <span class="text">Operaciones</span><i class="bi bi-chevron-down arrow"></i></a>
             <ul class="submenu">
                 <li><a href="caja.php"><span class="text">Caja</span></a></li>
+                <li><a href="movim_caja.php"><span class="text">Movim. de Caja</span></a></li>
                 <li><a href="apertura_cierre.php"><span class="text">Apertura / Cierre</span></a></li>
                 <li><a href="pedidos.php"><span class="text">Pedidos</span></a></li>
                 <li><a href="reservas.php"><span class="text">Reservas</span></a></li>
+                <li><a href="ventas.php"><span class="text">Ventas</span></a></li>
             </ul>
         </li>
 
