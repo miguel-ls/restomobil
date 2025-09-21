@@ -20,7 +20,7 @@ CREATE TABLE usuarios ( id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(50) 
 CREATE TABLE mesas ( id INT AUTO_INCREMENT PRIMARY KEY, numero_mesa VARCHAR(10) NOT NULL, capacidad INT NOT NULL DEFAULT 4, estado ENUM('disponible', 'ocupada', 'reservada', 'mantenimiento') NOT NULL DEFAULT 'disponible' );
 CREATE TABLE categorias_producto ( id INT AUTO_INCREMENT PRIMARY KEY, nombre VARCHAR(100) NOT NULL, descripcion TEXT );
 CREATE TABLE productos ( id INT AUTO_INCREMENT PRIMARY KEY, nombre VARCHAR(100) NOT NULL, descripcion TEXT, precio DECIMAL(10, 2) NOT NULL, id_categoria INT, imagen_url VARCHAR(255), disponible BOOLEAN DEFAULT TRUE, FOREIGN KEY (id_categoria) REFERENCES categorias_producto(id) );
-CREATE TABLE pedidos ( id INT AUTO_INCREMENT PRIMARY KEY, id_mesa INT NOT NULL, id_usuario_mozo INT NOT NULL, estado ENUM('recibido', 'en_preparacion', 'listo_para_servir', 'abierto', 'completado', 'cancelado', 'pagado') NOT NULL DEFAULT 'recibido', total DECIMAL(10, 2) DEFAULT 0.00, fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, FOREIGN KEY (id_mesa) REFERENCES mesas(id), FOREIGN KEY (id_usuario_mozo) REFERENCES usuarios(id) );
+CREATE TABLE pedidos ( id INT AUTO_INCREMENT PRIMARY KEY, id_mesa INT NOT NULL, id_usuario_mozo INT NOT NULL, estado ENUM('recibido', 'en_preparacion', 'listo_para_servir', 'abierto', 'completado', 'cancelado') NOT NULL DEFAULT 'recibido', total DECIMAL(10, 2) DEFAULT 0.00, fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, FOREIGN KEY (id_mesa) REFERENCES mesas(id), FOREIGN KEY (id_usuario_mozo) REFERENCES usuarios(id) );
 CREATE TABLE detalle_pedidos ( id INT AUTO_INCREMENT PRIMARY KEY, id_pedido INT NOT NULL, id_producto INT NOT NULL, cantidad INT NOT NULL DEFAULT 1, precio_unitario DECIMAL(10, 2) NOT NULL, subtotal DECIMAL(10, 2) GENERATED ALWAYS AS (cantidad * precio_unitario) STORED, FOREIGN KEY (id_pedido) REFERENCES pedidos(id) ON DELETE CASCADE, FOREIGN KEY (id_producto) REFERENCES productos(id) );
 CREATE TABLE reservas ( id INT AUTO_INCREMENT PRIMARY KEY, id_mesa INT, nombre_cliente VARCHAR(100) NOT NULL, telefono_cliente VARCHAR(20), email_cliente VARCHAR(100), fecha_reserva DATETIME NOT NULL, cantidad_personas INT NOT NULL, estado ENUM('confirmada', 'cancelada', 'completada') NOT NULL DEFAULT 'confirmada', observaciones TEXT, FOREIGN KEY (id_mesa) REFERENCES mesas(id) );
 
@@ -160,17 +160,6 @@ BEGIN
     SELECT p.id, p.id_mesa, m.numero_mesa, p.id_usuario_mozo, u.nombre_completo AS nombre_mozo, p.estado, p.total, p.fecha_creacion FROM pedidos p LEFT JOIN mesas m ON p.id_mesa = m.id LEFT JOIN usuarios u ON p.id_usuario_mozo = u.id ORDER BY p.fecha_creacion DESC;
 END$$
 
-DROP PROCEDURE IF EXISTS sp_getOrdersByStatus$$
-CREATE PROCEDURE sp_getOrdersByStatus(IN p_status VARCHAR(255))
-BEGIN
-    SELECT p.id, p.id_mesa, m.numero_mesa, p.id_usuario_mozo, u.nombre_completo AS nombre_mozo, p.estado, p.total, p.fecha_creacion
-    FROM pedidos p
-    LEFT JOIN mesas m ON p.id_mesa = m.id
-    LEFT JOIN usuarios u ON p.id_usuario_mozo = u.id
-    WHERE FIND_IN_SET(p.estado, p_status)
-    ORDER BY p.fecha_creacion DESC;
-END$$
-
 DROP PROCEDURE IF EXISTS sp_getOrderDetail$$
 CREATE PROCEDURE sp_getOrderDetail(IN p_id_pedido INT)
 BEGIN
@@ -211,7 +200,7 @@ BEGIN
 END$$
 
 DROP PROCEDURE IF EXISTS sp_updateOrder$$
-CREATE PROCEDURE sp_updateOrder(IN p_id_pedido INT, IN p_id_mesa INT, IN p_id_usuario_mozo INT, IN p_estado ENUM('recibido', 'en_preparacion', 'listo_para_servir', 'abierto', 'completado', 'cancelado', 'pagado'), IN p_items_json JSON)
+CREATE PROCEDURE sp_updateOrder(IN p_id_pedido INT, IN p_id_mesa INT, IN p_id_usuario_mozo INT, IN p_estado ENUM('recibido', 'en_preparacion', 'listo_para_servir', 'abierto', 'completado', 'cancelado'), IN p_items_json JSON)
 BEGIN
     DECLARE v_total_calculado DECIMAL(10, 2) DEFAULT 0;
     DECLARE v_item JSON;
