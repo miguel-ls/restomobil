@@ -40,19 +40,19 @@ body {
 .main-content { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
 
 /* Sidebar */
-.sidebar { width: 250px; background-color: #343a40; color: var(--light-text); padding: 20px; flex-shrink: 0; display: flex; flex-direction: column; transition: width 0.3s ease; }
-.sidebar-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid #495057; margin-bottom: 15px; }
-.sidebar .logo { text-decoration: none; color: white; font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; gap: 10px; }
+.sidebar { width: 250px; background-color: #d4edda; color: #155724; padding: 20px; flex-shrink: 0; display: flex; flex-direction: column; transition: width 0.3s ease; }
+.sidebar-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid #c3e6cb; margin-bottom: 15px; }
+.sidebar .logo { text-decoration: none; color: #155724; font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; gap: 10px; }
 .sidebar .logo .bi { font-size: 1.8rem; }
-#sidebar-toggle { background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+#sidebar-toggle { background: transparent; border: none; color: #155724; font-size: 1.5rem; cursor: pointer; }
 .sidebar ul { list-style-type: none; padding: 0; margin: 0; flex-grow: 1; }
-.sidebar ul li a { display: flex; align-items: center; color: var(--light-text); text-decoration: none; padding: 12px 10px; border-radius: 5px; transition: background-color 0.2s ease; }
-.sidebar ul li a:hover { background-color: #495057; }
+.sidebar ul li a { display: flex; align-items: center; color: #155724; text-decoration: none; padding: 12px 10px; border-radius: 5px; transition: background-color 0.2s ease; }
+.sidebar ul li a:hover { background-color: #c3e6cb; }
 .sidebar ul li a .icon { font-size: 1.2rem; width: 24px; text-align: center; margin-right: 10px; }
 .sidebar ul li a .text { transition: opacity 0.2s ease; }
-.sidebar-footer { border-top: 1px solid #495057; padding-top: 15px; }
-.user-info { display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #495057; border-radius: 5px; margin-bottom: 10px; }
-.logout-link { display: flex; align-items: center; justify-content: center; text-decoration: none; color: white; background-color: var(--secondary-color); padding: 10px; border-radius: 5px; }
+.sidebar-footer { border-top: 1px solid #c3e6cb; padding-top: 15px; }
+.user-info { display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #c3e6cb; border-radius: 5px; margin-bottom: 10px; }
+.logout-link { display: flex; align-items: center; justify-content: center; text-decoration: none; color: #155724; background-color: var(--secondary-color); padding: 10px; border-radius: 5px; }
 body.sidebar-collapsed .sidebar { width: 80px; }
 body.sidebar-collapsed .logo .text, body.sidebar-collapsed .sidebar ul li a .text, body.sidebar-collapsed .sidebar-footer .text { opacity: 0; width: 0; overflow: hidden; }
 body.sidebar-collapsed .sidebar ul li a, body.sidebar-collapsed .sidebar-footer .user-info, body.sidebar-collapsed .sidebar-footer .logout-link { justify-content: center; }
@@ -125,8 +125,8 @@ table th { background-color: var(--light-bg); font-weight: 600; }
 @media (max-width: 768px) {
     .desktop-only { display: none !important; }
     .mobile-only { display: block !important; }
-    .mobile-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background-color: #343a40; color: white; position: fixed; top: 0; left: 0; width: 100%; z-index: 1001; }
-    #mobile-menu-toggle { background: transparent; border: none; color: white; font-size: 1.8rem; }
+    .mobile-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background-color: #d4edda; color: #155724; position: fixed; top: 0; left: 0; width: 100%; z-index: 1001; }
+    #mobile-menu-toggle { background: transparent; border: none; color: #155724; font-size: 1.8rem; }
     .desktop-toggle { display: none; }
     .main-content { padding-top: 70px; }
     .sidebar { position: fixed; transform: translateX(-100%); z-index: 1002; width: 280px; transition: transform 0.3s ease-in-out; }
