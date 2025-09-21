@@ -6,18 +6,17 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Incluir configuración de la API
     require_once 'config.php';
     $is_editing = !empty($_POST['id']);
-    $api_url = API_BASE_URL . 'categorias.php';
+    $api_url = API_BASE_URL . 'tipo_documento_identidad.php';
     if ($is_editing) {
         $api_url .= '?id=' . intval($_POST['id']);
     }
 
     $data = [
+        'codigo' => $_POST['codigo'],
         'nombre' => $_POST['nombre'],
-        'descripcion' => $_POST['descripcion'],
-        'tipo_categoria' => $_POST['tipo_categoria']
+        'descripcion' => $_POST['descripcion']
     ];
 
     if ($is_editing) {
@@ -38,10 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $message_key = ($http_code >= 200 && $http_code < 300) ? 'success' : 'error';
     $message = urlencode($response_data['message'] ?? 'Ocurrió un error.');
 
-    header("Location: categorias.php?$message_key=$message");
+    header("Location: tipo_documento_identidad.php?$message_key=$message");
     exit();
 } else {
-    header('Location: categorias.php');
+    header('Location: tipo_documento_identidad.php');
     exit();
 }
 ?>

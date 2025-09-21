@@ -4,34 +4,34 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-include_once __DIR__ . '/../../models/Category.php';
+include_once __DIR__ . '/../../models/SaleDocumentType.php';
 
-$category = new Category();
+$saleDocumentType = new SaleDocumentType();
 $request_method = $_SERVER["REQUEST_METHOD"];
 
 switch ($request_method) {
     case 'GET':
         if (!empty($_GET["id"])) {
-            $category_id = intval($_GET["id"]);
-            $category_data = $category->readOne($category_id);
-            if ($category_data) {
+            $type_id = intval($_GET["id"]);
+            $type_data = $saleDocumentType->readOne($type_id);
+            if ($type_data) {
                 http_response_code(200);
-                echo json_encode($category_data);
+                echo json_encode($type_data);
             } else {
                 http_response_code(404);
-                echo json_encode(["message" => "Categoría no encontrada."]);
+                echo json_encode(["message" => "Tipo de documento no encontrado."]);
             }
         } else {
-            $stmt = $category->readAll();
+            $stmt = $saleDocumentType->readAll();
             $num = $stmt->rowCount();
             if ($num > 0) {
-                $categories_arr = ["records" => []];
+                $types_arr = ["records" => []];
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                     $row['estado'] = (bool)$row['estado'];
-                    array_push($categories_arr["records"], $row);
+                    array_push($types_arr["records"], $row);
                 }
                 http_response_code(200);
-                echo json_encode($categories_arr);
+                echo json_encode($types_arr);
             } else {
                 http_response_code(200);
                 echo json_encode(["records" => []]);
@@ -40,15 +40,15 @@ switch ($request_method) {
         break;
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->nombre) && !empty($data->tipo_categoria)) {
-            $stmt = $category->create($data->nombre, $data->descripcion ?? '', $data->tipo_categoria);
+        if (!empty($data->codigo) && !empty($data->nombre)) {
+            $stmt = $saleDocumentType->create($data->codigo, $data->nombre, $data->descripcion ?? '');
             if ($stmt) {
-                $new_category = $stmt->fetch(PDO::FETCH_ASSOC);
+                $new_type = $stmt->fetch(PDO::FETCH_ASSOC);
                 http_response_code(201);
-                echo json_encode(["message" => "Categoría creada.", "id" => $new_category['id']]);
+                echo json_encode(["message" => "Tipo de documento creado.", "id" => $new_type['id']]);
             } else {
                 http_response_code(503);
-                echo json_encode(["message" => "No se pudo crear la categoría."]);
+                echo json_encode(["message" => "No se pudo crear el tipo de documento."]);
             }
         } else {
             http_response_code(400);
@@ -57,15 +57,15 @@ switch ($request_method) {
         break;
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
-        $category_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
-        if ($category_id && !empty($data->nombre) && !empty($data->tipo_categoria)) {
+        $type_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
+        if ($type_id && !empty($data->codigo) && !empty($data->nombre)) {
             $estado = isset($data->estado) ? (bool)$data->estado : true;
-            if ($category->update($category_id, $data->nombre, $data->descripcion ?? '', $data->tipo_categoria, $estado)) {
+            if ($saleDocumentType->update($type_id, $data->codigo, $data->nombre, $data->descripcion ?? '', $estado)) {
                 http_response_code(200);
-                echo json_encode(["message" => "Categoría actualizada."]);
+                echo json_encode(["message" => "Tipo de documento actualizado."]);
             } else {
                 http_response_code(503);
-                echo json_encode(["message" => "No se pudo actualizar la categoría."]);
+                echo json_encode(["message" => "No se pudo actualizar el tipo de documento."]);
             }
         } else {
             http_response_code(400);
@@ -73,14 +73,14 @@ switch ($request_method) {
         }
         break;
     case 'DELETE':
-        $category_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
-        if ($category_id) {
-            if ($category->delete($category_id)) {
+        $type_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
+        if ($type_id) {
+            if ($saleDocumentType->delete($type_id)) {
                 http_response_code(200);
-                echo json_encode(["message" => "Categoría eliminada."]);
+                echo json_encode(["message" => "Tipo de documento eliminado."]);
             } else {
                 http_response_code(503);
-                echo json_encode(["message" => "No se pudo eliminar la categoría."]);
+                echo json_encode(["message" => "No se pudo eliminar el tipo de documento."]);
             }
         } else {
             http_response_code(400);

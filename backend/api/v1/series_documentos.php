@@ -4,34 +4,34 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-include_once __DIR__ . '/../../models/Category.php';
+include_once __DIR__ . '/../../models/SerieDocumento.php';
 
-$category = new Category();
+$serieDocumento = new SerieDocumento();
 $request_method = $_SERVER["REQUEST_METHOD"];
 
 switch ($request_method) {
     case 'GET':
         if (!empty($_GET["id"])) {
-            $category_id = intval($_GET["id"]);
-            $category_data = $category->readOne($category_id);
-            if ($category_data) {
+            $serie_id = intval($_GET["id"]);
+            $serie_data = $serieDocumento->readOne($serie_id);
+            if ($serie_data) {
                 http_response_code(200);
-                echo json_encode($category_data);
+                echo json_encode($serie_data);
             } else {
                 http_response_code(404);
-                echo json_encode(["message" => "Categoría no encontrada."]);
+                echo json_encode(["message" => "Serie no encontrada."]);
             }
         } else {
-            $stmt = $category->readAll();
+            $stmt = $serieDocumento->readAll();
             $num = $stmt->rowCount();
             if ($num > 0) {
-                $categories_arr = ["records" => []];
+                $series_arr = ["records" => []];
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                     $row['estado'] = (bool)$row['estado'];
-                    array_push($categories_arr["records"], $row);
+                    array_push($series_arr["records"], $row);
                 }
                 http_response_code(200);
-                echo json_encode($categories_arr);
+                echo json_encode($series_arr);
             } else {
                 http_response_code(200);
                 echo json_encode(["records" => []]);
@@ -40,15 +40,15 @@ switch ($request_method) {
         break;
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->nombre) && !empty($data->tipo_categoria)) {
-            $stmt = $category->create($data->nombre, $data->descripcion ?? '', $data->tipo_categoria);
+        if (!empty($data->id_tipo_documento) && !empty($data->serie)) {
+            $stmt = $serieDocumento->create($data->id_tipo_documento, $data->serie);
             if ($stmt) {
-                $new_category = $stmt->fetch(PDO::FETCH_ASSOC);
+                $new_serie = $stmt->fetch(PDO::FETCH_ASSOC);
                 http_response_code(201);
-                echo json_encode(["message" => "Categoría creada.", "id" => $new_category['id']]);
+                echo json_encode(["message" => "Serie creada.", "id" => $new_serie['id']]);
             } else {
                 http_response_code(503);
-                echo json_encode(["message" => "No se pudo crear la categoría."]);
+                echo json_encode(["message" => "No se pudo crear la serie."]);
             }
         } else {
             http_response_code(400);
@@ -57,15 +57,15 @@ switch ($request_method) {
         break;
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
-        $category_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
-        if ($category_id && !empty($data->nombre) && !empty($data->tipo_categoria)) {
+        $serie_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
+        if ($serie_id && !empty($data->id_tipo_documento) && !empty($data->serie)) {
             $estado = isset($data->estado) ? (bool)$data->estado : true;
-            if ($category->update($category_id, $data->nombre, $data->descripcion ?? '', $data->tipo_categoria, $estado)) {
+            if ($serieDocumento->update($serie_id, $data->id_tipo_documento, $data->serie, $estado)) {
                 http_response_code(200);
-                echo json_encode(["message" => "Categoría actualizada."]);
+                echo json_encode(["message" => "Serie actualizada."]);
             } else {
                 http_response_code(503);
-                echo json_encode(["message" => "No se pudo actualizar la categoría."]);
+                echo json_encode(["message" => "No se pudo actualizar la serie."]);
             }
         } else {
             http_response_code(400);
@@ -73,14 +73,14 @@ switch ($request_method) {
         }
         break;
     case 'DELETE':
-        $category_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
-        if ($category_id) {
-            if ($category->delete($category_id)) {
+        $serie_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
+        if ($serie_id) {
+            if ($serieDocumento->delete($serie_id)) {
                 http_response_code(200);
-                echo json_encode(["message" => "Categoría eliminada."]);
+                echo json_encode(["message" => "Serie eliminada."]);
             } else {
                 http_response_code(503);
-                echo json_encode(["message" => "No se pudo eliminar la categoría."]);
+                echo json_encode(["message" => "No se pudo eliminar la serie."]);
             }
         } else {
             http_response_code(400);
