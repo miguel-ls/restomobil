@@ -54,7 +54,11 @@ body {
 .user-info { display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #c3e6cb; border-radius: 5px; margin-bottom: 10px; }
 .logout-link { display: flex; align-items: center; justify-content: center; text-decoration: none; color: #ffffff; background-color: #155724; padding: 10px; border-radius: 5px; }
 body.sidebar-collapsed .sidebar { width: 80px; }
-body.sidebar-collapsed .logo .text, body.sidebar-collapsed .sidebar ul li a .text, body.sidebar-collapsed .sidebar-footer .text { opacity: 0; width: 0; overflow: hidden; }
+body.sidebar-collapsed .logo > .bi,
+body.sidebar-collapsed .logo > .text {
+    display: none;
+}
+body.sidebar-collapsed .sidebar ul li a .text, body.sidebar-collapsed .sidebar-footer .text { opacity: 0; width: 0; overflow: hidden; }
 body.sidebar-collapsed .sidebar ul li a, body.sidebar-collapsed .sidebar-footer .user-info, body.sidebar-collapsed .sidebar-footer .logout-link { justify-content: center; }
 body.sidebar-collapsed .sidebar ul li a .icon, body.sidebar-collapsed .sidebar-footer .user-info .icon { margin-right: 0; }
 
