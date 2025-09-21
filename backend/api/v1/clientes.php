@@ -39,7 +39,13 @@ switch ($request_method) {
         break;
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->id_tipo_documento_identidad) && !empty($data->numero_documento) && !empty($data->nombres_apellidos)) {
+        if (empty($data->id_tipo_documento_identidad) || empty($data->numero_documento) || empty($data->nombres_apellidos)) {
+            http_response_code(400);
+            echo json_encode(["message" => "Datos incompletos."]);
+            break;
+        }
+
+        try {
             $stmt = $cliente->create(
                 $data->id_tipo_documento_identidad,
                 $data->numero_documento,
@@ -49,6 +55,7 @@ switch ($request_method) {
                 $data->email ?? '',
                 $data->telefono ?? ''
             );
+
             if ($stmt) {
                 $new_cliente = $stmt->fetch(PDO::FETCH_ASSOC);
                 http_response_code(201);
@@ -57,9 +64,14 @@ switch ($request_method) {
                 http_response_code(503);
                 echo json_encode(["message" => "No se pudo crear el cliente."]);
             }
-        } else {
-            http_response_code(400);
-            echo json_encode(["message" => "Datos incompletos."]);
+        } catch (PDOException $e) {
+            if ($e->getCode() == '23000') { // 23000 is the SQLSTATE for integrity constraint violation
+                http_response_code(409); // Conflict
+                echo json_encode(["message" => "Ya existe un cliente con el tipo y número de documento especificado."]);
+            } else {
+                http_response_code(503);
+                echo json_encode(["message" => "Error en la base de datos.", "error" => $e->getMessage()]);
+            }
         }
         break;
     case 'PUT':

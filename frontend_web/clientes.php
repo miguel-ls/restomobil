@@ -137,3 +137,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<?php
+// Check for success or error messages in the URL and display the modal
+if (isset($_GET['success'])) {
+    echo "<script>showAlert('Éxito', '" . htmlspecialchars($_GET['success']) . "');</script>";
+}
+if (isset($_GET['error'])) {
+    echo "<script>showAlert('Error', '" . htmlspecialchars($_GET['error']) . "');</script>";
+}
+?>
