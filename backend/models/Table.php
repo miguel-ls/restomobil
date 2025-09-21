@@ -15,6 +15,14 @@ class Table {
         return $stmt;
     }
 
+    public function readByLibreStatus($es_libre) {
+        $query = "CALL sp_getTablesByLibreStatus(:es_libre)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':es_libre', $es_libre, PDO::PARAM_BOOL);
+        $stmt->execute();
+        return $stmt;
+    }
+
     public function getAvailableTables() {
         $query = "CALL sp_getAvailableTables()";
         $stmt = $this->conn->prepare($query);

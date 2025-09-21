@@ -6,11 +6,15 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
-$view = $_GET['view'] ?? 'edit'; // 'edit' or 'pago'
+$view = $_GET['view'] ?? 'edit'; // 'edit', 'pago', or 'caja_create'
 $is_pago_view = $view === 'pago';
+$is_caja_create_view = $view === 'caja_create';
 $is_paid = false;
 
 $page_title = 'Crear Nuevo Pedido';
+if ($is_caja_create_view) {
+    $page_title = 'Crear Pedido de Caja';
+}
 include_once 'templates/header.php';
 include_once __DIR__ . '/config.php';
 
@@ -50,10 +54,16 @@ if (isset($_GET['id'])) {
 
 if ($is_editing && $order_data) {
     $mesas_data = fetchFromAPI('mesas.php');
-} else {
+} else if ($is_caja_create_view) {
+    // For new "Caja" orders, fetch tables where es_libre = 0 (Tipo de Mesa Libre Desactivado)
+    $mesas_data = fetchFromAPI('mesas.php?es_libre=0');
+}
+else {
     $mesas_data = fetchFromAPI('mesas.php?status=available');
 }
-$mozos_data = fetchFromAPI('usuarios.php?rol=Mozo');
+
+$rol_to_fetch = $is_caja_create_view ? 'Cajero' : 'Mozo';
+$mozos_data = fetchFromAPI("usuarios.php?rol=$rol_to_fetch");
 $productos_data = fetchFromAPI('productos.php?estado=activo');
 $categorias_data = fetchFromAPI('categorias.php');
 
@@ -65,6 +75,8 @@ $categorias = isset($categorias_data['records']) ? $categorias_data['records'] :
 $form_action = "pedido_handler.php" . ($is_editing ? "?id=$order_id" : "");
 if ($is_pago_view) {
     $form_action .= ($is_editing ? "&" : "?") . "view=pago";
+} else if ($is_caja_create_view) {
+    $form_action .= "?view=caja_create";
 }
 
 ?>
@@ -171,10 +183,20 @@ if ($is_pago_view) {
                         
                         <div class="form-actions">
                             <button type="submit" class="btn" <?php if ($is_pago_view && !$is_paid) echo 'style="background-color: #28a745; color: white;"'; ?> <?php if ($is_paid) echo 'disabled'; ?>>
-                                <?php echo $is_paid ? 'Pagado' : ($is_pago_view ? 'Pagar' : ($is_editing ? 'Actualizar' : 'Crear') . ' Pedido'); ?>
+                                <?php
+                                    if ($is_paid) {
+                                        echo 'Pagado';
+                                    } else if ($is_pago_view) {
+                                        echo 'Pagar';
+                                    } else if ($is_caja_create_view) {
+                                        echo 'Crear Pedido';
+                                    } else {
+                                        echo ($is_editing ? 'Actualizar' : 'Crear') . ' Pedido';
+                                    }
+                                ?>
                             </button>
-                            <a href="<?php echo $is_pago_view ? 'caja.php' : 'pedidos.php'; ?>" class="btn btn-secondary">
-                                Volver a <?php echo $is_pago_view ? 'Caja' : 'Lista'; ?>
+                            <a href="<?php echo ($is_pago_view || $is_caja_create_view) ? 'caja.php' : 'pedidos.php'; ?>" class="btn btn-secondary">
+                                Volver a <?php echo ($is_pago_view || $is_caja_create_view) ? 'Caja' : 'Lista'; ?>
                             </a>
                         </div>
                     </form>
