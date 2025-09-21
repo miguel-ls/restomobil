@@ -55,7 +55,10 @@ $document_types = getIdentityDocumentTypes();
                         <select id="id_tipo_documento_identidad" name="id_tipo_documento_identidad" required>
                             <option value="">Seleccione...</option>
                             <?php foreach ($document_types as $type): ?>
-                                <option value="<?php echo $type['id']; ?>" <?php echo ($cliente['id_tipo_documento_identidad'] == $type['id']) ? 'selected' : ''; ?>>
+                                <option
+                                    value="<?php echo $type['id']; ?>"
+                                    data-codigo="<?php echo htmlspecialchars($type['codigo']); ?>"
+                                    <?php echo ($cliente['id_tipo_documento_identidad'] == $type['id']) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($type['nombre']); ?>
                                 </option>
                             <?php endforeach; ?>
@@ -66,7 +69,7 @@ $document_types = getIdentityDocumentTypes();
                         <label for="numero_documento">N° de Documento</label>
                         <div style="display: flex; gap: 10px;">
                             <input type="text" id="numero_documento" name="numero_documento" value="<?php echo htmlspecialchars($cliente['numero_documento']); ?>" required style="flex-grow: 1;">
-                            <button type="button" class="btn" id="sunat-btn" style="flex-shrink: 0;">Sunat</button>
+                            <button type="button" class="btn" id="sunat-btn" style="flex-shrink: 0; display: none;">Sunat</button>
                         </div>
                     </div>
 
@@ -115,16 +118,78 @@ $document_types = getIdentityDocumentTypes();
 </div>
 
 <script>
-// Placeholder for SUNAT API call
-document.getElementById('sunat-btn').addEventListener('click', function() {
-    const docNumber = document.getElementById('numero_documento').value;
-    if(docNumber) {
-        alert('Consultando a SUNAT/RENIEC con el número: ' + docNumber);
-        // Here you would typically make an API call to a government service
-        // and populate fields like 'nombres_apellidos' and 'direccion'.
-        // For this example, we'll just show an alert.
-    } else {
-        alert('Por favor, ingrese un número de documento.');
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoDocumentoSelect = document.getElementById('id_tipo_documento_identidad');
+    const sunatBtn = document.getElementById('sunat-btn');
+    const numeroDocumentoInput = document.getElementById('numero_documento');
+    const nombresInput = document.getElementById('nombres_apellidos');
+    const direccionInput = document.getElementById('direccion');
+    const ubigeoInput = document.getElementById('codigo_ubigeo');
+
+    const validDocumentCodes = ['1', '6']; // 1 for DNI, 6 for RUC
+
+    function toggleSunatButton() {
+        const selectedOption = tipoDocumentoSelect.options[tipoDocumentoSelect.selectedIndex];
+        const docCode = selectedOption ? selectedOption.getAttribute('data-codigo') : null;
+
+        if (docCode && validDocumentCodes.includes(docCode)) {
+            sunatBtn.style.display = 'inline-block';
+        } else {
+            sunatBtn.style.display = 'none';
+        }
     }
+
+    sunatBtn.addEventListener('click', function() {
+        const selectedOption = tipoDocumentoSelect.options[tipoDocumentoSelect.selectedIndex];
+        const docCode = selectedOption ? selectedOption.getAttribute('data-codigo') : null;
+        const docNumber = numeroDocumentoInput.value.trim();
+
+        if (!docCode || !docNumber) {
+            alert('Por favor, seleccione un tipo de documento y ingrese un número.');
+            return;
+        }
+
+        let queryType = '';
+        if (docCode === '1') {
+            queryType = 'dni';
+        } else if (docCode === '6') {
+            queryType = 'ruc';
+        } else {
+            return; // Should not happen if button is only visible for DNI/RUC
+        }
+
+        sunatBtn.textContent = 'Buscando...';
+        sunatBtn.disabled = true;
+
+        fetch(`consulta_api_externa.php?tipo=${queryType}&numero=${docNumber}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('La respuesta de la red no fue exitosa.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                nombresInput.value = data.nombre || '';
+                direccionInput.value = data.direccion || '';
+                ubigeoInput.value = data.ubigeo || '';
+            })
+            .catch(error => {
+                console.error('Error al consultar la API:', error);
+                alert('No se pudo obtener la información: ' + error.message);
+            })
+            .finally(() => {
+                sunatBtn.textContent = 'Sunat';
+                sunatBtn.disabled = false;
+            });
+    });
+
+    // Initial check on page load
+    toggleSunatButton();
+
+    // Add event listener for changes
+    tipoDocumentoSelect.addEventListener('change', toggleSunatButton);
 });
 </script>
