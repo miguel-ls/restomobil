@@ -8,6 +8,15 @@ class Cliente {
         $this->conn = Database::getInstance();
     }
 
+    public function search($search_term) {
+        $query = "CALL sp_searchClientes(:search_term)";
+        $stmt = $this->conn->prepare($query);
+        $search_term = "%{$search_term}%";
+        $stmt->bindParam(':search_term', $search_term);
+        $stmt->execute();
+        return $stmt;
+    }
+
     public function readAll() {
         $query = "CALL sp_getAllClientes()";
         $stmt = $this->conn->prepare($query);

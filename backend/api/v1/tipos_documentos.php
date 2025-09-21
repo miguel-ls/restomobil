@@ -41,7 +41,7 @@ switch ($request_method) {
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
         if (!empty($data->codigo) && !empty($data->nombre)) {
-            $stmt = $saleDocumentType->create($data->codigo, $data->nombre, $data->descripcion ?? '');
+            $stmt = $saleDocumentType->create($data->codigo, $data->nombre);
             if ($stmt) {
                 $new_type = $stmt->fetch(PDO::FETCH_ASSOC);
                 http_response_code(201);
@@ -60,7 +60,7 @@ switch ($request_method) {
         $type_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
         if ($type_id && !empty($data->codigo) && !empty($data->nombre)) {
             $estado = isset($data->estado) ? (bool)$data->estado : true;
-            if ($saleDocumentType->update($type_id, $data->codigo, $data->nombre, $data->descripcion ?? '', $estado)) {
+            if ($saleDocumentType->update($type_id, $data->codigo, $data->nombre, $estado)) {
                 http_response_code(200);
                 echo json_encode(["message" => "Tipo de documento actualizado."]);
             } else {
