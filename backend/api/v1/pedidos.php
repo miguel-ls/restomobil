@@ -68,6 +68,10 @@ switch ($request_method) {
 }
 
 function handleGetAllOrders($order) {
+    // El parámetro 'estado' puede ser una cadena de estados separados por comas (ej. "completado,pagado").
+    // El procedimiento almacenado sp_getOrdersByStatus utiliza FIND_IN_SET de MySQL,
+    // que está diseñado para buscar una cadena dentro de un conjunto de cadenas separadas por comas.
+    // Por lo tanto, no es necesario explotar la cadena en un array en PHP.
     if (!empty($_GET["estado"])) {
         $status = htmlspecialchars(strip_tags($_GET["estado"]));
         $stmt = $order->readByStatus($status);

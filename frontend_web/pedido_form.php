@@ -8,6 +8,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $view = $_GET['view'] ?? 'edit'; // 'edit' or 'pago'
 $is_pago_view = $view === 'pago';
+$is_paid = false;
 
 $page_title = 'Crear Nuevo Pedido';
 include_once 'templates/header.php';
@@ -42,6 +43,8 @@ if (isset($_GET['id'])) {
     if (isset($order_data['error']) || !$order_data) {
         $page_title = "Error";
         $order_data = null;
+    } else {
+        $is_paid = $order_data['estado'] === 'pagado';
     }
 }
 
@@ -74,7 +77,7 @@ if ($is_pago_view) {
                 <h1><?php echo $page_title; ?></h1>
             </div>
 
-            <div id="order-form-container" class="order-grid">
+<div id="order-form-container" class="order-grid <?php if ($is_paid) echo 'is-paid'; ?>">
                 <div class="product-list-container">
                     <h3>Productos Disponibles</h3>
                     <div id="category-filters" class="category-filters">
@@ -114,7 +117,7 @@ if ($is_pago_view) {
 
                         <div class="form-group">
                             <label for="id_mesa">Mesa</label>
-                            <select id="id_mesa" name="id_mesa" required>
+                            <select id="id_mesa" name="id_mesa" required <?php if ($is_paid) echo 'disabled'; ?>>
                                 <?php
                                 if (empty($mesas) && $is_editing && $order_data) {
                                     echo "<option value=\"{$order_data['id_mesa']}\" selected>Mesa {$order_data['id_mesa']} (Actual)</option>";
@@ -133,7 +136,7 @@ if ($is_pago_view) {
                         </div>
                         <div class="form-group">
                             <label for="id_usuario_mozo">Mozo</label>
-                            <select id="id_usuario_mozo" name="id_usuario_mozo" required>
+                            <select id="id_usuario_mozo" name="id_usuario_mozo" required <?php if ($is_paid) echo 'disabled'; ?>>
                                  <?php foreach ($mozos as $mozo): ?>
                                     <option value="<?php echo $mozo['id']; ?>" <?php if($is_editing && $order_data['id_usuario_mozo'] == $mozo['id']) echo 'selected'; ?>>
                                         <?php echo htmlspecialchars($mozo['nombre_completo']); ?>
@@ -167,8 +170,8 @@ if ($is_pago_view) {
                         <?php endif; ?>
                         
                         <div class="form-actions">
-                            <button type="submit" class="btn" <?php if ($is_pago_view) echo 'style="background-color: #28a745; color: white;"'; ?>>
-                                <?php echo $is_pago_view ? 'Pagar' : ($is_editing ? 'Actualizar' : 'Crear') . ' Pedido'; ?>
+                            <button type="submit" class="btn" <?php if ($is_pago_view && !$is_paid) echo 'style="background-color: #28a745; color: white;"'; ?> <?php if ($is_paid) echo 'disabled'; ?>>
+                                <?php echo $is_paid ? 'Pagado' : ($is_pago_view ? 'Pagar' : ($is_editing ? 'Actualizar' : 'Crear') . ' Pedido'); ?>
                             </button>
                             <a href="<?php echo $is_pago_view ? 'caja.php' : 'pedidos.php'; ?>" class="btn btn-secondary">
                                 Volver a <?php echo $is_pago_view ? 'Caja' : 'Lista'; ?>

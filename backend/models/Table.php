@@ -30,25 +30,27 @@ class Table {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function create($numero_mesa, $capacidad, $estado) {
-        $query = "CALL sp_createTable(:numero_mesa, :capacidad, :estado)";
+    public function create($numero_mesa, $capacidad, $estado, $es_libre) {
+        $query = "CALL sp_createTable(:numero_mesa, :capacidad, :estado, :es_libre)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':numero_mesa', $numero_mesa);
         $stmt->bindParam(':capacidad', $capacidad);
         $stmt->bindParam(':estado', $estado);
+        $stmt->bindParam(':es_libre', $es_libre, PDO::PARAM_BOOL);
         if ($stmt->execute()) {
             return $stmt;
         }
         return false;
     }
 
-    public function update($id, $numero_mesa, $capacidad, $estado) {
-        $query = "CALL sp_updateTable(:id, :numero_mesa, :capacidad, :estado)";
+    public function update($id, $numero_mesa, $capacidad, $estado, $es_libre) {
+        $query = "CALL sp_updateTable(:id, :numero_mesa, :capacidad, :estado, :es_libre)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':numero_mesa', $numero_mesa);
         $stmt->bindParam(':capacidad', $capacidad);
         $stmt->bindParam(':estado', $estado);
+        $stmt->bindParam(':es_libre', $es_libre, PDO::PARAM_BOOL);
         return $stmt->execute();
     }
 

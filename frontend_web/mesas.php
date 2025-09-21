@@ -38,6 +38,7 @@ $tables_data = getTables();
                             <th>Número de Mesa</th>
                             <th>Capacidad</th>
                             <th>Estado</th>
+                            <th>Tipo de Mesa</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -53,6 +54,9 @@ $tables_data = getTables();
                                             <?php echo htmlspecialchars(ucfirst($table['estado'])); ?>
                                         </span>
                                     </td>
+                                    <td>
+                                        <input type="checkbox" <?php echo ($table['es_libre'] ?? false) ? 'checked' : ''; ?> disabled>
+                                    </td>
                                     <td class="actions-cell">
                                         <a href="mesa_form.php?id=<?php echo $table['id']; ?>" class="btn btn-edit">Editar</a>
                                         <a href="mesa_delete_handler.php?id=<?php echo $table['id']; ?>" class="btn btn-delete" onclick="return confirm('¿Estás seguro?');">Eliminar</a>
@@ -60,7 +64,7 @@ $tables_data = getTables();
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <tr><td colspan="5">No se encontraron mesas.</td></tr>
+                            <tr><td colspan="6">No se encontraron mesas.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
