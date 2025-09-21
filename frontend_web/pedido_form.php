@@ -136,47 +136,59 @@ if ($is_pago_view) {
                         ?>
                         <input type="hidden" name="estado" id="estado" value="<?php echo htmlspecialchars($order_data['estado'] ?? $default_estado); ?>">
 
-                        <div class="form-group">
-                            <label for="id_mesa">Mesa</label>
-                            <select id="id_mesa" name="id_mesa" required <?php if ($is_paid) echo 'disabled'; ?>>
-                                <?php
-                                if (empty($mesas) && $is_editing && $order_data) {
-                                    echo "<option value=\"{$order_data['id_mesa']}\" selected>Mesa {$order_data['id_mesa']} (Actual)</option>";
-                                }
-
-                                foreach ($mesas as $mesa):
-                                    $is_selected = $is_editing && isset($order_data['id_mesa']) && $order_data['id_mesa'] == $mesa['id'];
-                                    $is_available = $mesa['estado'] == 'disponible';
-                                    $is_selectable = $is_available || $is_selected;
-                                ?>
-                                    <option value="<?php echo $mesa['id']; ?>" <?php if ($is_selected) echo 'selected'; ?> <?php if (!$is_selectable && !$is_pago_view) echo 'disabled'; ?>>
-                                        <?php echo htmlspecialchars($mesa['numero_mesa'] . ' (' . ucfirst($mesa['estado']) . ')'); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="id_usuario_mozo">Mozo</label>
-                            <select id="id_usuario_mozo" name="id_usuario_mozo" required <?php if ($is_paid) echo 'disabled'; ?>>
-                                 <?php foreach ($mozos as $mozo): ?>
-                                    <option value="<?php echo $mozo['id']; ?>" <?php if($is_editing && $order_data['id_usuario_mozo'] == $mozo['id']) echo 'selected'; ?>>
-                                        <?php echo htmlspecialchars($mozo['nombre_completo']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                        <div class="tab-nav">
+                            <button type="button" class="tab-button active" data-tab="details">Detalles de Pedido</button>
+                            <button type="button" class="tab-button" data-tab="client">Clientes</button>
                         </div>
 
-                        <div class="table-container desktop-only">
-                            <table id="order-items-table">
-                                <thead><tr><th>Producto</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th><th></th></tr></thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                        <div id="order-items-cards" class="mobile-only"></div>
+                        <div class="tab-content">
+                            <div id="tab-details" class="tab-pane active">
+                                <div class="form-group">
+                                    <label for="id_mesa">Mesa</label>
+                                    <select id="id_mesa" name="id_mesa" required <?php if ($is_paid) echo 'disabled'; ?>>
+                                        <?php
+                                        if (empty($mesas) && $is_editing && $order_data) {
+                                            echo "<option value=\"{$order_data['id_mesa']}\" selected>Mesa {$order_data['id_mesa']} (Actual)</option>";
+                                        }
 
-                        <div class="order-total-container">
-                            <strong>Total:</strong>
-                            <span id="order-total" style="font-weight: bold;"><?php echo CURRENCY_SYMBOL; ?>0.00</span>
+                                        foreach ($mesas as $mesa):
+                                            $is_selected = $is_editing && isset($order_data['id_mesa']) && $order_data['id_mesa'] == $mesa['id'];
+                                            $is_available = $mesa['estado'] == 'disponible';
+                                            $is_selectable = $is_available || $is_selected;
+                                        ?>
+                                            <option value="<?php echo $mesa['id']; ?>" <?php if ($is_selected) echo 'selected'; ?> <?php if (!$is_selectable && !$is_pago_view) echo 'disabled'; ?>>
+                                                <?php echo htmlspecialchars($mesa['numero_mesa'] . ' (' . ucfirst($mesa['estado']) . ')'); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_usuario_mozo">Mozo</label>
+                                    <select id="id_usuario_mozo" name="id_usuario_mozo" required <?php if ($is_paid) echo 'disabled'; ?>>
+                                         <?php foreach ($mozos as $mozo): ?>
+                                            <option value="<?php echo $mozo['id']; ?>" <?php if($is_editing && $order_data['id_usuario_mozo'] == $mozo['id']) echo 'selected'; ?>>
+                                                <?php echo htmlspecialchars($mozo['nombre_completo']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="table-container desktop-only">
+                                    <table id="order-items-table">
+                                        <thead><tr><th>Producto</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th><th></th></tr></thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                                <div id="order-items-cards" class="mobile-only"></div>
+
+                                <div class="order-total-container">
+                                    <strong>Total:</strong>
+                                    <span id="order-total" style="font-weight: bold;"><?php echo CURRENCY_SYMBOL; ?>0.00</span>
+                                </div>
+                            </div>
+                            <div id="tab-client" class="tab-pane">
+                                <!-- Contenido del tab de cliente va aquí -->
+                            </div>
                         </div>
 
                         <?php if ($is_editing && !$is_pago_view): ?>
@@ -421,6 +433,24 @@ document.addEventListener('DOMContentLoaded', function() {
         targetButton.classList.add('active');
 
         fetchAndRenderProducts(targetButton.dataset.category);
+    });
+
+    // Tab switching logic
+    const tabNav = document.querySelector('.tab-nav');
+    const tabPanes = document.querySelectorAll('.tab-content .tab-pane');
+
+    tabNav.addEventListener('click', function(e) {
+        const targetButton = e.target.closest('.tab-button');
+        if (!targetButton) return;
+
+        // Deactivate current tab
+        tabNav.querySelector('.active')?.classList.remove('active');
+        tabPanes.forEach(pane => pane.classList.remove('active'));
+
+        // Activate new tab
+        targetButton.classList.add('active');
+        const tabId = targetButton.dataset.tab;
+        document.getElementById('tab-' + tabId).classList.add('active');
     });
 });
 </script>
