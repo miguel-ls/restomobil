@@ -107,6 +107,7 @@ if ($is_pago_view) {
                                  data-id="<?php echo $producto['id']; ?>"
                                  data-nombre="<?php echo htmlspecialchars($producto['nombre']); ?>"
                                  data-precio="<?php echo $producto['precio']; ?>"
+                                 data-categoria-tipo="<?php echo htmlspecialchars($producto['categoria_tipo']); ?>"
                                  data-category="<?php echo htmlspecialchars($producto['categoria_nombre']); ?>">
                                 <h4><?php echo htmlspecialchars($producto['nombre']); ?></h4>
                                 <p><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($producto['precio'], 2)); ?></p>
@@ -243,8 +244,46 @@ document.addEventListener('DOMContentLoaded', function() {
             const item = currentOrder[productId];
             const subtotal = item.precio * item.cantidad;
             total += subtotal;
-            tableBody.innerHTML += `<tr><td>${item.nombre}</td><td><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></td><td>${currencySymbol}${item.precio.toFixed(2)}</td><td>${currencySymbol}${subtotal.toFixed(2)}</td><td><button type="button" class="btn-delete delete-item" data-id="${item.id}">X</button></td></tr>`;
-            cardsContainer.innerHTML += `<div class="order-item-card"><div class="card-item-header">${item.nombre}</div><div class="card-item-body"><div class="card-item-row"><span>Precio:</span><span>${currencySymbol}${item.precio.toFixed(2)}</span></div><div class="card-item-row"><span>Cantidad:</span><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></div><div class="card-item-row"><span>Subtotal:</span><strong>${currencySymbol}${subtotal.toFixed(2)}</strong></div></div><div class="card-item-footer"><button type="button" class="btn-delete delete-item" data-id="${item.id}">Eliminar</button></div></div>`;
+
+            const isService = item.categoria_tipo === 'servicios';
+
+            const priceInput = isService
+                ? `<input type="number" class="item-price" value="${item.precio.toFixed(2)}" data-id="${item.id}" step="0.01">`
+                : `${currencySymbol}${item.precio.toFixed(2)}`;
+
+            const obsRow = isService
+                ? `<tr class="observation-row"><td colspan="5"><textarea class="item-observaciones" data-id="${item.id}" placeholder="Observaciones">${item.observaciones || ''}</textarea></td></tr>`
+                : '';
+
+            // Desktop Table Row
+            tableBody.innerHTML += `
+                <tr>
+                    <td>${item.nombre}</td>
+                    <td><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></td>
+                    <td>${priceInput}</td>
+                    <td>${currencySymbol}${subtotal.toFixed(2)}</td>
+                    <td><button type="button" class="btn-delete delete-item" data-id="${item.id}">X</button></td>
+                </tr>
+                ${obsRow}`;
+
+            // Mobile Card
+            const cardObsRow = isService
+                ? `<div class="card-item-row"><span>Obs:</span><textarea class="item-observaciones" data-id="${item.id}" placeholder="Observaciones">${item.observaciones || ''}</textarea></div>`
+                : '';
+
+            cardsContainer.innerHTML += `
+                <div class="order-item-card">
+                    <div class="card-item-header">${item.nombre}</div>
+                    <div class="card-item-body">
+                        <div class="card-item-row"><span>Precio:</span><span>${priceInput}</span></div>
+                        <div class="card-item-row"><span>Cantidad:</span><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></div>
+                        ${cardObsRow}
+                        <div class="card-item-row"><span>Subtotal:</span><strong>${currencySymbol}${subtotal.toFixed(2)}</strong></div>
+                    </div>
+                    <div class="card-item-footer">
+                        <button type="button" class="btn-delete delete-item" data-id="${item.id}">Eliminar</button>
+                    </div>
+                </div>`;
         }
         orderTotalElement.textContent = `${currencySymbol}${total.toFixed(2)}`;
     }
@@ -262,6 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
             productItem.dataset.nombre = product.nombre;
             productItem.dataset.precio = product.precio;
             productItem.dataset.category = product.categoria_nombre;
+            productItem.dataset.categoriaTipo = product.categoria_tipo;
             productItem.innerHTML = `<h4>${product.nombre}</h4><p>${currencySymbol}${parseFloat(product.precio).toFixed(2)}</p>`;
             productList.appendChild(productItem);
         });
@@ -298,7 +338,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 id: item.id_producto,
                 nombre: item.nombre_producto,
                 precio: parseFloat(item.precio_unitario),
-                cantidad: parseInt(item.cantidad, 10)
+                cantidad: parseInt(item.cantidad, 10),
+                categoria_tipo: item.categoria_tipo,
+                observaciones: item.observaciones
             };
         });
         renderOrderItems();
@@ -316,7 +358,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 id: productId,
                 nombre: productItem.dataset.nombre,
                 precio: parseFloat(productItem.dataset.precio),
-                cantidad: 1
+                cantidad: 1,
+                categoria_tipo: productItem.dataset.categoriaTipo,
+                observaciones: ''
             };
         }
         renderOrderItems();
@@ -330,16 +374,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     orderDetailsContainer.addEventListener('input', function(e) {
+        const productId = e.target.dataset.id;
+        if (!currentOrder[productId]) return;
+
         if (e.target.classList.contains('item-quantity')) {
             const newQuantity = parseInt(e.target.value, 10);
-            const productId = e.target.dataset.id;
             if (newQuantity > 0) {
                 currentOrder[productId].cantidad = newQuantity;
             } else {
                 delete currentOrder[productId];
             }
-            renderOrderItems();
+        } else if (e.target.classList.contains('item-price')) {
+            currentOrder[productId].precio = parseFloat(e.target.value) || 0;
+        } else if (e.target.classList.contains('item-observaciones')) {
+            currentOrder[productId].observaciones = e.target.value;
         }
+        renderOrderItems();
     });
 
     document.querySelectorAll('.status-btn').forEach(button => {

@@ -169,7 +169,18 @@ END$$
 DROP PROCEDURE IF EXISTS sp_getOrderItems$$
 CREATE PROCEDURE sp_getOrderItems(IN p_id_pedido INT)
 BEGIN
-    SELECT dp.id_producto, pr.nombre AS nombre_producto, dp.cantidad, dp.precio_unitario, dp.subtotal FROM detalle_pedidos dp JOIN productos pr ON dp.id_producto = pr.id WHERE dp.id_pedido = p_id_pedido;
+    SELECT
+        dp.id_producto,
+        pr.nombre AS nombre_producto,
+        dp.cantidad,
+        dp.precio_unitario,
+        dp.subtotal,
+        dp.observaciones,
+        cp.tipo as categoria_tipo
+    FROM detalle_pedidos dp
+    JOIN productos pr ON dp.id_producto = pr.id
+    LEFT JOIN categorias_producto cp ON pr.id_categoria = cp.id
+    WHERE dp.id_pedido = p_id_pedido;
 END$$
 
 DROP PROCEDURE IF EXISTS sp_createOrder$$
