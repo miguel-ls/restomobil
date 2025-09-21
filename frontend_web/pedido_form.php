@@ -38,14 +38,8 @@ if (isset($_GET['id'])) {
     $page_title = "Editar Pedido #$order_id";
     $order_data = fetchFromAPI("pedidos.php?id=$order_id");
     if (isset($order_data['error']) || !$order_data) {
-        // Redirigir o mostrar un mensaje de error amigable
-        // Por simplicidad, aquí solo mostraremos un mensaje básico.
         $page_title = "Error";
-        // Asegúrate de que el resto de la página pueda manejar $order_data como nulo
         $order_data = null;
-        // Opcional: podrías incluir una plantilla de error aquí y salir.
-        // include 'templates/error_view.php';
-        // exit();
     }
 }
 
@@ -117,15 +111,12 @@ $categorias = isset($categorias_data['records']) ? $categorias_data['records'] :
                             <select id="id_mesa" name="id_mesa" required>
                                 <?php
                                 if (empty($mesas) && $is_editing && $order_data) {
-                                    // Si no hay mesas, pero estamos editando, al menos mostrar la mesa del pedido actual.
-                                    // Esto es un fallback en caso de que la API falle pero tengamos datos del pedido.
                                     echo "<option value=\"{$order_data['id_mesa']}\" selected>Mesa {$order_data['id_mesa']} (Actual)</option>";
                                 }
 
                                 foreach ($mesas as $mesa):
                                     $is_selected = $is_editing && isset($order_data['id_mesa']) && $order_data['id_mesa'] == $mesa['id'];
                                     $is_available = $mesa['estado'] == 'disponible';
-                                    // La mesa se puede seleccionar si está disponible, o si es la mesa que ya está seleccionada en el pedido que se edita.
                                     $is_selectable = $is_available || $is_selected;
                                 ?>
                                     <option value="<?php echo $mesa['id']; ?>" <?php if ($is_selected) echo 'selected'; ?> <?php if (!$is_selectable) echo 'disabled'; ?>>
@@ -181,24 +172,23 @@ $categorias = isset($categorias_data['records']) ? $categorias_data['records'] :
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const mesas = <?php echo json_encode($mesas); ?>;
-    if (mesas.length === 0) {
-        showModal('No hay mesas disponibles', 'En este momento, todas las mesas están ocupadas o no disponibles. Por favor, inténtelo de nuevo más tarde.');
-        // Opcional: deshabilitar el formulario
-        const formContainer = document.getElementById('order-form-container');
-        if (formContainer) {
-            formContainer.style.opacity = '0.5';
-            formContainer.style.pointerEvents = 'none';
-        }
-    }
-
+    // --- VARIABLES Y CONSTANTES ---
     const productList = document.getElementById('product-list');
     const orderDetailsContainer = document.getElementById('order-details');
     const orderTotalElement = document.getElementById('order-total');
+    const categoryFilters = document.getElementById('category-filters');
+    const orderForm = document.getElementById('order-form');
+    const estadoInput = document.getElementById('estado');
+
     const currencySymbol = '<?php echo CURRENCY_SYMBOL; ?>';
+    const apiBaseUrl = '<?php echo API_BASE_URL; ?>';
     const isEditing = <?php echo json_encode($is_editing); ?>;
-    let initialOrderData = <?php echo json_encode($is_editing ? $order_data : null); ?>;
+    const initialOrderData = <?php echo json_encode($is_editing ? $order_data : null); ?>;
+    const mesas = <?php echo json_encode($mesas); ?>;
+
     let currentOrder = {};
+
+    // --- FUNCIONES ---
 
     function renderOrderItems() {
         const tableBody = document.querySelector('#order-items-table tbody');
@@ -206,81 +196,23 @@ document.addEventListener('DOMContentLoaded', function() {
         tableBody.innerHTML = '';
         cardsContainer.innerHTML = '';
         let total = 0;
+
         for (const productId in currentOrder) {
             const item = currentOrder[productId];
             const subtotal = item.precio * item.cantidad;
             total += subtotal;
+            // Render para tabla (desktop)
             tableBody.innerHTML += `<tr><td>${item.nombre}</td><td><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></td><td>${currencySymbol}${item.precio.toFixed(2)}</td><td>${currencySymbol}${subtotal.toFixed(2)}</td><td><button type="button" class="btn-delete delete-item" data-id="${item.id}">X</button></td></tr>`;
+            // Render para tarjetas (mobile)
             cardsContainer.innerHTML += `<div class="order-item-card"><div class="card-item-header">${item.nombre}</div><div class="card-item-body"><div class="card-item-row"><span>Precio:</span><span>${currencySymbol}${item.precio.toFixed(2)}</span></div><div class="card-item-row"><span>Cantidad:</span><input type="number" class="item-quantity" value="${item.cantidad}" min="1" data-id="${item.id}"></div><div class="card-item-row"><span>Subtotal:</span><strong>${currencySymbol}${subtotal.toFixed(2)}</strong></div></div><div class="card-item-footer"><button type="button" class="btn-delete delete-item" data-id="${item.id}">Eliminar</button></div></div>`;
         }
         orderTotalElement.textContent = `${currencySymbol}${total.toFixed(2)}`;
     }
 
-    if (isEditing && initialOrderData && initialOrderData.items) {
-        initialOrderData.items.forEach(item => {
-            currentOrder[item.id_producto] = { id: item.id_producto, nombre: item.nombre_producto, precio: parseFloat(item.precio_unitario), cantidad: parseInt(item.cantidad, 10) };
-        });
-        renderOrderItems();
-    }
-
-    productList.addEventListener('click', function(e) {
-        const productItem = e.target.closest('.product-item');
-        if (!productItem) return;
-        const productId = productItem.dataset.id;
-        if (currentOrder[productId]) { currentOrder[productId].cantidad++; } else { currentOrder[productId] = { id: productId, nombre: productItem.dataset.nombre, precio: parseFloat(productItem.dataset.precio), cantidad: 1 }; }
-        renderOrderItems();
-    });
-
-    orderDetailsContainer.addEventListener('input', function(e) {
-        if (e.target.classList.contains('item-quantity')) {
-            const newQuantity = parseInt(e.target.value, 10);
-            const productId = e.target.dataset.id;
-            if (newQuantity > 0) { currentOrder[productId].cantidad = newQuantity; } else { delete currentOrder[productId]; }
-            renderOrderItems();
-        }
-    });
-
-    orderDetailsContainer.addEventListener('click', function(e) {
-        if (e.target.classList.contains('delete-item')) {
-            delete currentOrder[e.target.dataset.id];
-            renderOrderItems();
-        }
-    });
-
-    const statusButtons = document.querySelectorAll('.status-btn');
-    const estadoInput = document.getElementById('estado');
-    const orderForm = document.getElementById('order-form');
-
-    statusButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const newStatus = this.dataset.status;
-            estadoInput.value = newStatus;
-            // requestSubmit() es una forma más robusta de activar el envío del formulario
-            // programáticamente, asegurando que el evento 'submit' se dispare.
-            orderForm.requestSubmit();
-        });
-    });
-
-    orderForm.addEventListener('submit', function(e) {
-        // e.preventDefault(); // Descomentar para depurar sin enviar
-        const itemsInput = document.createElement('input');
-        itemsInput.type = 'hidden';
-        itemsInput.name = 'items';
-        itemsInput.value = JSON.stringify(Object.values(currentOrder));
-        this.appendChild(itemsInput);
-        // El formulario se enviará de forma nativa
-    });
-
-    // Lógica para el filtro de categorías
-    const categoryFilters = document.getElementById('category-filters');
-    const productListContainer = document.getElementById('product-list');
-    const apiBaseUrl = '<?php echo API_BASE_URL; ?>';
-    const currencySymbol = '<?php echo CURRENCY_SYMBOL; ?>';
-
     function renderProducts(products) {
-        productListContainer.innerHTML = '';
+        productList.innerHTML = '';
         if (!products || products.length === 0) {
-            productListContainer.innerHTML = '<p>No se encontraron productos para esta categoría.</p>';
+            productList.innerHTML = '<p>No se encontraron productos para esta categoría.</p>';
             return;
         }
         products.forEach(product => {
@@ -291,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
             productItem.dataset.precio = product.precio;
             productItem.dataset.category = product.categoria_nombre;
             productItem.innerHTML = `<h4>${product.nombre}</h4><p>${currencySymbol}${parseFloat(product.precio).toFixed(2)}</p>`;
-            productListContainer.appendChild(productItem);
+            productList.appendChild(productItem);
         });
     }
 
@@ -300,33 +232,107 @@ document.addEventListener('DOMContentLoaded', function() {
         if (category !== 'all') {
             url += `&categoria_nombre=${encodeURIComponent(category)}`;
         }
-
         try {
             const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
-            // The API returns { "records": [...] } or { "message": "..." } on no results
             renderProducts(data.records || []);
         } catch (error) {
             console.error("Error fetching products:", error);
-            productListContainer.innerHTML = '<p>Error al cargar los productos. Intente de nuevo más tarde.</p>';
+            productList.innerHTML = '<p>Error al cargar los productos. Intente de nuevo más tarde.</p>';
         }
     }
 
+    // --- INICIALIZACIÓN Y EVENT LISTENERS ---
+
+    // Alerta si no hay mesas disponibles al crear un nuevo pedido
+    if (!isEditing && mesas.length === 0) {
+        showAlert('No hay mesas disponibles', 'Todas las mesas están ocupadas. Por favor, libere una mesa antes de crear un nuevo pedido.');
+        const formContainer = document.getElementById('order-form-container');
+        if (formContainer) {
+            formContainer.style.opacity = '0.5';
+            formContainer.style.pointerEvents = 'none';
+        }
+    }
+
+    // Cargar items del pedido si estamos editando
+    if (isEditing && initialOrderData && initialOrderData.items) {
+        initialOrderData.items.forEach(item => {
+            currentOrder[item.id_producto] = {
+                id: item.id_producto,
+                nombre: item.nombre_producto,
+                precio: parseFloat(item.precio_unitario),
+                cantidad: parseInt(item.cantidad, 10)
+            };
+        });
+        renderOrderItems();
+    }
+
+    // Listener para añadir productos al pedido
+    productList.addEventListener('click', function(e) {
+        const productItem = e.target.closest('.product-item');
+        if (!productItem) return;
+
+        const productId = productItem.dataset.id;
+        if (currentOrder[productId]) {
+            currentOrder[productId].cantidad++;
+        } else {
+            currentOrder[productId] = {
+                id: productId,
+                nombre: productItem.dataset.nombre,
+                precio: parseFloat(productItem.dataset.precio),
+                cantidad: 1
+            };
+        }
+        renderOrderItems();
+    });
+
+    // Listener para acciones en la grilla de detalles (cambiar cantidad, eliminar)
+    orderDetailsContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-item')) {
+            delete currentOrder[e.target.dataset.id];
+            renderOrderItems();
+        }
+    });
+    orderDetailsContainer.addEventListener('input', function(e) {
+        if (e.target.classList.contains('item-quantity')) {
+            const newQuantity = parseInt(e.target.value, 10);
+            const productId = e.target.dataset.id;
+            if (newQuantity > 0) {
+                currentOrder[productId].cantidad = newQuantity;
+            } else {
+                delete currentOrder[productId];
+            }
+            renderOrderItems();
+        }
+    });
+
+    // Listener para los botones de cambio de estado
+    document.querySelectorAll('.status-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            estadoInput.value = this.dataset.status;
+            orderForm.requestSubmit();
+        });
+    });
+
+    // Listener para el envío del formulario
+    orderForm.addEventListener('submit', function(e) {
+        const itemsInput = document.createElement('input');
+        itemsInput.type = 'hidden';
+        itemsInput.name = 'items';
+        itemsInput.value = JSON.stringify(Object.values(currentOrder));
+        this.appendChild(itemsInput);
+    });
+
+    // Listener para el filtro de categorías
     categoryFilters.addEventListener('click', function(e) {
         const targetButton = e.target.closest('button.btn-category');
         if (!targetButton) return;
 
-        const currentActive = categoryFilters.querySelector('.active');
-        if (currentActive) {
-            currentActive.classList.remove('active');
-        }
+        categoryFilters.querySelector('.active')?.classList.remove('active');
         targetButton.classList.add('active');
 
-        const selectedCategory = targetButton.dataset.category;
-        fetchAndRenderProducts(selectedCategory);
+        fetchAndRenderProducts(targetButton.dataset.category);
     });
 });
 </script>
