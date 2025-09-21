@@ -10,7 +10,7 @@
 define('CURRENCY_SYMBOL', 'S/.');
 
 // Define la URL base para la API. Asegúrate de que termine con una barra inclinada (/).
-define('API_BASE_URL', 'http://localhost/restaurante_system/backend/api/v1/');
+define('API_BASE_URL', 'http://localhost/personal/restaurante_system/backend/api/v1/');
 
 // Aquí se pueden añadir otras configuraciones globales en el futuro.
 ?>
