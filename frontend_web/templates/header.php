@@ -23,17 +23,26 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const menuToggle = document.getElementById('mobile-menu-toggle');
     const body = document.getElementById('page-body');
-    const overlay = document.getElementById('mobile-overlay');
 
-    if (menuToggle && body && overlay) {
-        menuToggle.addEventListener('click', function() {
+    // Toggle para el menú móvil
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const overlay = document.getElementById('mobile-overlay');
+    if (mobileMenuToggle && body && overlay) {
+        mobileMenuToggle.addEventListener('click', function() {
             body.classList.toggle('sidebar-collapsed');
         });
 
         overlay.addEventListener('click', function() {
             body.classList.remove('sidebar-collapsed');
+        });
+    }
+
+    // Toggle para el menú de escritorio
+    const desktopToggle = document.getElementById('sidebar-toggle');
+    if (desktopToggle && body) {
+        desktopToggle.addEventListener('click', function() {
+            body.classList.toggle('sidebar-collapsed');
         });
     }
 });
