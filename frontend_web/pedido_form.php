@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 : `${currencySymbol}${item.precio.toFixed(2)}`;
 
             const obsRow = isService
-                ? `<tr class="observation-row"><td colspan="5"><textarea class="item-observaciones" data-id="${item.id}" placeholder="Observaciones">${item.observaciones || ''}</textarea></td></tr>`
+                ? `<tr class="observation-row"><td colspan="5"><textarea style="width: 98%;" class="item-observaciones" data-id="${item.id}" placeholder="Observaciones">${item.observaciones || ''}</textarea></td></tr>`
                 : '';
 
             // Desktop Table Row
@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Mobile Card
             const cardObsRow = isService
-                ? `<div class="card-item-row"><span>Obs:</span><textarea class="item-observaciones" data-id="${item.id}" placeholder="Observaciones">${item.observaciones || ''}</textarea></div>`
+                ? `<div class="card-item-row"><span>Obs:</span><textarea style="width: 95%;" class="item-observaciones" data-id="${item.id}" placeholder="Observaciones">${item.observaciones || ''}</textarea></div>`
                 : '';
 
             cardsContainer.innerHTML += `
@@ -377,6 +377,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const productId = e.target.dataset.id;
         if (!currentOrder[productId]) return;
 
+        let shouldRender = true;
+
         if (e.target.classList.contains('item-quantity')) {
             const newQuantity = parseInt(e.target.value, 10);
             if (newQuantity > 0) {
@@ -388,8 +390,12 @@ document.addEventListener('DOMContentLoaded', function() {
             currentOrder[productId].precio = parseFloat(e.target.value) || 0;
         } else if (e.target.classList.contains('item-observaciones')) {
             currentOrder[productId].observaciones = e.target.value;
+            shouldRender = false; // Do not re-render for observation changes
         }
-        renderOrderItems();
+
+        if (shouldRender) {
+            renderOrderItems();
+        }
     });
 
     document.querySelectorAll('.status-btn').forEach(button => {
