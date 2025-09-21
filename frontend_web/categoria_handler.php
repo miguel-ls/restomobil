@@ -16,8 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $data = [
         'nombre' => $_POST['nombre'],
-        'descripcion' => $_POST['descripcion']
+        'descripcion' => $_POST['descripcion'],
+        'tipo_categoria' => $_POST['tipo_categoria']
     ];
+
+    if ($is_editing) {
+        $data['estado'] = isset($_POST['estado']) ? (int)$_POST['estado'] : 0;
+    }
 
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

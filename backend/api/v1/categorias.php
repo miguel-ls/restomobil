@@ -27,6 +27,7 @@ switch ($request_method) {
             if ($num > 0) {
                 $categories_arr = ["records" => []];
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $row['estado'] = (bool)$row['estado'];
                     array_push($categories_arr["records"], $row);
                 }
                 http_response_code(200);
@@ -39,8 +40,8 @@ switch ($request_method) {
         break;
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->nombre)) {
-            $stmt = $category->create($data->nombre, $data->descripcion);
+        if (!empty($data->nombre) && !empty($data->tipo_categoria)) {
+            $stmt = $category->create($data->nombre, $data->descripcion ?? '', $data->tipo_categoria);
             if ($stmt) {
                 $new_category = $stmt->fetch(PDO::FETCH_ASSOC);
                 http_response_code(201);
@@ -57,8 +58,9 @@ switch ($request_method) {
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
         $category_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
-        if ($category_id && !empty($data->nombre)) {
-            if ($category->update($category_id, $data->nombre, $data->descripcion)) {
+        if ($category_id && !empty($data->nombre) && !empty($data->tipo_categoria)) {
+            $estado = isset($data->estado) ? (bool)$data->estado : true;
+            if ($category->update($category_id, $data->nombre, $data->descripcion ?? '', $data->tipo_categoria, $estado)) {
                 http_response_code(200);
                 echo json_encode(["message" => "Categoría actualizada."]);
             } else {
