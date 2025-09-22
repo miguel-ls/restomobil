@@ -46,15 +46,7 @@ DROP PROCEDURE IF EXISTS `sp_getAllTipoDocumentoVenta`$$
 CREATE PROCEDURE `sp_getAllTipoDocumentoVenta`()
 BEGIN
     -- Assuming tipo_documento_venta has an 'estado' column
-    SELECT id, codigo, nombre, descripcion, estado FROM tipo_documento_venta;
-END$$
-
-DROP PROCEDURE IF EXISTS `sp_getOneSaleDocumentType`$$
-CREATE PROCEDURE `sp_getOneSaleDocumentType`(IN p_id INT)
-BEGIN
-    SELECT id, codigo, nombre, descripcion, estado
-    FROM tipo_documento_venta
-    WHERE id = p_id;
+    SELECT id, codigo, nombre FROM tipo_documento_venta WHERE estado = 1;
 END$$
 
 DELIMITER ;
@@ -100,7 +92,7 @@ CREATE PROCEDURE sp_getOrderDetail(IN p_id_pedido INT)
 BEGIN
     SELECT
         p.id, p.id_mesa, m.numero_mesa, p.id_usuario_mozo, u.nombre_completo AS nombre_mozo, p.estado, p.total, p.fecha_creacion, p.fecha_actualizacion,
-        p.id_cliente, c.nombres_apellidos AS nombre_cliente, c.numero_documento AS ruc_cliente, c.direccion AS direccion_cliente, c.codigo_ubigeo, c.id_tipo_documento_identidad AS id_tipo_documento_identidad_cliente,
+        p.id_cliente, c.nombres_apellidos AS nombre_cliente, c.numero_documento AS ruc_cliente, c.direccion AS direccion_cliente,
         p.id_tipo_documento_venta
     FROM pedidos p
     LEFT JOIN mesas m ON p.id_mesa = m.id

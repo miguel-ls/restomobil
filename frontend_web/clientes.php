@@ -73,7 +73,7 @@ $clientes_data = getClientes();
                                     </td>
                                     <td class="actions-cell">
                                         <a href="cliente_form.php?id=<?php echo $cliente['id']; ?>" class="btn btn-edit">Editar</a>
-                                        <a href="cliente_delete_handler.php?id=<?php echo $cliente['id']; ?>" class="btn btn-delete" onclick="return confirm('¿Estás seguro de que quieres eliminar permanentemente este cliente? Esta acción no se puede deshacer.');">Eliminar</a>
+                                        <a href="cliente_delete_handler.php?id=<?php echo $cliente['id']; ?>" class="btn btn-delete" onclick="return confirm('¿Estás seguro de que quieres desactivar este cliente?');">Eliminar</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

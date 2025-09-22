@@ -186,7 +186,7 @@ if ($is_pago_view) {
                                     <span id="order-total" style="font-weight: bold;"><?php echo CURRENCY_SYMBOL; ?>0.00</span>
                                 </div>
                             </div>
-                            <div id="tab-client" class="tab-pane form-frame">
+                            <div id="tab-client" class="tab-pane">
                                 <div class="form-group">
                                     <label for="id_tipo_documento_venta">Tipo de Comprobante</label>
                                     <select id="id_tipo_documento_venta" name="id_tipo_documento_venta">
@@ -195,13 +195,8 @@ if ($is_pago_view) {
                                 </div>
                                 <div class="form-group">
                                     <label for="cliente_search">Buscar Cliente (Nombre o RUC)</label>
-                                    <div class="search-container">
-                                        <div style="display: flex; gap: 10px;">
-                                            <input type="text" id="cliente_search" placeholder="Escriba para buscar..." style="flex-grow: 1;">
-                                            <button type="button" id="btn-sunat-main" class="btn">Sunat</button>
-                                        </div>
-                                        <div id="cliente_search_results"></div>
-                                    </div>
+                                    <input type="text" id="cliente_search" placeholder="Escriba para buscar...">
+                                    <div id="cliente_search_results"></div>
                                 </div>
                                 <input type="hidden" id="id_cliente" name="id_cliente" value="<?php echo htmlspecialchars($order_data['id_cliente'] ?? ''); ?>">
 
@@ -213,13 +208,16 @@ if ($is_pago_view) {
                                 <div class="form-group-row">
                                     <div class="form-group" style="flex-grow: 1;">
                                         <label for="id_tipo_documento_identidad_cliente">Tipo Documento</label>
-                                        <select id="id_tipo_documento_identidad_cliente" name="id_tipo_documento_identidad_cliente">
+                                        <select id="id_tipo_documento_identidad_cliente" name="id_tipo_documento_identidad_cliente" disabled>
                                             <option value="">Seleccione...</option>
                                         </select>
                                     </div>
                                     <div class="form-group" style="flex-grow: 2;">
                                         <label for="cliente_ruc">RUC / DNI</label>
-                                        <input type="text" id="cliente_ruc" name="cliente_ruc" value="<?php echo htmlspecialchars($order_data['ruc_cliente'] ?? ''); ?>">
+                                        <div style="display: flex; gap: 10px;">
+                                            <input type="text" id="cliente_ruc" name="cliente_ruc" value="<?php echo htmlspecialchars($order_data['ruc_cliente'] ?? ''); ?>">
+                                            <button type="button" id="btn-sunat-main" class="btn">Sunat</button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -234,6 +232,10 @@ if ($is_pago_view) {
                                     </div>
                                 </div>
 
+                                <div class="form-group" style="text-align: right;">
+                                    <button type="button" id="btn-clear-cliente" class="btn btn-secondary">Limpiar</button>
+                                    <button type="button" id="btn-crear-cliente" class="btn">Crear Cliente</button>
+                                </div>
                             </div>
                         </div>
 
@@ -273,6 +275,51 @@ if ($is_pago_view) {
     </main>
 </div>
 
+<!-- Modal para Crear Cliente -->
+<div id="modal-crear-cliente" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Crear Nuevo Cliente</h2>
+        <form id="form-crear-cliente">
+            <div class="form-group">
+                <label for="modal_id_tipo_documento_identidad">Tipo de Documento</label>
+                <select id="modal_id_tipo_documento_identidad" name="id_tipo_documento_identidad" required>
+                    <option value="">Seleccione...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="modal_numero_documento">N° de Documento</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="modal_numero_documento" name="numero_documento" required style="flex-grow: 1;">
+                    <button type="button" class="btn" id="modal-sunat-btn" style="flex-shrink: 0; display: none;">Sunat</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="modal_nombres_apellidos">Nombres y Apellidos</label>
+                <input type="text" id="modal_nombres_apellidos" name="nombres_apellidos" required>
+            </div>
+            <div class="form-group">
+                <label for="modal_direccion">Dirección</label>
+                <input type="text" id="modal_direccion" name="direccion">
+            </div>
+            <div class="form-group">
+                <label for="modal_codigo_ubigeo">Código de Ubigeo</label>
+                <input type="text" id="modal_codigo_ubigeo" name="codigo_ubigeo">
+            </div>
+            <div class="form-group">
+                <label for="modal_email">Email</label>
+                <input type="email" id="modal_email" name="email">
+            </div>
+            <div class="form-group">
+                <label for="modal_telefono">Teléfono</label>
+                <input type="text" id="modal_telefono" name="telefono">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn">Guardar Cliente</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 
 <script>
@@ -461,64 +508,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    orderForm.addEventListener('submit', async function(e) {
-        e.preventDefault(); // Stop the form from submitting immediately
-
-        // Client saving logic
-        const idCliente = idClienteInput.value;
-        const ruc = clienteRucInput.value.trim();
-
-        // Only save the client if the fields are enabled (not read-only) AND there's a document number
-        if (!clienteNombreInput.readOnly && ruc) {
-            const clienteData = {
-                id_tipo_documento_identidad: clienteTipoDocIdentidadSelect.value,
-                numero_documento: ruc,
-                nombres_apellidos: clienteNombreInput.value.trim(),
-                direccion: clienteDireccionInput.value.trim(),
-                codigo_ubigeo: clienteUbigeoInput.value.trim(),
-                email: '', // Not in form
-                telefono: '' // Not in form
-            };
-
-            const method = idCliente ? 'PUT' : 'POST';
-            const url = idCliente ? `${apiBaseUrl}clientes.php?id=${idCliente}` : `${apiBaseUrl}clientes.php`;
-            if (idCliente) {
-                clienteData.estado = 'Activado';
-            }
-
-            try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(clienteData)
-                });
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.message || 'Error al guardar el cliente.');
-                }
-
-                // Set the hidden client ID input with the new/updated ID
-                idClienteInput.value = idCliente || result.id;
-
-            } catch (error) {
-                alert(`Error al guardar el cliente: ${error.message}`);
-                return; // Stop the order from being saved if the client save fails
-            }
-        }
-
-        // Order submission logic (validation and adding items)
+    orderForm.addEventListener('submit', function(e) {
         const tipoComprobanteSelect = document.getElementById('id_tipo_documento_venta');
         const selectedComprobante = tipoComprobanteSelect.options[tipoComprobanteSelect.selectedIndex];
 
         if (selectedComprobante && selectedComprobante.textContent === 'Factura') {
-            if (!idClienteInput.value || !clienteNombreInput.value || !clienteDireccionInput.value) {
-                alert('Para emitir una Factura, debe seleccionar o crear un cliente con RUC, nombre y dirección.');
+            const idCliente = document.getElementById('id_cliente').value;
+            const clienteNombre = document.getElementById('cliente_nombre').value;
+            const clienteDireccion = document.getElementById('cliente_direccion').value;
+
+            if (!idCliente || !clienteNombre || !clienteDireccion) {
+                e.preventDefault();
+                alert('Para emitir una Factura, debe seleccionar un cliente con RUC, nombre y dirección.');
                 return;
             }
-        } else if (idClienteInput.value && !clienteNombreInput.value) {
-            alert('El campo nombre del cliente es obligatorio si se ha seleccionado un cliente.');
-            return;
+        } else if (document.getElementById('id_cliente').value) {
+            const clienteNombre = document.getElementById('cliente_nombre').value;
+            if (!clienteNombre) {
+                e.preventDefault();
+                alert('El campo nombre del cliente es obligatorio si se ha seleccionado un cliente.');
+                return;
+            }
         }
 
         const itemsInput = document.createElement('input');
@@ -526,9 +536,6 @@ document.addEventListener('DOMContentLoaded', function() {
         itemsInput.name = 'items';
         itemsInput.value = JSON.stringify(Object.values(currentOrder));
         this.appendChild(itemsInput);
-
-        // Now, submit the form for the order
-        this.submit();
     });
 
     categoryFilters.addEventListener('click', function(e) {
@@ -562,6 +569,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const clienteRucInput = document.getElementById('cliente_ruc');
     const clienteDireccionInput = document.getElementById('cliente_direccion');
     const clienteUbigeoInput = document.getElementById('cliente_ubigeo');
+    const btnClearCliente = document.getElementById('btn-clear-cliente');
     const btnSunatMain = document.getElementById('btn-sunat-main');
 
     async function loadSaleDocumentTypes() {
@@ -612,7 +620,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         [clienteNombreInput, clienteRucInput, clienteDireccionInput, clienteUbigeoInput].forEach(el => el.readOnly = false);
         clienteTipoDocIdentidadSelect.disabled = false;
+
+        btnClearCliente.style.display = 'none';
     }
+
+    btnClearCliente.addEventListener('click', clearClienteSelection);
 
     function selectCliente(cliente) {
         idClienteInput.value = cliente.id;
@@ -624,6 +636,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         [clienteNombreInput, clienteRucInput, clienteDireccionInput, clienteUbigeoInput].forEach(el => el.readOnly = true);
         clienteTipoDocIdentidadSelect.disabled = true;
+
+        btnClearCliente.style.display = 'inline-block';
     }
 
     clienteSearchInput.addEventListener('keyup', async function() {
@@ -655,41 +669,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     btnSunatMain.addEventListener('click', async () => {
-        const docNumber = clienteSearchInput.value.trim();
-        let queryType = '';
-        let docCode = '';
-
-        if (docNumber.length === 8) {
-            queryType = 'dni';
-            docCode = '1';
-        } else if (docNumber.length === 11) {
-            queryType = 'ruc';
-            docCode = '6';
-        } else {
-            alert('Por favor, ingrese un número de DNI (8 dígitos) o RUC (11 dígitos) en el buscador.');
+        const docNumber = clienteRucInput.value.trim();
+        const selectedOption = [...clienteTipoDocIdentidadSelect.options].find(opt => opt.text.toLowerCase() === 'ruc' || opt.text.toLowerCase() === 'dni');
+        const docCode = selectedOption ? selectedOption.dataset.codigo : null;
+        if (!docNumber || !docCode) {
+            alert('Por favor, ingrese un número de RUC o DNI y seleccione el tipo de documento correspondiente.');
             return;
         }
+        let queryType = (docCode === '1') ? 'dni' : 'ruc';
 
         btnSunatMain.textContent = 'Buscando...';
         btnSunatMain.disabled = true;
-        clearClienteSelection();
-
         try {
             const response = await fetch(`consulta_api_externa.php?tipo=${queryType}&numero=${docNumber}`);
             const data = await response.json();
             if (data.error) throw new Error(data.error);
-
             clienteNombreInput.value = data.nombre || '';
             clienteDireccionInput.value = data.direccion || '';
             clienteUbigeoInput.value = data.ubigeo || '';
-            clienteRucInput.value = docNumber;
-
-            for (let i = 0; i < clienteTipoDocIdentidadSelect.options.length; i++) {
-                if (clienteTipoDocIdentidadSelect.options[i].getAttribute('data-codigo') === docCode) {
-                    clienteTipoDocIdentidadSelect.selectedIndex = i;
-                    break;
-                }
-            }
         } catch (error) {
             alert('Error al consultar: ' + error.message);
         } finally {
@@ -698,28 +695,182 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    loadSaleDocumentTypes();
+    loadIdentityDocumentTypes(clienteTipoDocIdentidadSelect);
 
-    async function initializeForm() {
-        await Promise.all([
-            loadSaleDocumentTypes(),
-            loadIdentityDocumentTypes(clienteTipoDocIdentidadSelect)
-        ]);
+    if (isEditing && initialOrderData && initialOrderData.id_cliente) {
+        selectCliente({
+            id: initialOrderData.id_cliente,
+            nombres_apellidos: initialOrderData.nombre_cliente,
+            id_tipo_documento_identidad: initialOrderData.id_tipo_documento_identidad_cliente,
+            numero_documento: initialOrderData.ruc_cliente,
+            direccion: initialOrderData.direccion_cliente,
+            codigo_ubigeo: initialOrderData.codigo_ubigeo
+        });
+    } else {
+        clearClienteSelection();
+    }
 
-        if (isEditing && initialOrderData && initialOrderData.id_cliente) {
-            selectCliente({
-                id: initialOrderData.id_cliente,
-                nombres_apellidos: initialOrderData.nombre_cliente,
-                id_tipo_documento_identidad: initialOrderData.id_tipo_documento_identidad_cliente,
-                numero_documento: initialOrderData.ruc_cliente,
-                direccion: initialOrderData.direccion_cliente,
-                codigo_ubigeo: initialOrderData.codigo_ubigeo
-            });
+    const btnCrearCliente = document.getElementById('btn-crear-cliente');
+    const modalCrearCliente = document.getElementById('modal-crear-cliente');
+    const closeBtn = document.querySelector('.close-btn');
+
+    btnCrearCliente.addEventListener('click', () => {
+        modalCrearCliente.style.display = 'block';
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modalCrearCliente.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target == modalCrearCliente) {
+            modalCrearCliente.style.display = 'none';
+        }
+    });
+
+    const modalForm = document.getElementById('form-crear-cliente');
+    const modalTipoDocumentoSelect = document.getElementById('modal_id_tipo_documento_identidad');
+    const modalSunatBtn = document.getElementById('modal-sunat-btn');
+    const modalNumeroDocumentoInput = document.getElementById('modal_numero_documento');
+    const modalNombresInput = document.getElementById('modal_nombres_apellidos');
+    const modalDireccionInput = document.getElementById('modal_direccion');
+    const modalUbigeoInput = document.getElementById('modal_codigo_ubigeo');
+
+    loadIdentityDocumentTypes(modalTipoDocumentoSelect);
+
+    function toggleModalSunatButton() {
+        const selectedOption = modalTipoDocumentoSelect.options[modalTipoDocumentoSelect.selectedIndex];
+        const docCode = selectedOption ? selectedOption.getAttribute('data-codigo') : null;
+        const validDocumentCodes = ['1', '6'];
+        if (docCode && validDocumentCodes.includes(docCode)) {
+            modalSunatBtn.style.display = 'inline-block';
         } else {
-            clearClienteSelection();
+            modalSunatBtn.style.display = 'none';
         }
     }
 
-    initializeForm();
+    modalTipoDocumentoSelect.addEventListener('change', toggleModalSunatButton);
+    toggleModalSunatButton();
 
+    modalSunatBtn.addEventListener('click', async () => {
+        const selectedOption = modalTipoDocumentoSelect.options[modalTipoDocumentoSelect.selectedIndex];
+        const docCode = selectedOption ? selectedOption.getAttribute('data-codigo') : null;
+        const docNumber = modalNumeroDocumentoInput.value.trim();
+
+        if (!docCode || !docNumber) {
+            alert('Por favor, seleccione un tipo de documento y ingrese un número.');
+            return;
+        }
+
+        let queryType = (docCode === '1') ? 'dni' : 'ruc';
+        modalSunatBtn.textContent = 'Buscando...';
+        modalSunatBtn.disabled = true;
+
+        try {
+            const response = await fetch(`consulta_api_externa.php?tipo=${queryType}&numero=${docNumber}`);
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            modalNombresInput.value = data.nombre || '';
+            modalDireccionInput.value = data.direccion || '';
+            modalUbigeoInput.value = data.ubigeo || '';
+        } catch (error) {
+            alert('Error al consultar: ' + error.message);
+        } finally {
+            modalSunatBtn.textContent = 'Sunat';
+            modalSunatBtn.disabled = false;
+        }
+    });
+
+    modalForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(modalForm);
+        const clienteData = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch(`${apiBaseUrl}clientes.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(clienteData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert('Cliente creado exitosamente.');
+                modalCrearCliente.style.display = 'none';
+                modalForm.reset();
+
+                selectCliente({
+                    id: result.id,
+                    nombres_apellidos: clienteData.nombres_apellidos,
+                    id_tipo_documento_identidad: clienteData.id_tipo_documento_identidad,
+                    numero_documento: clienteData.numero_documento,
+                    direccion: clienteData.direccion,
+                    codigo_ubigeo: clienteData.codigo_ubigeo
+                });
+
+            } else {
+                throw new Error(result.message || 'Error al crear el cliente.');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    });
 });
 </script>
+<style>
+.form-group-row {
+    display: flex;
+    gap: 20px;
+}
+#cliente_search_results {
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    position: absolute;
+    background-color: white;
+    width: calc(100% - 22px);
+    z-index: 1000;
+}
+.search-result-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+.search-result-item:hover {
+    background-color: #f0f0f0;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 5px;
+}
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+</style>
