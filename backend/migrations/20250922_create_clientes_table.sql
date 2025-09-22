@@ -16,7 +16,7 @@ CREATE TABLE `clientes` (
   `telefono` VARCHAR(20) NULL,
   `estado` ENUM('Activado', 'Desactivado') NOT NULL DEFAULT 'Activado',
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `documento_UNIQUE` (`id_tipo_documento_identidad` ASC, `numero_documento` ASC),
+  UNIQUE INDEX `numero_documento_UNIQUE` (`numero_documento` ASC),
   CONSTRAINT `fk_clientes_tipo_documento_identidad`
     FOREIGN KEY (`id_tipo_documento_identidad`)
     REFERENCES `tipo_documento_identidad` (`id`)
@@ -137,32 +137,6 @@ DROP PROCEDURE IF EXISTS `sp_deleteCliente`$$
 CREATE PROCEDURE `sp_deleteCliente`(IN p_id INT)
 BEGIN
     UPDATE clientes SET estado = 'Desactivado' WHERE id = p_id;
-END$$
-
--- Search clients
-DROP PROCEDURE IF EXISTS `sp_searchClientes`$$
-CREATE PROCEDURE `sp_searchClientes`(IN p_search_term VARCHAR(200))
-BEGIN
-    SELECT
-        c.id,
-        c.id_tipo_documento_identidad,
-        tdi.nombre as tipo_documento_nombre,
-        c.numero_documento,
-        c.nombres_apellidos,
-        c.direccion,
-        c.codigo_ubigeo,
-        c.email,
-        c.telefono,
-        c.estado
-    FROM
-        clientes c
-    JOIN
-        tipo_documento_identidad tdi ON c.id_tipo_documento_identidad = tdi.id
-    WHERE
-        (c.nombres_apellidos LIKE p_search_term OR c.numero_documento LIKE p_search_term)
-        AND c.estado = 'Activado'
-    ORDER BY
-        c.nombres_apellidos;
 END$$
 
 DELIMITER ;

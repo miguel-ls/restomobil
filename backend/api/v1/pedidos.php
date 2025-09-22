@@ -30,8 +30,8 @@ switch ($request_method) {
         $data = json_decode(file_get_contents("php://input"));
         if (!empty($data->id_mesa) && !empty($data->id_usuario_mozo) && !empty($data->items) && is_array($data->items) && !empty($data->estado)) {
             $id_cliente = !empty($data->id_cliente) ? $data->id_cliente : null;
-            $id_tipo_comprobante = !empty($data->id_tipo_comprobante) ? $data->id_tipo_comprobante : null;
-            $stmt = $order->create($data->id_mesa, $data->id_usuario_mozo, $data->items, $data->estado, $id_cliente, $id_tipo_comprobante);
+            $id_tipo_documento_venta = !empty($data->id_tipo_documento_venta) ? $data->id_tipo_documento_venta : null;
+            $stmt = $order->create($data->id_mesa, $data->id_usuario_mozo, $data->items, $data->estado, $id_cliente, $id_tipo_documento_venta);
             if ($stmt) {
                 $new_order = $stmt->fetch(PDO::FETCH_ASSOC);
                 http_response_code(201);
@@ -51,8 +51,8 @@ switch ($request_method) {
         $order_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
         if ($order_id && !empty($data->id_mesa) && !empty($data->id_usuario_mozo) && isset($data->estado) && isset($data->items) && is_array($data->items)) {
             $id_cliente = !empty($data->id_cliente) ? $data->id_cliente : null;
-            $id_tipo_comprobante = !empty($data->id_tipo_comprobante) ? $data->id_tipo_comprobante : null;
-            if ($order->update($order_id, $data->id_mesa, $data->id_usuario_mozo, $data->estado, $data->items, $id_cliente, $id_tipo_comprobante)) {
+            $id_tipo_documento_venta = !empty($data->id_tipo_documento_venta) ? $data->id_tipo_documento_venta : null;
+            if ($order->update($order_id, $data->id_mesa, $data->id_usuario_mozo, $data->estado, $data->items, $id_cliente, $id_tipo_documento_venta)) {
                 http_response_code(200);
                 echo json_encode(["message" => "Pedido actualizado exitosamente."]);
             } else {
