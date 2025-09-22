@@ -127,7 +127,7 @@ if ($is_pago_view) {
                     </div>
                     <form id="order-form" method="POST" action="<?php echo $form_action; ?>">
                         <?php
-                            $default_estado = 'recibido';
+                            $default_estado = 'abierto';
                             if ($is_pago_view) {
                                 $default_estado = 'pagado';
                             } else if ($is_caja_create_view) {

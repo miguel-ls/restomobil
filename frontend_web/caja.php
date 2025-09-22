@@ -28,7 +28,7 @@ $orders_data = getCompletedOrders();
     <main class="main-content">
         <div class="container">
             <div class="page-header">
-                <h1>Pedidos Completados y Cancelados</h1>
+                <h1>Caja</h1>
                 <a href="pedido_form.php?view=caja_create" class="btn">Crear Pedido Nuevo</a>
             </div>
 
