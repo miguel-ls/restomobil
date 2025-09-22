@@ -32,6 +32,8 @@ body {
 .error-message { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
 .success-message { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.page-header h1 { margin: 0; }
+.page-header .page-header-actions { margin-left: auto; }
 .page-header .btn { width: auto; }
 
 /* Layout Principal */
@@ -381,4 +383,15 @@ table th { background-color: var(--light-bg); font-weight: 600; }
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+.filter-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.filter-group > input {
+    flex-grow: 1;
 }

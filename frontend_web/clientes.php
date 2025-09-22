@@ -18,7 +18,15 @@ function getClientes() {
     return json_decode($response, true);
 }
 
+function getIdentityDocumentTypes() {
+    $api_url = API_BASE_URL . 'tipo_documento_identidad.php';
+    $response = file_get_contents($api_url);
+    $data = json_decode($response, true);
+    return $data['records'] ?? [];
+}
+
 $clientes_data = getClientes();
+$document_types = getIdentityDocumentTypes();
 ?>
 
 <div class="dashboard-container">
@@ -27,11 +35,24 @@ $clientes_data = getClientes();
         <div class="container">
             <div class="page-header">
                 <h1>Catálogo de Clientes</h1>
-                <a href="cliente_form.php" class="btn">Nuevo Cliente</a>
+                <div class="page-header-actions">
+                    <a href="cliente_form.php" class="btn">Nuevo Cliente</a>
+                </div>
             </div>
 
             <div class="filters">
-                <input type="text" id="filter-numero-documento" placeholder="Filtrar por N° Documento...">
+                <select id="filter-tipo-documento">
+                    <option value="">Todos los Tipos</option>
+                    <?php foreach ($document_types as $type): ?>
+                        <option value="<?php echo htmlspecialchars($type['nombre']); ?>" data-codigo="<?php echo htmlspecialchars($type['codigo']); ?>">
+                            <?php echo htmlspecialchars($type['nombre']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <div class="filter-group">
+                    <input type="text" id="filter-numero-documento" placeholder="Filtrar por N° Documento...">
+                    <button type="button" class="btn" id="sunat-btn">SUNAT</button>
+                </div>
                 <input type="text" id="filter-nombres" placeholder="Filtrar por Nombres...">
                 <input type="text" id="filter-email" placeholder="Filtrar por Email...">
                 <input type="text" id="filter-telefono" placeholder="Filtrar por Teléfono...">
@@ -50,6 +71,7 @@ $clientes_data = getClientes();
                             <th>N° Documento</th>
                             <th>Nombres y Apellidos</th>
                             <th>Dirección</th>
+                            <th>Ubigeo</th>
                             <th>Email</th>
                             <th>Teléfono</th>
                             <th>Estado</th>
@@ -64,6 +86,7 @@ $clientes_data = getClientes();
                                     <td><?php echo htmlspecialchars($cliente['numero_documento']); ?></td>
                                     <td><?php echo htmlspecialchars($cliente['nombres_apellidos']); ?></td>
                                     <td><?php echo htmlspecialchars($cliente['direccion']); ?></td>
+                                    <td><?php echo htmlspecialchars($cliente['codigo_ubigeo']); ?></td>
                                     <td><?php echo htmlspecialchars($cliente['email']); ?></td>
                                     <td><?php echo htmlspecialchars($cliente['telefono']); ?></td>
                                     <td>
@@ -78,7 +101,7 @@ $clientes_data = getClientes();
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <tr><td colspan="8">No se encontraron clientes.</td></tr>
+                            <tr><td colspan="9">No se encontraron clientes.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -89,6 +112,7 @@ $clientes_data = getClientes();
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const filters = {
+        tipo_documento: document.getElementById('filter-tipo-documento'),
         numero_documento: document.getElementById('filter-numero-documento'),
         nombres: document.getElementById('filter-nombres'),
         email: document.getElementById('filter-email'),
@@ -96,9 +120,11 @@ document.addEventListener('DOMContentLoaded', function() {
         estado: document.getElementById('filter-estado')
     };
     const tableRows = document.querySelectorAll('#clientes-table tbody tr');
+    const sunatBtn = document.getElementById('sunat-btn');
 
     function filterTable() {
         const filterValues = {
+            tipo_documento: filters.tipo_documento.value.toLowerCase(),
             numero_documento: filters.numero_documento.value.toLowerCase(),
             nombres: filters.nombres.value.toLowerCase(),
             email: filters.email.value.toLowerCase(),
@@ -109,20 +135,22 @@ document.addEventListener('DOMContentLoaded', function() {
         tableRows.forEach(row => {
             if (row.cells.length > 1) {
                 const cells = {
+                    tipo_documento: row.cells[0].textContent.toLowerCase(),
                     numero_documento: row.cells[1].textContent.toLowerCase(),
                     nombres: row.cells[2].textContent.toLowerCase(),
-                    email: row.cells[4].textContent.toLowerCase(),
-                    telefono: row.cells[5].textContent.toLowerCase(),
-                    estado: row.cells[6].textContent.trim().toLowerCase()
+                    email: row.cells[5].textContent.toLowerCase(),
+                    telefono: row.cells[6].textContent.toLowerCase(),
+                    estado: row.cells[7].textContent.trim().toLowerCase()
                 };
 
+                const matchesTipoDoc = filterValues.tipo_documento === '' || cells.tipo_documento.includes(filterValues.tipo_documento);
                 const matchesNumeroDoc = cells.numero_documento.includes(filterValues.numero_documento);
                 const matchesNombres = cells.nombres.includes(filterValues.nombres);
                 const matchesEmail = cells.email.includes(filterValues.email);
                 const matchesTelefono = cells.telefono.includes(filterValues.telefono);
                 const matchesEstado = filterValues.estado === '' || cells.estado === filterValues.estado;
 
-                if (matchesNumeroDoc && matchesNombres && matchesEmail && matchesTelefono && matchesEstado) {
+                if (matchesTipoDoc && matchesNumeroDoc && matchesNombres && matchesEmail && matchesTelefono && matchesEstado) {
                     row.style.display = '';
                 } else {
                     row.style.display = 'none';
@@ -132,9 +160,68 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     for (const key in filters) {
-        filters[key].addEventListener('keyup', filterTable);
-        filters[key].addEventListener('change', filterTable);
+        if (filters[key]) {
+            filters[key].addEventListener('keyup', filterTable);
+            filters[key].addEventListener('change', filterTable);
+        }
     }
+
+    sunatBtn.addEventListener('click', function() {
+        const selectedOption = filters.tipo_documento.options[filters.tipo_documento.selectedIndex];
+        const docCode = selectedOption ? selectedOption.getAttribute('data-codigo') : null;
+        const docNumber = filters.numero_documento.value.trim();
+
+        if (!docCode || !docNumber) {
+            alert('Por favor, seleccione un tipo de documento y ingrese un número.');
+            return;
+        }
+
+        let queryType = '';
+        if (docCode === '1') {
+            queryType = 'dni';
+        } else if (docCode === '6') {
+            queryType = 'ruc';
+        } else {
+            alert('La consulta solo es válida para DNI o RUC.');
+            return;
+        }
+
+        sunatBtn.textContent = 'Buscando...';
+        sunatBtn.disabled = true;
+
+        fetch(`consulta_api_externa.php?tipo=${queryType}&numero=${docNumber}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('La respuesta de la red no fue exitosa.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                filters.nombres.value = data.nombre || '';
+                // No se autocompleta la dirección en el filtro, solo en el form.
+
+                // Auto-seleccionar el tipo de documento y filtrar
+                for (let i = 0; i < filters.tipo_documento.options.length; i++) {
+                    if (filters.tipo_documento.options[i].getAttribute('data-codigo') === docCode) {
+                        filters.tipo_documento.selectedIndex = i;
+                        break;
+                    }
+                }
+
+                filterTable(); // Aplicar todos los filtros
+            })
+            .catch(error => {
+                console.error('Error al consultar la API:', error);
+                alert('No se pudo obtener la información: ' + error.message);
+            })
+            .finally(() => {
+                sunatBtn.textContent = 'SUNAT';
+                sunatBtn.disabled = false;
+            });
+    });
 });
 </script>
 
