@@ -13,8 +13,11 @@ include_once 'templates/header.php';
 include_once __DIR__ . '/config.php';
 
 // Función para obtener los pedidos desde la API
-function getOrders() {
+function getOrders($status = '') {
     $api_url = API_BASE_URL . 'pedidos.php';
+    if (!empty($status)) {
+        $api_url .= '?estado=' . urlencode($status);
+    }
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $response = curl_exec($ch);
@@ -22,7 +25,7 @@ function getOrders() {
     return json_decode($response, true);
 }
 
-$orders_data = getOrders();
+$orders_data = getOrders('abierto');
 ?>
 
 <div class="dashboard-container">
