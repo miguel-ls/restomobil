@@ -238,9 +238,13 @@ if ($is_pago_view) {
                         <fieldset class="status-actions-frame">
                             <legend>Acciones Rápidas de Estado</legend>
                             <div class="btn-group">
-                                <button type="button" class="btn btn-abierto status-btn" data-status="abierto">Abierto</button>
-                                <button type="button" class="btn btn-completado status-btn" data-status="completado">Completado</button>
-                                <button type="button" class="btn btn-cancelado status-btn" data-status="cancelado">Cancelado</button>
+                                <?php if ($order_data['estado'] !== 'abierto'): ?>
+                                    <button type="button" class="btn btn-abierto status-btn" data-status="abierto">Abrir</button>
+                                <?php endif; ?>
+                                <?php if ($order_data['estado'] !== 'completado'): ?>
+                                    <button type="button" class="btn btn-completado status-btn" data-status="completado">Completar</button>
+                                <?php endif; ?>
+                                <button type="button" class="btn btn-cancelado status-btn" data-status="cancelado">Cancelar</button>
                             </div>
                         </fieldset>
                         <?php endif; ?>
