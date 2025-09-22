@@ -60,6 +60,8 @@ $orders_data = getCompletedOrders();
                             <div class="card-footer">
                                 <?php if ($order['estado'] == 'completado'): ?>
                                     <a href="pedido_form.php?id=<?php echo $order['id']; ?>&view=pago" class="btn-card btn-edit">Pagar</a>
+                                <?php elseif ($order['estado'] == 'cancelado'): ?>
+                                    <a href="pedido_form.php?id=<?php echo $order['id']; ?>&view=pago" class="btn-card btn-edit" style="background-color: green; color: white;">Editar</a>
                                 <?php elseif ($order['estado'] == 'pagado'): ?>
                                     <a href="pedido_form.php?id=<?php echo $order['id']; ?>&view=pago" class="btn-card btn-view">Ver Detalle</a>
                                 <?php endif; ?>
