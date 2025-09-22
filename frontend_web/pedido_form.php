@@ -713,21 +713,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    loadSaleDocumentTypes();
-    loadIdentityDocumentTypes(clienteTipoDocIdentidadSelect);
+    async function initializeForm() {
+        await Promise.all([
+            loadSaleDocumentTypes(),
+            loadIdentityDocumentTypes(clienteTipoDocIdentidadSelect)
+        ]);
 
-    if (isEditing && initialOrderData && initialOrderData.id_cliente) {
-        selectCliente({
-            id: initialOrderData.id_cliente,
-            nombres_apellidos: initialOrderData.nombre_cliente,
-            id_tipo_documento_identidad: initialOrderData.id_tipo_documento_identidad_cliente,
-            numero_documento: initialOrderData.ruc_cliente,
-            direccion: initialOrderData.direccion_cliente,
-            codigo_ubigeo: initialOrderData.codigo_ubigeo
-        });
-    } else {
-        clearClienteSelection();
+        if (isEditing && initialOrderData && initialOrderData.id_cliente) {
+            selectCliente({
+                id: initialOrderData.id_cliente,
+                nombres_apellidos: initialOrderData.nombre_cliente,
+                id_tipo_documento_identidad: initialOrderData.id_tipo_documento_identidad_cliente,
+                numero_documento: initialOrderData.ruc_cliente,
+                direccion: initialOrderData.direccion_cliente,
+                codigo_ubigeo: initialOrderData.codigo_ubigeo
+            });
+        } else {
+            clearClienteSelection();
+        }
     }
+
+    initializeForm();
 
 });
 </script>
