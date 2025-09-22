@@ -195,11 +195,13 @@ if ($is_pago_view) {
                                 </div>
                                 <div class="form-group">
                                     <label for="cliente_search">Buscar Cliente (Nombre o RUC)</label>
-                                    <div style="display: flex; gap: 10px;">
-                                        <input type="text" id="cliente_search" placeholder="Escriba para buscar..." style="flex-grow: 1;">
-                                        <button type="button" id="btn-sunat-main" class="btn">Sunat</button>
+                                    <div class="search-container">
+                                        <div style="display: flex; gap: 10px;">
+                                            <input type="text" id="cliente_search" placeholder="Escriba para buscar..." style="flex-grow: 1;">
+                                            <button type="button" id="btn-sunat-main" class="btn">Sunat</button>
+                                        </div>
+                                        <div id="cliente_search_results"></div>
                                     </div>
-                                    <div id="cliente_search_results"></div>
                                 </div>
                                 <input type="hidden" id="id_cliente" name="id_cliente" value="<?php echo htmlspecialchars($order_data['id_cliente'] ?? ''); ?>">
 
@@ -721,58 +723,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 </script>
-<style>
-.form-group-row {
-    display: flex;
-    gap: 20px;
-}
-#cliente_search_results {
-    border: 1px solid #ccc;
-    max-height: 150px;
-    overflow-y: auto;
-    position: absolute;
-    background-color: white;
-    width: calc(100% - 22px);
-    z-index: 1000;
-}
-.search-result-item {
-    padding: 8px 12px;
-    cursor: pointer;
-}
-.search-result-item:hover {
-    background-color: #f0f0f0;
-}
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1001;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
-}
-.modal-content {
-    background-color: #fefefe;
-    margin: 10% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 500px;
-    border-radius: 5px;
-}
-.close-btn {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-.close-btn:hover,
-.close-btn:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-</style>
