@@ -83,21 +83,9 @@ $document_types = getIdentityDocumentTypes();
                         <input type="text" id="direccion" name="direccion" value="<?php echo htmlspecialchars($cliente['direccion']); ?>">
                     </div>
 
-                    <input type="hidden" id="codigo_ubigeo" name="codigo_ubigeo" value="<?php echo htmlspecialchars($cliente['codigo_ubigeo']); ?>">
-
                     <div class="form-group">
-                        <label for="departamento">Departamento</label>
-                        <select id="departamento" name="departamento"></select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="provincia">Provincia</label>
-                        <select id="provincia" name="provincia"></select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="distrito">Distrito</label>
-                        <select id="distrito" name="distrito"></select>
+                        <label for="codigo_ubigeo">Código de Ubigeo</label>
+                        <input type="text" id="codigo_ubigeo" name="codigo_ubigeo" value="<?php echo htmlspecialchars($cliente['codigo_ubigeo']); ?>">
                     </div>
 
                     <div class="form-group">
@@ -203,101 +191,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add event listener for changes
     tipoDocumentoSelect.addEventListener('change', toggleSunatButton);
-
-    // --- Ubigeo Logic ---
-    const departamentoSelect = document.getElementById('departamento');
-    const provinciaSelect = document.getElementById('provincia');
-    const distritoSelect = document.getElementById('distrito');
-    const ubigeoHiddenInput = document.getElementById('codigo_ubigeo');
-    const isEdit = <?php echo json_encode($is_edit); ?>;
-    const initialUbigeo = "<?php echo htmlspecialchars($cliente['codigo_ubigeo']); ?>";
-    const API_BASE_URL = "<?php echo API_BASE_URL; ?>";
-
-    function populateSelect(selectElement, items, defaultOptionText) {
-        selectElement.innerHTML = `<option value="">${defaultOptionText}</option>`;
-        items.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.id;
-            option.textContent = item.nombre;
-            selectElement.appendChild(option);
-        });
-    }
-
-    async function loadDepartamentos() {
-        try {
-            const response = await fetch(`${API_BASE_URL}departamentos.php`);
-            const data = await response.json();
-            populateSelect(departamentoSelect, data.records || [], 'Seleccione un departamento');
-            if (isEdit && initialUbigeo) {
-                const depId = initialUbigeo.substring(0, 2);
-                departamentoSelect.value = depId;
-                await loadProvincias(depId);
-            }
-        } catch (error) {
-            console.error('Error cargando departamentos:', error);
-        }
-    }
-
-    async function loadProvincias(depId) {
-        if (!depId) {
-            provinciaSelect.innerHTML = '<option value="">Seleccione una provincia</option>';
-            distritoSelect.innerHTML = '<option value="">Seleccione un distrito</option>';
-            return;
-        }
-        try {
-            const response = await fetch(`${API_BASE_URL}provincias.php?dep_id=${depId}`);
-            const data = await response.json();
-            populateSelect(provinciaSelect, data.records || [], 'Seleccione una provincia');
-            if (isEdit && initialUbigeo) {
-                const provId = initialUbigeo.substring(0, 4);
-                provinciaSelect.value = provId;
-                await loadDistritos(provId);
-            }
-        } catch (error) {
-            console.error('Error cargando provincias:', error);
-        }
-    }
-
-    async function loadDistritos(provId) {
-        if (!provId) {
-            distritoSelect.innerHTML = '<option value="">Seleccione un distrito</option>';
-            return;
-        }
-        try {
-            const response = await fetch(`${API_BASE_URL}distritos.php?prov_id=${provId}`);
-            const data = await response.json();
-            populateSelect(distritoSelect, data.records || [], 'Seleccione un distrito');
-            if (isEdit && initialUbigeo) {
-                distritoSelect.value = initialUbigeo;
-            }
-             // Once everything is loaded, clear the flag for subsequent user interactions
-            if (isEdit) {
-               setTimeout(() => { isEdit = false; }, 0);
-            }
-        } catch (error) {
-            console.error('Error cargando distritos:', error);
-        }
-    }
-
-    departamentoSelect.addEventListener('change', () => {
-        const depId = departamentoSelect.value;
-        ubigeoHiddenInput.value = ''; // Reset on change
-        loadProvincias(depId);
-        distritoSelect.innerHTML = '<option value="">Seleccione un distrito</option>'; // Clear districts
-    });
-
-    provinciaSelect.addEventListener('change', () => {
-        const provId = provinciaSelect.value;
-        ubigeoHiddenInput.value = ''; // Reset on change
-        loadDistritos(provId);
-    });
-
-    distritoSelect.addEventListener('change', () => {
-        ubigeoHiddenInput.value = distritoSelect.value;
-    });
-
-    // Initial Load
-    loadDepartamentos();
 });
 </script>
 
