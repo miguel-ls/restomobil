@@ -127,7 +127,7 @@ if ($is_pago_view) {
                     </div>
                     <form id="order-form" method="POST" action="<?php echo $form_action; ?>">
                         <?php
-                            $default_estado = 'abierto';
+                            $default_estado = 'recibido';
                             if ($is_pago_view) {
                                 $default_estado = 'pagado';
                             } else if ($is_caja_create_view) {
@@ -234,7 +234,7 @@ if ($is_pago_view) {
                             </div>
                         </div>
 
-                        <?php if ($is_editing && !$is_pago_view): ?>
+                        <?php if ($is_editing): ?>
                         <fieldset class="status-actions-frame">
                             <legend>Acciones Rápidas de Estado</legend>
                             <div class="btn-group">

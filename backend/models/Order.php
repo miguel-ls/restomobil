@@ -52,7 +52,7 @@ class Order {
         return $order_details;
     }
 
-    public function create($id_mesa, $id_usuario_mozo, $items, $estado = 'abierto', $id_cliente = null, $id_tipo_documento_venta = null) {
+    public function create($id_mesa, $id_usuario_mozo, $items, $estado = 'recibido', $id_cliente = null, $id_tipo_documento_venta = null) {
         $query = "CALL sp_createOrder(:id_mesa, :id_usuario_mozo, :items_json, :estado, :id_cliente, :id_tipo_documento_venta)";
         $stmt = $this->conn->prepare($query);
         $items_json = json_encode($items);
