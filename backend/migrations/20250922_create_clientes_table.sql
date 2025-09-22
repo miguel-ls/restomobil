@@ -133,11 +133,10 @@ BEGIN
 END$$
 
 -- Delete a client (logical delete)
--- Delete a client (hard delete)
 DROP PROCEDURE IF EXISTS `sp_deleteCliente`$$
 CREATE PROCEDURE `sp_deleteCliente`(IN p_id INT)
 BEGIN
-    DELETE FROM clientes WHERE id = p_id;
+    UPDATE clientes SET estado = 'Desactivado' WHERE id = p_id;
 END$$
 
 DELIMITER ;

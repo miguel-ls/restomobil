@@ -34,7 +34,7 @@ include_once 'templates/header.php';
                 <a href="tipos_documentos.php" class="btn btn-secondary">Volver</a>
             </div>
             <div class="form-container">
-                <form action="tipos_documentos_handler.php" method="POST">
+                <form id="tipo-documento-form">
                     <input type="hidden" name="id" value="<?php echo htmlspecialchars($type_data['id'] ?? ''); ?>">
                     <div class="form-group">
                         <label for="codigo">Código SUNAT</label>
@@ -65,3 +65,50 @@ include_once 'templates/header.php';
         </div>
     </main>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('tipo-documento-form');
+    const isEditing = <?php echo json_encode($is_editing); ?>;
+    const apiBaseUrl = '<?php echo API_BASE_URL; ?>';
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        const typeId = data.id;
+
+        const method = isEditing ? 'PUT' : 'POST';
+        const url = isEditing ? `${apiBaseUrl}tipos_documentos.php?id=${typeId}` : `${apiBaseUrl}tipos_documentos.php`;
+
+        if (data.estado !== undefined) {
+            data.estado = data.estado == '1';
+        }
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || `Error ${method === 'PUT' ? 'actualizando' : 'creando'} el tipo de documento.`);
+            }
+
+            const successMessage = result.message || `Tipo de documento ${method === 'PUT' ? 'actualizado' : 'creado'} con éxito.`;
+            window.location.href = `tipos_documentos.php?success=${encodeURIComponent(successMessage)}`;
+
+        } catch (error) {
+            // Assuming showAlert is a global function defined in another script
+            if (typeof showAlert === 'function') {
+                showAlert('Error', error.message);
+            } else {
+                alert('Error: ' + error.message);
+            }
+        }
+    });
+});
+</script>
