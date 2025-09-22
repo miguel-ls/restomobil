@@ -49,6 +49,14 @@ BEGIN
     SELECT id, codigo, nombre, descripcion, estado FROM tipo_documento_venta;
 END$$
 
+DROP PROCEDURE IF EXISTS `sp_getOneSaleDocumentType`$$
+CREATE PROCEDURE `sp_getOneSaleDocumentType`(IN p_id INT)
+BEGIN
+    SELECT id, codigo, nombre, descripcion, estado
+    FROM tipo_documento_venta
+    WHERE id = p_id;
+END$$
+
 DELIMITER ;
 
 -- -----------------------------------------------------

@@ -35,25 +35,25 @@ include_once 'templates/header.php';
             </div>
             <div class="form-container">
                 <form action="tipos_documentos_handler.php" method="POST">
-                    <input type="hidden" name="id" value="<?php echo htmlspecialchars($type_data['id']); ?>">
+                    <input type="hidden" name="id" value="<?php echo htmlspecialchars($type_data['id'] ?? ''); ?>">
                     <div class="form-group">
                         <label for="codigo">Código SUNAT</label>
-                        <input type="text" id="codigo" name="codigo" value="<?php echo htmlspecialchars($type_data['codigo']); ?>" required>
+                        <input type="text" id="codigo" name="codigo" value="<?php echo htmlspecialchars($type_data['codigo'] ?? ''); ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="nombre">Nombre</label>
-                        <input type="text" id="nombre" name="nombre" value="<?php echo htmlspecialchars($type_data['nombre']); ?>" required>
+                        <input type="text" id="nombre" name="nombre" value="<?php echo htmlspecialchars($type_data['nombre'] ?? ''); ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="descripcion">Descripción</label>
-                        <textarea id="descripcion" name="descripcion" rows="4"><?php echo htmlspecialchars($type_data['descripcion']); ?></textarea>
+                        <textarea id="descripcion" name="descripcion" rows="4"><?php echo htmlspecialchars($type_data['descripcion'] ?? ''); ?></textarea>
                     </div>
                     <?php if ($is_editing): ?>
                     <div class="form-group">
                         <label for="estado">Estado</label>
                         <select id="estado" name="estado">
-                            <option value="1" <?php echo ($type_data['estado'] == 1) ? 'selected' : ''; ?>>Activo</option>
-                            <option value="0" <?php echo ($type_data['estado'] == 0) ? 'selected' : ''; ?>>Inactivo</option>
+                            <option value="1" <?php echo (($type_data['estado'] ?? 1) == 1) ? 'selected' : ''; ?>>Activo</option>
+                            <option value="0" <?php echo (($type_data['estado'] ?? 1) == 0) ? 'selected' : ''; ?>>Inactivo</option>
                         </select>
                     </div>
                     <?php endif; ?>
