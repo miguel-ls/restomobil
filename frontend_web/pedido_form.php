@@ -195,30 +195,30 @@ if ($is_pago_view) {
                                 </div>
                                 <div class="form-group">
                                     <label for="cliente_search">Buscar Cliente (Nombre o RUC)</label>
-                                    <input type="text" id="cliente_search" placeholder="Escriba para buscar...">
+                                    <div style="display: flex; gap: 10px;">
+                                        <input type="text" id="cliente_search" placeholder="Escriba para buscar..." style="flex-grow: 1;">
+                                        <button type="button" id="btn-sunat-main" class="btn" style="flex-shrink: 0;">Sunat</button>
+                                    </div>
                                     <div id="cliente_search_results"></div>
                                 </div>
                                 <input type="hidden" id="id_cliente" name="id_cliente" value="<?php echo htmlspecialchars($order_data['id_cliente'] ?? ''); ?>">
 
-                                <div class="form-group">
-                                    <label for="cliente_nombre">Nombre del Cliente</label>
-                                    <input type="text" id="cliente_nombre" name="cliente_nombre" value="<?php echo htmlspecialchars($order_data['nombre_cliente'] ?? ''); ?>">
-                                </div>
-
                                 <div class="form-group-row">
                                     <div class="form-group" style="flex-grow: 1;">
                                         <label for="id_tipo_documento_identidad_cliente">Tipo Documento</label>
-                                        <select id="id_tipo_documento_identidad_cliente" name="id_tipo_documento_identidad_cliente" disabled>
+                                        <select id="id_tipo_documento_identidad_cliente" name="id_tipo_documento_identidad_cliente">
                                             <option value="">Seleccione...</option>
                                         </select>
                                     </div>
                                     <div class="form-group" style="flex-grow: 2;">
                                         <label for="cliente_ruc">RUC / DNI</label>
-                                        <div style="display: flex; gap: 10px;">
-                                            <input type="text" id="cliente_ruc" name="cliente_ruc" value="<?php echo htmlspecialchars($order_data['ruc_cliente'] ?? ''); ?>">
-                                            <button type="button" id="btn-sunat-main" class="btn">Sunat</button>
-                                        </div>
+                                        <input type="text" id="cliente_ruc" name="cliente_ruc" value="<?php echo htmlspecialchars($order_data['ruc_cliente'] ?? ''); ?>">
                                     </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="cliente_nombre">Nombre del Cliente</label>
+                                    <input type="text" id="cliente_nombre" name="cliente_nombre" value="<?php echo htmlspecialchars($order_data['nombre_cliente'] ?? ''); ?>">
                                 </div>
 
                                 <div class="form-group-row">
@@ -230,11 +230,6 @@ if ($is_pago_view) {
                                         <label for="cliente_ubigeo">Ubigeo</label>
                                         <input type="text" id="cliente_ubigeo" name="cliente_ubigeo" value="<?php echo htmlspecialchars($order_data['codigo_ubigeo'] ?? ''); ?>">
                                     </div>
-                                </div>
-
-                                <div class="form-group" style="text-align: right;">
-                                    <button type="button" id="btn-clear-cliente" class="btn btn-secondary">Limpiar</button>
-                                    <button type="button" id="btn-crear-cliente" class="btn">Crear Cliente</button>
                                 </div>
                             </div>
                         </div>
@@ -274,53 +269,6 @@ if ($is_pago_view) {
         </div>
     </main>
 </div>
-
-<!-- Modal para Crear Cliente -->
-<div id="modal-crear-cliente" class="modal">
-    <div class="modal-content">
-        <span class="close-btn">&times;</span>
-        <h2>Crear Nuevo Cliente</h2>
-        <form id="form-crear-cliente">
-            <div class="form-group">
-                <label for="modal_id_tipo_documento_identidad">Tipo de Documento</label>
-                <select id="modal_id_tipo_documento_identidad" name="id_tipo_documento_identidad" required>
-                    <option value="">Seleccione...</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="modal_numero_documento">N° de Documento</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="modal_numero_documento" name="numero_documento" required style="flex-grow: 1;">
-                    <button type="button" class="btn" id="modal-sunat-btn" style="flex-shrink: 0; display: none;">Sunat</button>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="modal_nombres_apellidos">Nombres y Apellidos</label>
-                <input type="text" id="modal_nombres_apellidos" name="nombres_apellidos" required>
-            </div>
-            <div class="form-group">
-                <label for="modal_direccion">Dirección</label>
-                <input type="text" id="modal_direccion" name="direccion">
-            </div>
-            <div class="form-group">
-                <label for="modal_codigo_ubigeo">Código de Ubigeo</label>
-                <input type="text" id="modal_codigo_ubigeo" name="codigo_ubigeo">
-            </div>
-            <div class="form-group">
-                <label for="modal_email">Email</label>
-                <input type="email" id="modal_email" name="email">
-            </div>
-            <div class="form-group">
-                <label for="modal_telefono">Teléfono</label>
-                <input type="text" id="modal_telefono" name="telefono">
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="btn">Guardar Cliente</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -569,7 +517,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const clienteRucInput = document.getElementById('cliente_ruc');
     const clienteDireccionInput = document.getElementById('cliente_direccion');
     const clienteUbigeoInput = document.getElementById('cliente_ubigeo');
-    const btnClearCliente = document.getElementById('btn-clear-cliente');
     const btnSunatMain = document.getElementById('btn-sunat-main');
 
     async function loadSaleDocumentTypes() {
@@ -620,11 +567,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         [clienteNombreInput, clienteRucInput, clienteDireccionInput, clienteUbigeoInput].forEach(el => el.readOnly = false);
         clienteTipoDocIdentidadSelect.disabled = false;
-
-        btnClearCliente.style.display = 'none';
     }
-
-    btnClearCliente.addEventListener('click', clearClienteSelection);
 
     function selectCliente(cliente) {
         idClienteInput.value = cliente.id;
@@ -634,10 +577,8 @@ document.addEventListener('DOMContentLoaded', function() {
         clienteDireccionInput.value = cliente.direccion;
         clienteUbigeoInput.value = cliente.codigo_ubigeo;
 
-        [clienteNombreInput, clienteRucInput, clienteDireccionInput, clienteUbigeoInput].forEach(el => el.readOnly = true);
-        clienteTipoDocIdentidadSelect.disabled = true;
-
-        btnClearCliente.style.display = 'inline-block';
+        [clienteNombreInput, clienteRucInput, clienteDireccionInput, clienteUbigeoInput].forEach(el => el.readOnly = false);
+        clienteTipoDocIdentidadSelect.disabled = false;
     }
 
     clienteSearchInput.addEventListener('keyup', async function() {
@@ -670,7 +611,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     btnSunatMain.addEventListener('click', async () => {
         const docNumber = clienteRucInput.value.trim();
-        const selectedOption = [...clienteTipoDocIdentidadSelect.options].find(opt => opt.text.toLowerCase() === 'ruc' || opt.text.toLowerCase() === 'dni');
+        const selectedOption = clienteTipoDocIdentidadSelect.options[clienteTipoDocIdentidadSelect.selectedIndex];
         const docCode = selectedOption ? selectedOption.dataset.codigo : null;
         if (!docNumber || !docCode) {
             alert('Por favor, ingrese un número de RUC o DNI y seleccione el tipo de documento correspondiente.');
@@ -710,113 +651,6 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         clearClienteSelection();
     }
-
-    const btnCrearCliente = document.getElementById('btn-crear-cliente');
-    const modalCrearCliente = document.getElementById('modal-crear-cliente');
-    const closeBtn = document.querySelector('.close-btn');
-
-    btnCrearCliente.addEventListener('click', () => {
-        modalCrearCliente.style.display = 'block';
-    });
-
-    closeBtn.addEventListener('click', () => {
-        modalCrearCliente.style.display = 'none';
-    });
-
-    window.addEventListener('click', (e) => {
-        if (e.target == modalCrearCliente) {
-            modalCrearCliente.style.display = 'none';
-        }
-    });
-
-    const modalForm = document.getElementById('form-crear-cliente');
-    const modalTipoDocumentoSelect = document.getElementById('modal_id_tipo_documento_identidad');
-    const modalSunatBtn = document.getElementById('modal-sunat-btn');
-    const modalNumeroDocumentoInput = document.getElementById('modal_numero_documento');
-    const modalNombresInput = document.getElementById('modal_nombres_apellidos');
-    const modalDireccionInput = document.getElementById('modal_direccion');
-    const modalUbigeoInput = document.getElementById('modal_codigo_ubigeo');
-
-    loadIdentityDocumentTypes(modalTipoDocumentoSelect);
-
-    function toggleModalSunatButton() {
-        const selectedOption = modalTipoDocumentoSelect.options[modalTipoDocumentoSelect.selectedIndex];
-        const docCode = selectedOption ? selectedOption.getAttribute('data-codigo') : null;
-        const validDocumentCodes = ['1', '6'];
-        if (docCode && validDocumentCodes.includes(docCode)) {
-            modalSunatBtn.style.display = 'inline-block';
-        } else {
-            modalSunatBtn.style.display = 'none';
-        }
-    }
-
-    modalTipoDocumentoSelect.addEventListener('change', toggleModalSunatButton);
-    toggleModalSunatButton();
-
-    modalSunatBtn.addEventListener('click', async () => {
-        const selectedOption = modalTipoDocumentoSelect.options[modalTipoDocumentoSelect.selectedIndex];
-        const docCode = selectedOption ? selectedOption.getAttribute('data-codigo') : null;
-        const docNumber = modalNumeroDocumentoInput.value.trim();
-
-        if (!docCode || !docNumber) {
-            alert('Por favor, seleccione un tipo de documento y ingrese un número.');
-            return;
-        }
-
-        let queryType = (docCode === '1') ? 'dni' : 'ruc';
-        modalSunatBtn.textContent = 'Buscando...';
-        modalSunatBtn.disabled = true;
-
-        try {
-            const response = await fetch(`consulta_api_externa.php?tipo=${queryType}&numero=${docNumber}`);
-            const data = await response.json();
-            if (data.error) throw new Error(data.error);
-            modalNombresInput.value = data.nombre || '';
-            modalDireccionInput.value = data.direccion || '';
-            modalUbigeoInput.value = data.ubigeo || '';
-        } catch (error) {
-            alert('Error al consultar: ' + error.message);
-        } finally {
-            modalSunatBtn.textContent = 'Sunat';
-            modalSunatBtn.disabled = false;
-        }
-    });
-
-    modalForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(modalForm);
-        const clienteData = Object.fromEntries(formData.entries());
-
-        try {
-            const response = await fetch(`${apiBaseUrl}clientes.php`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(clienteData)
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                alert('Cliente creado exitosamente.');
-                modalCrearCliente.style.display = 'none';
-                modalForm.reset();
-
-                selectCliente({
-                    id: result.id,
-                    nombres_apellidos: clienteData.nombres_apellidos,
-                    id_tipo_documento_identidad: clienteData.id_tipo_documento_identidad,
-                    numero_documento: clienteData.numero_documento,
-                    direccion: clienteData.direccion,
-                    codigo_ubigeo: clienteData.codigo_ubigeo
-                });
-
-            } else {
-                throw new Error(result.message || 'Error al crear el cliente.');
-            }
-        } catch (error) {
-            alert('Error: ' + error.message);
-        }
-    });
 });
 </script>
 <style>
