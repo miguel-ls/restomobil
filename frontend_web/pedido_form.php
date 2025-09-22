@@ -202,20 +202,38 @@ if ($is_pago_view) {
 
                                 <div class="form-group">
                                     <label for="cliente_nombre">Nombre del Cliente</label>
-                                    <div style="display: flex; gap: 10px;">
-                                        <input type="text" id="cliente_nombre" name="cliente_nombre" value="<?php echo htmlspecialchars($order_data['nombre_cliente'] ?? ''); ?>">
-                                        <button type="button" id="btn-clear-cliente" class="btn btn-secondary" style="display: none;">Limpiar</button>
+                                    <input type="text" id="cliente_nombre" name="cliente_nombre" value="<?php echo htmlspecialchars($order_data['nombre_cliente'] ?? ''); ?>">
+                                </div>
+
+                                <div class="form-group-row">
+                                    <div class="form-group" style="flex-grow: 1;">
+                                        <label for="id_tipo_documento_identidad_cliente">Tipo Documento</label>
+                                        <select id="id_tipo_documento_identidad_cliente" name="id_tipo_documento_identidad_cliente" disabled>
+                                            <option value="">Seleccione...</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="flex-grow: 2;">
+                                        <label for="cliente_ruc">RUC / DNI</label>
+                                        <div style="display: flex; gap: 10px;">
+                                            <input type="text" id="cliente_ruc" name="cliente_ruc" value="<?php echo htmlspecialchars($order_data['ruc_cliente'] ?? ''); ?>">
+                                            <button type="button" id="btn-sunat-main" class="btn">Sunat</button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="cliente_ruc">RUC / DNI</label>
-                                    <input type="text" id="cliente_ruc" name="cliente_ruc" value="<?php echo htmlspecialchars($order_data['ruc_cliente'] ?? ''); ?>" readonly>
+
+                                <div class="form-group-row">
+                                    <div class="form-group" style="flex-grow: 2;">
+                                        <label for="cliente_direccion">Dirección</label>
+                                        <input type="text" id="cliente_direccion" name="cliente_direccion" value="<?php echo htmlspecialchars($order_data['direccion_cliente'] ?? ''); ?>">
+                                    </div>
+                                    <div class="form-group" style="flex-grow: 1;">
+                                        <label for="cliente_ubigeo">Ubigeo</label>
+                                        <input type="text" id="cliente_ubigeo" name="cliente_ubigeo" value="<?php echo htmlspecialchars($order_data['codigo_ubigeo'] ?? ''); ?>">
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="cliente_direccion">Dirección</label>
-                                    <input type="text" id="cliente_direccion" name="cliente_direccion" value="<?php echo htmlspecialchars($order_data['direccion_cliente'] ?? ''); ?>" readonly>
-                                </div>
-                                <div class="form-group">
+
+                                <div class="form-group" style="text-align: right;">
+                                    <button type="button" id="btn-clear-cliente" class="btn btn-secondary">Limpiar</button>
                                     <button type="button" id="btn-crear-cliente" class="btn">Crear Cliente</button>
                                 </div>
                             </div>
@@ -436,7 +454,6 @@ document.addEventListener('DOMContentLoaded', function() {
     productList.addEventListener('click', function(e) {
         const productItem = e.target.closest('.product-item');
         if (!productItem) return;
-
         const productId = productItem.dataset.id;
         if (currentOrder[productId]) {
             currentOrder[productId].cantidad++;
@@ -465,7 +482,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!currentOrder[productId]) return;
 
         let shouldRender = true;
-
         if (e.target.classList.contains('item-quantity')) {
             const newQuantity = parseInt(e.target.value, 10);
             if (newQuantity > 0) {
@@ -507,7 +523,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
         } else if (document.getElementById('id_cliente').value) {
-            // If a client is selected (even for Boleta), the name is required.
             const clienteNombre = document.getElementById('cliente_nombre').value;
             if (!clienteNombre) {
                 e.preventDefault();
@@ -526,10 +541,8 @@ document.addEventListener('DOMContentLoaded', function() {
     categoryFilters.addEventListener('click', function(e) {
         const targetButton = e.target.closest('button.btn-category');
         if (!targetButton) return;
-
         categoryFilters.querySelector('.active')?.classList.remove('active');
         targetButton.classList.add('active');
-
         fetchAndRenderProducts(targetButton.dataset.category);
     });
 
@@ -539,10 +552,8 @@ document.addEventListener('DOMContentLoaded', function() {
     tabNav.addEventListener('click', function(e) {
         const targetButton = e.target.closest('.tab-button');
         if (!targetButton) return;
-
         tabNav.querySelector('.active')?.classList.remove('active');
         tabPanes.forEach(pane => pane.classList.remove('active'));
-
         targetButton.classList.add('active');
         const tabId = targetButton.dataset.tab;
         document.getElementById('tab-' + tabId).classList.add('active');
@@ -554,11 +565,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const clienteSearchResults = document.getElementById('cliente_search_results');
     const idClienteInput = document.getElementById('id_cliente');
     const clienteNombreInput = document.getElementById('cliente_nombre');
+    const clienteTipoDocIdentidadSelect = document.getElementById('id_tipo_documento_identidad_cliente');
     const clienteRucInput = document.getElementById('cliente_ruc');
     const clienteDireccionInput = document.getElementById('cliente_direccion');
+    const clienteUbigeoInput = document.getElementById('cliente_ubigeo');
     const btnClearCliente = document.getElementById('btn-clear-cliente');
+    const btnSunatMain = document.getElementById('btn-sunat-main');
 
-    async function loadTiposComprobante() {
+    async function loadSaleDocumentTypes() {
         try {
             const response = await fetch(`${apiBaseUrl}tipos_documentos.php`);
             const data = await response.json();
@@ -574,16 +588,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         } catch (error) {
-            console.error('Error loading document types:', error);
+            console.error('Error loading sale document types:', error);
+        }
+    }
+
+    async function loadIdentityDocumentTypes(selectElement) {
+        try {
+            const response = await fetch(`${apiBaseUrl}tipo_documento_identidad.php`);
+            const data = await response.json();
+            if (data.records) {
+                data.records.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type.id;
+                    option.dataset.codigo = type.codigo;
+                    option.textContent = type.nombre;
+                    selectElement.appendChild(option.cloneNode(true));
+                });
+            }
+        } catch (error) {
+            console.error('Error loading identity document types:', error);
         }
     }
 
     function clearClienteSelection() {
         idClienteInput.value = '';
         clienteNombreInput.value = '';
+        clienteTipoDocIdentidadSelect.value = '';
         clienteRucInput.value = '';
         clienteDireccionInput.value = '';
-        clienteNombreInput.readOnly = false;
+        clienteUbigeoInput.value = '';
+
+        [clienteNombreInput, clienteRucInput, clienteDireccionInput, clienteUbigeoInput].forEach(el => el.readOnly = false);
+        clienteTipoDocIdentidadSelect.disabled = false;
+
         btnClearCliente.style.display = 'none';
     }
 
@@ -592,10 +629,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function selectCliente(cliente) {
         idClienteInput.value = cliente.id;
         clienteNombreInput.value = cliente.nombres_apellidos;
+        clienteTipoDocIdentidadSelect.value = cliente.id_tipo_documento_identidad;
         clienteRucInput.value = cliente.numero_documento;
         clienteDireccionInput.value = cliente.direccion;
+        clienteUbigeoInput.value = cliente.codigo_ubigeo;
 
-        clienteNombreInput.readOnly = true;
+        [clienteNombreInput, clienteRucInput, clienteDireccionInput, clienteUbigeoInput].forEach(el => el.readOnly = true);
+        clienteTipoDocIdentidadSelect.disabled = true;
+
         btnClearCliente.style.display = 'inline-block';
     }
 
@@ -605,7 +646,6 @@ document.addEventListener('DOMContentLoaded', function() {
             clienteSearchResults.innerHTML = '';
             return;
         }
-
         try {
             const response = await fetch(`${apiBaseUrl}clientes.php?search=${encodeURIComponent(query)}`);
             const data = await response.json();
@@ -628,13 +668,44 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    loadTiposComprobante();
+    btnSunatMain.addEventListener('click', async () => {
+        const docNumber = clienteRucInput.value.trim();
+        const selectedOption = [...clienteTipoDocIdentidadSelect.options].find(opt => opt.text.toLowerCase() === 'ruc' || opt.text.toLowerCase() === 'dni');
+        const docCode = selectedOption ? selectedOption.dataset.codigo : null;
+        if (!docNumber || !docCode) {
+            alert('Por favor, ingrese un número de RUC o DNI y seleccione el tipo de documento correspondiente.');
+            return;
+        }
+        let queryType = (docCode === '1') ? 'dni' : 'ruc';
+
+        btnSunatMain.textContent = 'Buscando...';
+        btnSunatMain.disabled = true;
+        try {
+            const response = await fetch(`consulta_api_externa.php?tipo=${queryType}&numero=${docNumber}`);
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            clienteNombreInput.value = data.nombre || '';
+            clienteDireccionInput.value = data.direccion || '';
+            clienteUbigeoInput.value = data.ubigeo || '';
+        } catch (error) {
+            alert('Error al consultar: ' + error.message);
+        } finally {
+            btnSunatMain.textContent = 'Sunat';
+            btnSunatMain.disabled = false;
+        }
+    });
+
+    loadSaleDocumentTypes();
+    loadIdentityDocumentTypes(clienteTipoDocIdentidadSelect);
+
     if (isEditing && initialOrderData && initialOrderData.id_cliente) {
         selectCliente({
             id: initialOrderData.id_cliente,
             nombres_apellidos: initialOrderData.nombre_cliente,
+            id_tipo_documento_identidad: initialOrderData.id_tipo_documento_identidad_cliente,
             numero_documento: initialOrderData.ruc_cliente,
-            direccion: initialOrderData.direccion_cliente
+            direccion: initialOrderData.direccion_cliente,
+            codigo_ubigeo: initialOrderData.codigo_ubigeo
         });
     } else {
         clearClienteSelection();
@@ -666,23 +737,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalDireccionInput = document.getElementById('modal_direccion');
     const modalUbigeoInput = document.getElementById('modal_codigo_ubigeo');
 
-    async function loadDocumentTypesForModal() {
-        try {
-            const response = await fetch(`${apiBaseUrl}tipo_documento_identidad.php`);
-            const data = await response.json();
-            if (data.records) {
-                data.records.forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type.id;
-                    option.dataset.codigo = type.codigo;
-                    option.textContent = type.nombre;
-                    modalTipoDocumentoSelect.appendChild(option);
-                });
-            }
-        } catch (error) {
-            console.error('Error loading document types for modal:', error);
-        }
-    }
+    loadIdentityDocumentTypes(modalTipoDocumentoSelect);
 
     function toggleModalSunatButton() {
         const selectedOption = modalTipoDocumentoSelect.options[modalTipoDocumentoSelect.selectedIndex];
@@ -696,7 +751,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     modalTipoDocumentoSelect.addEventListener('change', toggleModalSunatButton);
-    loadDocumentTypesForModal();
     toggleModalSunatButton();
 
     modalSunatBtn.addEventListener('click', async () => {
@@ -750,8 +804,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 selectCliente({
                     id: result.id,
                     nombres_apellidos: clienteData.nombres_apellidos,
+                    id_tipo_documento_identidad: clienteData.id_tipo_documento_identidad,
                     numero_documento: clienteData.numero_documento,
-                    direccion: clienteData.direccion
+                    direccion: clienteData.direccion,
+                    codigo_ubigeo: clienteData.codigo_ubigeo
                 });
 
             } else {
@@ -763,3 +819,58 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+<style>
+.form-group-row {
+    display: flex;
+    gap: 20px;
+}
+#cliente_search_results {
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    position: absolute;
+    background-color: white;
+    width: calc(100% - 22px);
+    z-index: 1000;
+}
+.search-result-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+.search-result-item:hover {
+    background-color: #f0f0f0;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 5px;
+}
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+</style>
