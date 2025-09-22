@@ -232,10 +232,6 @@ if ($is_pago_view) {
                                     </div>
                                 </div>
 
-                                <div class="form-group" style="text-align: right;">
-                                    <button type="button" id="btn-clear-cliente" class="btn btn-secondary">Limpiar</button>
-                                    <button type="button" id="btn-save-cliente" class="btn">Guardar Cliente</button>
-                                </div>
                             </div>
                         </div>
 
@@ -463,27 +459,64 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    orderForm.addEventListener('submit', function(e) {
+    orderForm.addEventListener('submit', async function(e) {
+        e.preventDefault(); // Stop the form from submitting immediately
+
+        // Client saving logic
+        const idCliente = idClienteInput.value;
+        const ruc = clienteRucInput.value.trim();
+
+        // Only save the client if the fields are enabled (not read-only) AND there's a document number
+        if (!clienteNombreInput.readOnly && ruc) {
+            const clienteData = {
+                id_tipo_documento_identidad: clienteTipoDocIdentidadSelect.value,
+                numero_documento: ruc,
+                nombres_apellidos: clienteNombreInput.value.trim(),
+                direccion: clienteDireccionInput.value.trim(),
+                codigo_ubigeo: clienteUbigeoInput.value.trim(),
+                email: '', // Not in form
+                telefono: '' // Not in form
+            };
+
+            const method = idCliente ? 'PUT' : 'POST';
+            const url = idCliente ? `${apiBaseUrl}clientes.php?id=${idCliente}` : `${apiBaseUrl}clientes.php`;
+            if (idCliente) {
+                clienteData.estado = 'Activado';
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(clienteData)
+                });
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Error al guardar el cliente.');
+                }
+
+                // Set the hidden client ID input with the new/updated ID
+                idClienteInput.value = idCliente || result.id;
+
+            } catch (error) {
+                alert(`Error al guardar el cliente: ${error.message}`);
+                return; // Stop the order from being saved if the client save fails
+            }
+        }
+
+        // Order submission logic (validation and adding items)
         const tipoComprobanteSelect = document.getElementById('id_tipo_documento_venta');
         const selectedComprobante = tipoComprobanteSelect.options[tipoComprobanteSelect.selectedIndex];
 
         if (selectedComprobante && selectedComprobante.textContent === 'Factura') {
-            const idCliente = document.getElementById('id_cliente').value;
-            const clienteNombre = document.getElementById('cliente_nombre').value;
-            const clienteDireccion = document.getElementById('cliente_direccion').value;
-
-            if (!idCliente || !clienteNombre || !clienteDireccion) {
-                e.preventDefault();
-                alert('Para emitir una Factura, debe seleccionar un cliente con RUC, nombre y dirección.');
+            if (!idClienteInput.value || !clienteNombreInput.value || !clienteDireccionInput.value) {
+                alert('Para emitir una Factura, debe seleccionar o crear un cliente con RUC, nombre y dirección.');
                 return;
             }
-        } else if (document.getElementById('id_cliente').value) {
-            const clienteNombre = document.getElementById('cliente_nombre').value;
-            if (!clienteNombre) {
-                e.preventDefault();
-                alert('El campo nombre del cliente es obligatorio si se ha seleccionado un cliente.');
-                return;
-            }
+        } else if (idClienteInput.value && !clienteNombreInput.value) {
+            alert('El campo nombre del cliente es obligatorio si se ha seleccionado un cliente.');
+            return;
         }
 
         const itemsInput = document.createElement('input');
@@ -491,6 +524,9 @@ document.addEventListener('DOMContentLoaded', function() {
         itemsInput.name = 'items';
         itemsInput.value = JSON.stringify(Object.values(currentOrder));
         this.appendChild(itemsInput);
+
+        // Now, submit the form for the order
+        this.submit();
     });
 
     categoryFilters.addEventListener('click', function(e) {
@@ -524,9 +560,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const clienteRucInput = document.getElementById('cliente_ruc');
     const clienteDireccionInput = document.getElementById('cliente_direccion');
     const clienteUbigeoInput = document.getElementById('cliente_ubigeo');
-    const btnClearCliente = document.getElementById('btn-clear-cliente');
     const btnSunatMain = document.getElementById('btn-sunat-main');
-    const btnSaveCliente = document.getElementById('btn-save-cliente');
 
     async function loadSaleDocumentTypes() {
         try {
@@ -576,12 +610,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         [clienteNombreInput, clienteRucInput, clienteDireccionInput, clienteUbigeoInput].forEach(el => el.readOnly = false);
         clienteTipoDocIdentidadSelect.disabled = false;
-
-        btnClearCliente.style.display = 'none';
-        btnSaveCliente.textContent = 'Crear Cliente';
     }
-
-    btnClearCliente.addEventListener('click', clearClienteSelection);
 
     function selectCliente(cliente) {
         idClienteInput.value = cliente.id;
@@ -593,9 +622,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         [clienteNombreInput, clienteRucInput, clienteDireccionInput, clienteUbigeoInput].forEach(el => el.readOnly = true);
         clienteTipoDocIdentidadSelect.disabled = true;
-
-        btnClearCliente.style.display = 'inline-block';
-        btnSaveCliente.textContent = 'Actualizar Cliente';
     }
 
     clienteSearchInput.addEventListener('keyup', async function() {
@@ -670,48 +696,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    btnSaveCliente.addEventListener('click', async () => {
-        const clienteId = idClienteInput.value;
-        const method = clienteId ? 'PUT' : 'POST';
-        const url = clienteId ? `${apiBaseUrl}clientes.php?id=${clienteId}` : `${apiBaseUrl}clientes.php`;
-
-        const clienteData = {
-            id_tipo_documento_identidad: clienteTipoDocIdentidadSelect.value,
-            numero_documento: clienteRucInput.value,
-            nombres_apellidos: clienteNombreInput.value,
-            direccion: clienteDireccionInput.value,
-            codigo_ubigeo: clienteUbigeoInput.value,
-            email: '', // email and telefono are not in the form, but might be required by the API
-            telefono: ''
-        };
-
-        if (clienteId) {
-            clienteData.estado = 'Activado'; // Or get it from somewhere if needed
-        }
-
-        try {
-            const response = await fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(clienteData)
-            });
-
-            const result = await response.json();
-            if (!response.ok) {
-                throw new Error(result.message || 'Error al guardar el cliente.');
-            }
-
-            alert('Cliente guardado exitosamente.');
-            const newClienteData = {
-                id: clienteId || result.id,
-                ...clienteData
-            };
-            selectCliente(newClienteData);
-
-        } catch (error) {
-            alert('Error: ' + error.message);
-        }
-    });
 
     async function initializeForm() {
         await Promise.all([
