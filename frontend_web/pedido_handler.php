@@ -45,7 +45,9 @@ $api_data = [
     'id_mesa' => $id_mesa,
     'id_usuario_mozo' => $id_usuario_mozo,
     'estado' => $estado,
-    'items' => $items
+    'items' => $items,
+    'id_cliente' => $_POST['id_cliente'] ?? null,
+    'id_tipo_documento_venta' => $_POST['id_tipo_documento_venta'] ?? null
 ];
 
 // Incluir configuración de la API
