@@ -163,7 +163,33 @@ END$$
 DROP PROCEDURE IF EXISTS sp_getOrderDetail$$
 CREATE PROCEDURE sp_getOrderDetail(IN p_id_pedido INT)
 BEGIN
-    SELECT p.id, p.id_mesa, m.numero_mesa, p.id_usuario_mozo, u.nombre_completo AS nombre_mozo, p.estado, p.total, p.fecha_creacion, p.fecha_actualizacion FROM pedidos p LEFT JOIN mesas m ON p.id_mesa = m.id LEFT JOIN usuarios u ON p.id_usuario_mozo = u.id WHERE p.id = p_id_pedido;
+    SELECT
+        p.id,
+        p.id_mesa,
+        m.numero_mesa,
+        p.id_usuario_mozo,
+        u.nombre_completo AS nombre_mozo,
+        p.estado,
+        p.total,
+        p.fecha_creacion,
+        p.fecha_actualizacion,
+        p.id_cliente,
+        p.id_tipo_documento_venta,
+        c.nombres_apellidos AS nombre_cliente,
+        c.numero_documento AS ruc_cliente,
+        c.id_tipo_documento_identidad AS id_tipo_documento_identidad_cliente,
+        c.direccion AS direccion_cliente,
+        c.codigo_ubigeo
+    FROM
+        pedidos p
+    LEFT JOIN
+        mesas m ON p.id_mesa = m.id
+    LEFT JOIN
+        usuarios u ON p.id_usuario_mozo = u.id
+    LEFT JOIN
+        clientes c ON p.id_cliente = c.id
+    WHERE
+        p.id = p_id_pedido;
 END$$
 
 DROP PROCEDURE IF EXISTS sp_getOrderItems$$
