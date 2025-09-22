@@ -155,9 +155,27 @@ END$$
 
 -- Procedimientos para 'pedidos'
 DROP PROCEDURE IF EXISTS sp_getAllOrders$$
-CREATE PROCEDURE sp_getAllOrders()
+CREATE PROCEDURE sp_getAllOrders(IN p_status VARCHAR(255))
 BEGIN
-    SELECT p.id, p.id_mesa, m.numero_mesa, p.id_usuario_mozo, u.nombre_completo AS nombre_mozo, p.estado, p.total, p.fecha_creacion FROM pedidos p LEFT JOIN mesas m ON p.id_mesa = m.id LEFT JOIN usuarios u ON p.id_usuario_mozo = u.id ORDER BY p.fecha_creacion DESC;
+    SELECT
+        p.id,
+        p.id_mesa,
+        m.numero_mesa,
+        p.id_usuario_mozo,
+        u.nombre_completo AS nombre_mozo,
+        p.estado,
+        p.total,
+        p.fecha_creacion
+    FROM
+        pedidos p
+    LEFT JOIN
+        mesas m ON p.id_mesa = m.id
+    LEFT JOIN
+        usuarios u ON p.id_usuario_mozo = u.id
+    WHERE
+        (p_status IS NULL OR p_status = '' OR FIND_IN_SET(p.estado, p_status))
+    ORDER BY
+        p.fecha_creacion DESC;
 END$$
 
 DROP PROCEDURE IF EXISTS sp_getOrderDetail$$

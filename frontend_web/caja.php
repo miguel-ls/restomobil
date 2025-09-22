@@ -6,13 +6,12 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
-$page_title = 'Caja';
+$page_title = 'Pedidos Finalizados';
 include_once 'templates/header.php';
 include_once __DIR__ . '/config.php';
 
 function getCompletedOrders() {
-    // I will modify the API endpoint later to handle this properly
-    $api_url = API_BASE_URL . 'pedidos.php?estado=completado,pagado';
+    $api_url = API_BASE_URL . 'pedidos.php?estado=completado,cancelado';
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $response = curl_exec($ch);
@@ -29,7 +28,7 @@ $orders_data = getCompletedOrders();
     <main class="main-content">
         <div class="container">
             <div class="page-header">
-                <h1>Pedidos Completados</h1>
+                <h1>Pedidos Completados y Cancelados</h1>
                 <a href="pedido_form.php?view=caja_create" class="btn">Crear Pedido Nuevo</a>
             </div>
 
@@ -68,7 +67,7 @@ $orders_data = getCompletedOrders();
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <p>No se encontraron pedidos completados.</p>
+                    <p>No se encontraron pedidos completados o cancelados.</p>
                 <?php endif; ?>
             </div>
         </div>

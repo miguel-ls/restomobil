@@ -9,14 +9,14 @@ class Order {
     }
 
     public function readAll() {
-        $query = "CALL sp_getAllOrders()";
+        $query = "CALL sp_getAllOrders(NULL)";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
     }
 
     public function readByStatus($status) {
-        $query = "CALL sp_getOrdersByStatus(:status)";
+        $query = "CALL sp_getAllOrders(:status)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':status', $status);
         $stmt->execute();
