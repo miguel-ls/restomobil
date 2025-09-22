@@ -46,7 +46,7 @@ $types_data = getSaleDocumentTypes();
                                 <tr>
                                     <td><?php echo htmlspecialchars($type['codigo']); ?></td>
                                     <td><?php echo htmlspecialchars($type['nombre']); ?></td>
-                                    <td><?php echo htmlspecialchars($type['descripcion']); ?></td>
+                                    <td><?php echo htmlspecialchars($type['descripcion'] ?? ''); ?></td>
                                     <td>
                                         <span class="status <?php echo $type['estado'] ? 'status-active' : 'status-inactive'; ?>">
                                             <?php echo $type['estado'] ? 'Activo' : 'Inactivo'; ?>

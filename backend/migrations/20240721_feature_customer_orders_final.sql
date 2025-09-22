@@ -46,7 +46,7 @@ DROP PROCEDURE IF EXISTS `sp_getAllTipoDocumentoVenta`$$
 CREATE PROCEDURE `sp_getAllTipoDocumentoVenta`()
 BEGIN
     -- Assuming tipo_documento_venta has an 'estado' column
-    SELECT id, codigo, nombre FROM tipo_documento_venta WHERE estado = 1;
+    SELECT id, codigo, nombre, descripcion, estado FROM tipo_documento_venta;
 END$$
 
 DELIMITER ;
