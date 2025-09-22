@@ -52,22 +52,24 @@ class Order {
         return $order_details;
     }
 
-    public function create($id_mesa, $id_usuario_mozo, $items, $estado = 'recibido') {
-        $query = "CALL sp_createOrder(:id_mesa, :id_usuario_mozo, :items_json, :estado)";
+    public function create($id_mesa, $id_usuario_mozo, $items, $estado = 'recibido', $id_cliente = null, $id_tipo_comprobante = null) {
+        $query = "CALL sp_createOrder(:id_mesa, :id_usuario_mozo, :items_json, :estado, :id_cliente, :id_tipo_comprobante)";
         $stmt = $this->conn->prepare($query);
         $items_json = json_encode($items);
         $stmt->bindParam(':id_mesa', $id_mesa);
         $stmt->bindParam(':id_usuario_mozo', $id_usuario_mozo);
         $stmt->bindParam(':items_json', $items_json);
         $stmt->bindParam(':estado', $estado);
+        $stmt->bindParam(':id_cliente', $id_cliente);
+        $stmt->bindParam(':id_tipo_comprobante', $id_tipo_comprobante);
         if ($stmt->execute()) {
             return $stmt;
         }
         return false;
     }
 
-    public function update($id, $id_mesa, $id_usuario_mozo, $status, $items) {
-        $query = "CALL sp_updateOrder(:id, :id_mesa, :id_usuario_mozo, :status, :items_json)";
+    public function update($id, $id_mesa, $id_usuario_mozo, $status, $items, $id_cliente = null, $id_tipo_comprobante = null) {
+        $query = "CALL sp_updateOrder(:id, :id_mesa, :id_usuario_mozo, :status, :items_json, :id_cliente, :id_tipo_comprobante)";
         $stmt = $this->conn->prepare($query);
         $items_json = json_encode($items);
         $stmt->bindParam(':id', $id);
@@ -75,6 +77,8 @@ class Order {
         $stmt->bindParam(':id_usuario_mozo', $id_usuario_mozo);
         $stmt->bindParam(':status', $status);
         $stmt->bindParam(':items_json', $items_json);
+        $stmt->bindParam(':id_cliente', $id_cliente);
+        $stmt->bindParam(':id_tipo_comprobante', $id_tipo_comprobante);
         return $stmt->execute();
     }
 }

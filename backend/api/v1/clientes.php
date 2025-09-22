@@ -21,6 +21,21 @@ switch ($request_method) {
                 http_response_code(404);
                 echo json_encode(["message" => "Cliente no encontrado."]);
             }
+        } else if (!empty($_GET["search"])) {
+            $search_term = htmlspecialchars(strip_tags($_GET["search"]));
+            $stmt = $cliente->search($search_term);
+            $num = $stmt->rowCount();
+            if ($num > 0) {
+                $clientes_arr = ["records" => []];
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    array_push($clientes_arr["records"], $row);
+                }
+                http_response_code(200);
+                echo json_encode($clientes_arr);
+            } else {
+                http_response_code(200);
+                echo json_encode(["records" => []]);
+            }
         } else {
             $stmt = $cliente->readAll();
             $num = $stmt->rowCount();
