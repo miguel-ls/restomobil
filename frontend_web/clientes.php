@@ -35,33 +35,58 @@ $document_types = getIdentityDocumentTypes();
         <div class="container">
             <div class="page-header">
                 <h1>Catálogo de Clientes</h1>
-                <div class="page-header-actions">
-                    <a href="cliente_form.php" class="btn">Nuevo Cliente</a>
+            </div>
+
+            <div class="filter-container">
+                <div class="filter-group">
+                    <input type="text" id="search-box" placeholder="Buscar Cliente (Nombre o RUC)">
+                    <button type="button" class="btn" id="sunat-btn">SUNAT</button>
                 </div>
             </div>
 
-            <div class="filters">
-                <select id="filter-tipo-documento">
-                    <option value="">Todos los Tipos</option>
-                    <?php foreach ($document_types as $type): ?>
-                        <option value="<?php echo htmlspecialchars($type['nombre']); ?>" data-codigo="<?php echo htmlspecialchars($type['codigo']); ?>">
-                            <?php echo htmlspecialchars($type['nombre']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <div class="filter-group">
-                    <input type="text" id="filter-numero-documento" placeholder="Filtrar por N° Documento...">
-                    <button type="button" class="btn" id="sunat-btn">SUNAT</button>
-                </div>
-                <input type="text" id="filter-nombres" placeholder="Filtrar por Nombres...">
-                <input type="text" id="filter-email" placeholder="Filtrar por Email...">
-                <input type="text" id="filter-telefono" placeholder="Filtrar por Teléfono...">
-                <select id="filter-estado">
-                    <option value="">Todos los Estados</option>
-                    <option value="Activado">Activado</option>
-                    <option value="Desactivado">Desactivado</option>
-                </select>
-            </div>
+            <fieldset class="form-frame">
+                <form action="cliente_handler.php" method="POST" id="cliente-form">
+                    <input type="hidden" name="id" id="cliente-id">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_tipo_documento_identidad">Tipo de Documento</label>
+                            <select id="id_tipo_documento_identidad" name="id_tipo_documento_identidad" required>
+                                <option value="">Seleccione...</option>
+                                <?php foreach ($document_types as $type): ?>
+                                    <option
+                                        value="<?php echo $type['id']; ?>"
+                                        data-codigo="<?php echo htmlspecialchars($type['codigo']); ?>">
+                                        <?php echo htmlspecialchars($type['nombre']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="numero_documento">RUC / DNI</label>
+                            <input type="text" id="numero_documento" name="numero_documento" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombres_apellidos">Nombre del Cliente</label>
+                            <input type="text" id="nombres_apellidos" name="nombres_apellidos" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="direccion">Dirección</label>
+                            <input type="text" id="direccion" name="direccion">
+                        </div>
+                        <div class="form-group">
+                            <label for="codigo_ubigeo">Ubigeo</label>
+                            <input type="text" id="codigo_ubigeo" name="codigo_ubigeo">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn" id="form-submit-btn">Crear Cliente</button>
+                    </div>
+                </form>
+            </fieldset>
 
             <div class="table-container">
                 <table id="clientes-table">
@@ -81,7 +106,7 @@ $document_types = getIdentityDocumentTypes();
                     <tbody>
                         <?php if (isset($clientes_data['records']) && !empty($clientes_data['records'])): ?>
                             <?php foreach ($clientes_data['records'] as $cliente): ?>
-                                <tr>
+                                <tr data-cliente='<?php echo json_encode($cliente); ?>'>
                                     <td><?php echo htmlspecialchars($cliente['tipo_documento_nombre']); ?></td>
                                     <td><?php echo htmlspecialchars($cliente['numero_documento']); ?></td>
                                     <td><?php echo htmlspecialchars($cliente['nombres_apellidos']); ?></td>
@@ -95,7 +120,7 @@ $document_types = getIdentityDocumentTypes();
                                         </span>
                                     </td>
                                     <td class="actions-cell">
-                                        <a href="cliente_form.php?id=<?php echo $cliente['id']; ?>" class="btn btn-edit">Editar</a>
+                                        <button type="button" class="btn btn-edit">Editar</button>
                                         <a href="cliente_delete_handler.php?id=<?php echo $cliente['id']; ?>" class="btn btn-delete" onclick="return confirm('¿Estás seguro de que quieres desactivar este cliente?');">Eliminar</a>
                                     </td>
                                 </tr>
@@ -111,46 +136,25 @@ $document_types = getIdentityDocumentTypes();
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const filters = {
-        tipo_documento: document.getElementById('filter-tipo-documento'),
-        numero_documento: document.getElementById('filter-numero-documento'),
-        nombres: document.getElementById('filter-nombres'),
-        email: document.getElementById('filter-email'),
-        telefono: document.getElementById('filter-telefono'),
-        estado: document.getElementById('filter-estado')
-    };
+    const searchBox = document.getElementById('search-box');
     const tableRows = document.querySelectorAll('#clientes-table tbody tr');
     const sunatBtn = document.getElementById('sunat-btn');
+    const clienteForm = document.getElementById('cliente-form');
+    const clienteIdInput = document.getElementById('cliente-id');
+    const tipoDocumentoSelect = document.getElementById('id_tipo_documento_identidad');
+    const numeroDocumentoInput = document.getElementById('numero_documento');
+    const nombresApellidosInput = document.getElementById('nombres_apellidos');
+    const direccionInput = document.getElementById('direccion');
+    const codigoUbigeoInput = document.getElementById('codigo_ubigeo');
+    const submitButton = document.getElementById('form-submit-btn');
 
     function filterTable() {
-        const filterValues = {
-            tipo_documento: filters.tipo_documento.value.toLowerCase(),
-            numero_documento: filters.numero_documento.value.toLowerCase(),
-            nombres: filters.nombres.value.toLowerCase(),
-            email: filters.email.value.toLowerCase(),
-            telefono: filters.telefono.value.toLowerCase(),
-            estado: filters.estado.value.toLowerCase()
-        };
-
+        const searchTerm = searchBox.value.toLowerCase();
         tableRows.forEach(row => {
             if (row.cells.length > 1) {
-                const cells = {
-                    tipo_documento: row.cells[0].textContent.toLowerCase(),
-                    numero_documento: row.cells[1].textContent.toLowerCase(),
-                    nombres: row.cells[2].textContent.toLowerCase(),
-                    email: row.cells[5].textContent.toLowerCase(),
-                    telefono: row.cells[6].textContent.toLowerCase(),
-                    estado: row.cells[7].textContent.trim().toLowerCase()
-                };
-
-                const matchesTipoDoc = filterValues.tipo_documento === '' || cells.tipo_documento.includes(filterValues.tipo_documento);
-                const matchesNumeroDoc = cells.numero_documento.includes(filterValues.numero_documento);
-                const matchesNombres = cells.nombres.includes(filterValues.nombres);
-                const matchesEmail = cells.email.includes(filterValues.email);
-                const matchesTelefono = cells.telefono.includes(filterValues.telefono);
-                const matchesEstado = filterValues.estado === '' || cells.estado === filterValues.estado;
-
-                if (matchesTipoDoc && matchesNumeroDoc && matchesNombres && matchesEmail && matchesTelefono && matchesEstado) {
+                const docNumber = row.cells[1].textContent.toLowerCase();
+                const name = row.cells[2].textContent.toLowerCase();
+                if (docNumber.includes(searchTerm) || name.includes(searchTerm)) {
                     row.style.display = '';
                 } else {
                     row.style.display = 'none';
@@ -159,59 +163,77 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    for (const key in filters) {
-        if (filters[key]) {
-            filters[key].addEventListener('keyup', filterTable);
-            filters[key].addEventListener('change', filterTable);
-        }
+    function populateForm(row) {
+        const clienteData = JSON.parse(row.getAttribute('data-cliente'));
+
+        clienteIdInput.value = clienteData.id;
+        tipoDocumentoSelect.value = clienteData.id_tipo_documento_identidad;
+        numeroDocumentoInput.value = clienteData.numero_documento;
+        nombresApellidosInput.value = clienteData.nombres_apellidos;
+        direccionInput.value = clienteData.direccion;
+        codigoUbigeoInput.value = clienteData.codigo_ubigeo;
+
+        submitButton.textContent = 'Actualizar Cliente';
     }
 
-    sunatBtn.addEventListener('click', function() {
-        const selectedOption = filters.tipo_documento.options[filters.tipo_documento.selectedIndex];
-        const docCode = selectedOption ? selectedOption.getAttribute('data-codigo') : null;
-        const docNumber = filters.numero_documento.value.trim();
+    function resetForm() {
+        clienteForm.reset();
+        clienteIdInput.value = '';
+        submitButton.textContent = 'Crear Cliente';
+    }
 
-        if (!docCode || !docNumber) {
-            alert('Por favor, seleccione un tipo de documento y ingrese un número.');
-            return;
+    searchBox.addEventListener('keyup', filterTable);
+
+    tableRows.forEach(row => {
+        // We add the listener to the whole row, except the last cell with the buttons
+        for (let i = 0; i < row.cells.length - 1; i++) {
+            row.cells[i].addEventListener('click', () => populateForm(row));
         }
 
+        const editButton = row.querySelector('.btn-edit');
+        if (editButton) {
+            editButton.addEventListener('click', () => populateForm(row));
+        }
+    });
+
+    sunatBtn.addEventListener('click', function() {
+        const docNumber = searchBox.value.trim();
         let queryType = '';
-        if (docCode === '1') {
+        let docCode = '';
+
+        if (docNumber.length === 8) {
             queryType = 'dni';
-        } else if (docCode === '6') {
+            docCode = '1'; // Assuming '1' is the code for DNI
+        } else if (docNumber.length === 11) {
             queryType = 'ruc';
+            docCode = '6'; // Assuming '6' is the code for RUC
         } else {
-            alert('La consulta solo es válida para DNI o RUC.');
+            alert('Por favor, ingrese un número de DNI (8 dígitos) o RUC (11 dígitos) en el buscador.');
             return;
         }
 
         sunatBtn.textContent = 'Buscando...';
         sunatBtn.disabled = true;
+        resetForm();
 
         fetch(`consulta_api_externa.php?tipo=${queryType}&numero=${docNumber}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('La respuesta de la red no fue exitosa.');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.error) {
                     throw new Error(data.error);
                 }
-                filters.nombres.value = data.nombre || '';
-                // No se autocompleta la dirección en el filtro, solo en el form.
+                nombresApellidosInput.value = data.nombre || '';
+                direccionInput.value = data.direccion || '';
+                codigoUbigeoInput.value = data.ubigeo || '';
+                numeroDocumentoInput.value = docNumber;
 
-                // Auto-seleccionar el tipo de documento y filtrar
-                for (let i = 0; i < filters.tipo_documento.options.length; i++) {
-                    if (filters.tipo_documento.options[i].getAttribute('data-codigo') === docCode) {
-                        filters.tipo_documento.selectedIndex = i;
+                // Auto-seleccionar el tipo de documento en el formulario
+                for (let i = 0; i < tipoDocumentoSelect.options.length; i++) {
+                    if (tipoDocumentoSelect.options[i].getAttribute('data-codigo') === docCode) {
+                        tipoDocumentoSelect.selectedIndex = i;
                         break;
                     }
                 }
-
-                filterTable(); // Aplicar todos los filtros
             })
             .catch(error => {
                 console.error('Error al consultar la API:', error);
@@ -222,6 +244,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 sunatBtn.disabled = false;
             });
     });
+
+    // Add a clear button to the form
+    const clearButton = document.createElement('button');
+    clearButton.type = 'button';
+    clearButton.textContent = 'Limpiar';
+    clearButton.classList.add('btn', 'btn-secondary');
+    clearButton.addEventListener('click', resetForm);
+    submitButton.parentNode.insertBefore(clearButton, submitButton.nextSibling);
 });
 </script>
 
