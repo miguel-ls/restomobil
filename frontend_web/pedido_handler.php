@@ -23,6 +23,73 @@ $estado = $_POST['estado'] ?? 'recibido';
 $items_json = $_POST['items'] ?? '[]';
 $items = json_decode($items_json);
 
+// Datos del cliente
+$id_cliente = !empty($_POST['id_cliente']) ? $_POST['id_cliente'] : null;
+$id_tipo_documento_identidad_cliente = $_POST['id_tipo_documento_identidad_cliente'] ?? null;
+$cliente_ruc = $_POST['cliente_ruc'] ?? null;
+$cliente_nombre = $_POST['cliente_nombre'] ?? null;
+$cliente_direccion = $_POST['cliente_direccion'] ?? null;
+$cliente_ubigeo = $_POST['cliente_ubigeo'] ?? null;
+$id_tipo_documento_venta = $_POST['id_tipo_documento_venta'] ?? null;
+
+require_once 'config.php';
+
+// Si se proporcionó un número de documento, intentar crear o actualizar el cliente
+if (!empty($cliente_ruc) && !empty($id_tipo_documento_identidad_cliente) && !empty($cliente_nombre)) {
+    $cliente_api_url = API_BASE_URL . 'clientes.php';
+
+    // Datos del cliente para la API
+    $cliente_data = [
+        'id_tipo_documento_identidad' => $id_tipo_documento_identidad_cliente,
+        'numero_documento' => $cliente_ruc,
+        'nombres_apellidos' => $cliente_nombre,
+        'direccion' => $cliente_direccion,
+        'codigo_ubigeo' => $cliente_ubigeo
+    ];
+
+    $method = 'POST'; // Por defecto, crear
+    if ($id_cliente) {
+        // Si tenemos un ID, actualizamos
+        $cliente_api_url .= "?id=$id_cliente";
+        $method = 'PUT';
+    } else {
+        // Si no hay ID, verificamos si el cliente ya existe por su documento
+        $check_url = API_BASE_URL . "clientes.php?numero_documento=" . urlencode($cliente_ruc);
+        $check_response = @file_get_contents($check_url);
+        if ($check_response !== false) {
+            $existing_client_data = json_decode($check_response, true);
+            if (!empty($existing_client_data['records'])) {
+                // El cliente existe, obtenemos su ID y actualizamos
+                $id_cliente = $existing_client_data['records'][0]['id'];
+                $cliente_api_url .= "?id=$id_cliente";
+                $method = 'PUT';
+            }
+        }
+    }
+
+    $ch_cliente = curl_init($cliente_api_url);
+    curl_setopt($ch_cliente, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch_cliente, CURLOPT_CUSTOMREQUEST, $method);
+    curl_setopt($ch_cliente, CURLOPT_POSTFIELDS, json_encode($cliente_data));
+    curl_setopt($ch_cliente, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    $response_cliente = curl_exec($ch_cliente);
+    $http_code_cliente = curl_getinfo($ch_cliente, CURLINFO_HTTP_CODE);
+    curl_close($ch_cliente);
+
+    if ($http_code_cliente >= 200 && $http_code_cliente < 300) {
+        $response_data_cliente = json_decode($response_cliente, true);
+        if (isset($response_data_cliente['id'])) {
+            $id_cliente = $response_data_cliente['id']; // Asignar el ID del cliente recién creado/actualizado
+        }
+    } else {
+        // Manejar error si la creación/actualización del cliente falla
+        $error_message = urlencode(json_decode($response_cliente, true)['message'] ?? 'Error al procesar datos del cliente.');
+        header("Location: pedido_form.php?id=$order_id&error=$error_message");
+        exit();
+    }
+}
+
+
 if ($is_pago_view || $is_caja_create_view) {
     $redirect_url = 'caja.php';
 } else {
@@ -45,11 +112,12 @@ $api_data = [
     'id_mesa' => $id_mesa,
     'id_usuario_mozo' => $id_usuario_mozo,
     'estado' => $estado,
-    'items' => $items
+    'items' => $items,
+    'id_cliente' => $id_cliente,
+    'id_tipo_documento_venta' => $id_tipo_documento_venta
 ];
 
 // Incluir configuración de la API
-require_once 'config.php';
 $api_url = API_BASE_URL . 'pedidos.php';
 $method = 'POST';
 
