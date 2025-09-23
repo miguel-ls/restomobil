@@ -18,8 +18,14 @@ include_once __DIR__ . '/config.php';
         <div class="container">
             <div class="page-header">
                 <h1>Historial de Apertura y Cierre de Caja</h1>
-                <a href="apertura_cierre_form.php" class="btn">Registrar Nuevo Movimiento</a>
+                <a href="apertura_cierre_form.php" class="btn">Registrar Movimiento</a>
             </div>
+             <?php if (isset($_GET['success'])): ?>
+                <p class="success-message"><?php echo htmlspecialchars(urldecode($_GET['success'])); ?></p>
+            <?php endif; ?>
+            <?php if (isset($_GET['error'])): ?>
+                <p class="error-message"><?php echo htmlspecialchars(urldecode($_GET['error'])); ?></p>
+            <?php endif; ?>
 
             <div class="filter-container">
                 <form id="filter-form">
@@ -48,9 +54,7 @@ include_once __DIR__ . '/config.php';
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="apertura-cierre-tbody">
-                        <!-- Las filas de datos se insertarán aquí dinámicamente -->
-                    </tbody>
+                    <tbody id="apertura-cierre-tbody"></tbody>
                 </table>
             </div>
 
@@ -77,7 +81,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterForm = document.getElementById('filter-form');
     const paginationControls = document.getElementById('pagination-controls');
     const pageSizeSelector = document.getElementById('page-size');
-
     let currentPage = 1;
 
     async function fetchRegistros() {
@@ -85,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const fechaInicio = document.getElementById('fecha_inicio').value;
         const fechaFin = document.getElementById('fecha_fin').value;
         const tipoMovimiento = document.getElementById('tipo_movimiento').value;
-
         let queryParams = `?page=${currentPage}&page_size=${pageSize}`;
         if (fechaInicio) queryParams += `&fecha_inicio=${fechaInicio}`;
         if (fechaFin) queryParams += `&fecha_fin=${fechaFin}`;
@@ -93,30 +95,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             const response = await fetch(API_URL + queryParams);
-            if (!response.ok) {
-                if (response.status === 404) {
-                    tbody.innerHTML = '<tr><td colspan="6">No se encontraron registros.</td></tr>';
-                    updatePagination(null);
-                } else {
-                    throw new Error('Error en la respuesta de la red: ' + response.statusText);
-                }
-                return;
-            }
-
             const data = await response.json();
             renderTable(data.records);
             updatePagination(data.pagination);
-
         } catch (error) {
             console.error('Error al obtener los registros:', error);
-            tbody.innerHTML = '<tr><td colspan="6">Error al cargar los datos. Por favor, intente de nuevo.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6">Error al cargar los datos.</td></tr>';
         }
     }
 
     function formatDateTime(isoString) {
         const date = new Date(isoString);
         const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexados
+        const month = String(date.getMonth() + 1).padStart(2, '0');
         const year = date.getFullYear();
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -129,7 +120,6 @@ document.addEventListener('DOMContentLoaded', function() {
             tbody.innerHTML = '<tr><td colspan="6">No hay registros que coincidan con los filtros.</td></tr>';
             return;
         }
-
         registros.forEach(reg => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -149,12 +139,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updatePagination(pagination) {
         paginationControls.innerHTML = '';
-        if (!pagination || pagination.total_pages <= 1) {
-            return;
-        }
-
+        if (!pagination || pagination.total_pages <= 1) return;
         const { page, total_pages } = pagination;
-
         const prevButton = document.createElement('button');
         prevButton.innerText = '« Anterior';
         prevButton.disabled = page <= 1;
@@ -165,7 +151,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         paginationControls.appendChild(prevButton);
-
         for (let i = 1; i <= total_pages; i++) {
             const pageButton = document.createElement('button');
             pageButton.innerText = i;
@@ -176,7 +161,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             paginationControls.appendChild(pageButton);
         }
-
         const nextButton = document.createElement('button');
         nextButton.innerText = 'Siguiente »';
         nextButton.disabled = page >= total_pages;
@@ -189,18 +173,18 @@ document.addEventListener('DOMContentLoaded', function() {
         paginationControls.appendChild(nextButton);
     }
 
-    filterForm.addEventListener('submit', function(e) {
+    filterForm.addEventListener('submit', (e) => {
         e.preventDefault();
         currentPage = 1;
         fetchRegistros();
     });
 
-    pageSizeSelector.addEventListener('change', function() {
+    pageSizeSelector.addEventListener('change', () => {
         currentPage = 1;
         fetchRegistros();
     });
 
-    tbody.addEventListener('click', function(e) {
+    tbody.addEventListener('click', (e) => {
         if (e.target.classList.contains('btn-delete')) {
             const registroId = e.target.getAttribute('data-id');
             if (confirm('¿Estás seguro de que quieres eliminar este registro?')) {
@@ -215,60 +199,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' }
             });
-
             const result = await response.json();
-
             if (response.ok) {
                 alert(result.message || 'Registro eliminado con éxito.');
                 fetchRegistros();
             } else {
                 alert('Error al eliminar: ' + (result.message || 'Error desconocido'));
             }
-
         } catch (error) {
             console.error('Error al eliminar:', error);
             alert('Ocurrió un error de red al intentar eliminar el registro.');
         }
     }
 
-    // Carga inicial
     fetchRegistros();
 });
 </script>
 
 <style>
-.pagination-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 1rem;
-}
-#pagination-controls button {
-    margin: 0 2px;
-}
-#pagination-controls button.active {
-    font-weight: bold;
-    background-color: #007bff;
-    color: white;
-}
-.filter-container .filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-}
-.filter-container .filters input,
-.filter-container .filters select,
-.filter-container .filters button {
-    flex-grow: 0;
-    flex-shrink: 0;
-}
-.filter-container .filters input[type="date"] {
-    width: auto;
-    padding: 8px;
-}
-.filter-container .filters select {
-    width: 150px;
-    padding: 8px;
-}
+.pagination-container { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+#pagination-controls button { margin: 0 2px; }
+#pagination-controls button.active { font-weight: bold; background-color: #007bff; color: white; }
+.filter-container .filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.filter-container .filters input, .filter-container .filters select, .filter-container .filters button { flex-grow: 0; flex-shrink: 0; }
+.filter-container .filters input[type="date"] { width: auto; padding: 8px; }
+.filter-container .filters select { width: 150px; padding: 8px; }
 </style>

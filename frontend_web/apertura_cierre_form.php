@@ -8,7 +8,6 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 include_once 'templates/header.php';
 include_once __DIR__ . '/config.php';
 
-// Función auxiliar para obtener datos de la API
 function getAPIData($endpoint) {
     $api_url = API_BASE_URL . $endpoint;
     $ch = curl_init($api_url);
@@ -32,7 +31,6 @@ if (isset($_GET['id'])) {
     $page_title = 'Editar Registro';
     $registro_data = getAPIData("apertura_cierre.php?id=$registro_id");
 
-    // Formatear la fecha para el input type="datetime-local"
     if ($registro_data && !empty($registro_data['fecha'])) {
         $registro_data['fecha'] = (new DateTime($registro_data['fecha']))->format('Y-m-d\TH:i');
     }

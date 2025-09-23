@@ -19,12 +19,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         'usuario_id' => $_SESSION['user_id']
     ];
 
-    // Cerramos la sesión para evitar bloqueos. La API la reabrirá.
     session_write_close();
 
     $ch = curl_init();
 
-    // Para que la API pueda acceder a la sesión, debemos pasar el ID de sesión
     curl_setopt($ch, CURLOPT_COOKIE, "PHPSESSID=" . $_COOKIE['PHPSESSID']);
 
     if ($action == 'create') {
@@ -57,7 +55,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $error_data = json_decode($response, true);
         $error_message = $error_data['message'] ?? 'Ocurrió un error en la operación.';
-        // Redirigir de vuelta al formulario con el error
         $redirect_url = 'apertura_cierre_form.php?error=' . urlencode($error_message);
         if ($action == 'update' && !empty($_POST['id'])) {
             $redirect_url .= '&id=' . $_POST['id'];

@@ -39,13 +39,13 @@ switch ($request_method) {
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
         if (!empty($data->fecha) && !empty($data->tipo_movimiento) && isset($data->importe) && isset($_SESSION['user_id'])) {
-            $result = $aperturaCierre->create($data->fecha, $data->tipo_movimiento, $data->importe, $data->descripcion, $_SESSION['user_id']);
+            $result = $aperturaCierre->create($data->fecha, $data->tipo_movimiento, $data->importe, $data->descripcion ?? '', $_SESSION['user_id']);
             if (is_numeric($result)) {
                 http_response_code(201);
                 echo json_encode(["message" => "Registro creado con éxito.", "id" => $result]);
             } else {
-                http_response_code(400); // Bad Request o 409 Conflict
-                echo json_encode(["message" => $result]); // $result contiene el mensaje de error del modelo
+                http_response_code(409); // 409 Conflict es más apropiado para una clave única duplicada
+                echo json_encode(["message" => $result]);
             }
         } else {
             http_response_code(400);
@@ -56,13 +56,13 @@ switch ($request_method) {
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
         if (!empty($data->id) && !empty($data->fecha) && !empty($data->tipo_movimiento) && isset($data->importe)) {
-            $result = $aperturaCierre->update($data->id, $data->fecha, $data->tipo_movimiento, $data->importe, $data->descripcion);
+            $result = $aperturaCierre->update($data->id, $data->fecha, $data->tipo_movimiento, $data->importe, $data->descripcion ?? '');
             if ($result === true) {
                 http_response_code(200);
                 echo json_encode(["message" => "Registro actualizado con éxito."]);
             } else {
-                http_response_code(400); // Bad Request o 409 Conflict
-                echo json_encode(["message" => $result]); // $result contiene el mensaje de error del modelo
+                http_response_code(409); // 409 Conflict
+                echo json_encode(["message" => $result]);
             }
         } else {
             http_response_code(400);
@@ -115,7 +115,7 @@ function handleGetAll($aperturaCierre, $filters) {
             ]
         ]);
     } else {
-        http_response_code(404);
+        http_response_code(200); // Devolver 200 con un array vacío es una práctica común
         echo json_encode([
             "message" => "No se encontraron registros.",
             "records" => [],
