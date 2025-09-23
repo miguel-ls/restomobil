@@ -150,6 +150,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const importeClass = mov.tipo_movimiento === 'entrada' ? 'text-success' : 'text-danger';
             const importeSign = mov.tipo_movimiento === 'entrada' ? '+' : '-';
 
+            let actionButtons = '';
+            if (!mov.is_closed) {
+                actionButtons = `
+                    <a href="movimiento_caja_form.php?id=${mov.id}" class="btn btn-edit">Editar</a>
+                    <button class="btn btn-delete" data-id="${mov.id}">Eliminar</button>
+                `;
+            }
+
             tr.innerHTML = `
                 <td data-label="Fecha">${formatDateTime(mov.fecha)}</td>
                 <td data-label="Tipo">${mov.tipo_movimiento.charAt(0).toUpperCase() + mov.tipo_movimiento.slice(1)}</td>
@@ -157,8 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td data-label="Descripción">${mov.descripcion || ''}</td>
                 <td data-label="Usuario">${mov.usuario_nombre || 'N/A'}</td>
                 <td data-label="Acciones" class="actions-cell">
-                    <a href="movimiento_caja_form.php?id=${mov.id}" class="btn btn-edit">Editar</a>
-                    <button class="btn btn-delete" data-id="${mov.id}">Eliminar</button>
+                    ${actionButtons}
                 </td>
             `;
             tbody.appendChild(tr);
@@ -212,30 +219,9 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchMovimientos();
     });
 
-    tbody.addEventListener('click', async (e) => {
-        const target = e.target;
-        const tr = target.closest('tr');
-        if (!tr) return;
-
-        const fechaMovimiento = tr.dataset.fecha;
-
-        if (target.classList.contains('btn-edit')) {
-            e.preventDefault();
-            const isClosed = await checkIfDateIsClosed(fechaMovimiento);
-            if (isClosed) {
-                alert('La fecha está cerrada y no se puede editar el movimiento.');
-            } else {
-                window.location.href = target.href;
-            }
-        }
-
-        if (target.classList.contains('btn-delete')) {
-            const movimientoId = target.getAttribute('data-id');
-            const isClosed = await checkIfDateIsClosed(fechaMovimiento);
-            if (isClosed) {
-                alert('La fecha está cerrada y no se puede eliminar el movimiento.');
-                return;
-            }
+    tbody.addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-delete')) {
+            const movimientoId = e.target.getAttribute('data-id');
             if (confirm('¿Estás seguro de que quieres eliminar este movimiento?')) {
                 deleteMovimiento(movimientoId);
             }
