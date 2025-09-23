@@ -55,7 +55,6 @@ if (isset($_GET['id'])) {
 if ($is_editing && $order_data) {
     $mesas_data = fetchFromAPI('mesas.php');
 } else if ($is_caja_create_view) {
-    // For new "Caja" orders, fetch tables where es_libre = 1 (Tipo de Mesa Libre Activado)
     $mesas_data = fetchFromAPI('mesas.php?es_libre=1');
 }
 else {
@@ -151,7 +150,6 @@ if ($is_pago_view) {
                                             if (empty($mesas) && $is_editing && $order_data) {
                                                 echo "<option value=\"{$order_data['id_mesa']}\" selected>Mesa {$order_data['id_mesa']} (Actual)</option>";
                                             }
-
                                             foreach ($mesas as $mesa):
                                                 $is_selected = $is_editing && isset($order_data['id_mesa']) && $order_data['id_mesa'] == $mesa['id'];
                                                 $is_available = $mesa['estado'] == 'disponible';
@@ -479,9 +477,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     orderForm.addEventListener('submit', async function(e) {
-        e.preventDefault(); // Prevenir siempre el envío síncrono para manejarlo con JS
+        e.preventDefault();
 
-        // --- Lógica de PAGO (cuando view=pago) ---
         if (isPagoView) {
             const serieSelect = document.getElementById('id_serie_documento');
             if (!serieSelect.value) {
@@ -498,40 +495,30 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('id_serie_documento', serieSelect.value);
             formData.append('id_tipo_documento_venta', document.getElementById('id_tipo_documento_venta').value);
 
-
             try {
                 const response = await fetch(`${apiBaseUrl}procesar_venta.php`, {
                     method: 'POST',
                     body: formData
                 });
-
                 const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.message || 'Error desconocido en el servidor.');
-                }
-
+                if (!response.ok) throw new Error(result.message || 'Error desconocido en el servidor.');
                 alert(`Venta generada con éxito. Número: ${result.numero_documento}`);
                 window.location.href = 'ventas.php';
-
             } catch (error) {
                 console.error('Error al procesar el pago:', error);
                 alert('Error al procesar el pago: ' + error.message);
                 submitButton.disabled = false;
                 submitButton.textContent = 'Pagar';
             }
-            return; // Detener la ejecución aquí para la vista de pago
+            return;
         }
 
-        // --- Lógica de CREACIÓN/EDICIÓN normal ---
         const tipoComprobanteSelect = document.getElementById('id_tipo_documento_venta');
         const selectedComprobante = tipoComprobanteSelect.options[tipoComprobanteSelect.selectedIndex];
-
         if (selectedComprobante && selectedComprobante.textContent === 'Factura') {
             const idCliente = document.getElementById('id_cliente').value;
             const clienteNombre = document.getElementById('cliente_nombre').value;
             const clienteDireccion = document.getElementById('cliente_direccion').value;
-
             if (!idCliente || !clienteNombre || !clienteDireccion) {
                 alert('Para emitir una Factura, debe seleccionar un cliente con RUC, nombre y dirección.');
                 return;
@@ -549,8 +536,6 @@ document.addEventListener('DOMContentLoaded', function() {
         itemsInput.name = 'items';
         itemsInput.value = JSON.stringify(Object.values(currentOrder));
         this.appendChild(itemsInput);
-
-        // Si todas las validaciones pasan, se envía el formulario
         this.submit();
     });
 
@@ -564,7 +549,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const tabNav = document.querySelector('.tab-nav');
     const tabPanes = document.querySelectorAll('.tab-content .tab-pane');
-
     tabNav.addEventListener('click', function(e) {
         const targetButton = e.target.closest('.tab-button');
         if (!targetButton) return;
@@ -575,32 +559,25 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('tab-' + tabId).classList.add('active');
     });
 
-    // Client tab logic
     const tipoComprobanteSelect = document.getElementById('id_tipo_documento_venta');
     const serieDocumentoSelect = document.getElementById('id_serie_documento');
-
     async function loadSeries(tipoDocId, selectedSerieId = null) {
         serieDocumentoSelect.innerHTML = '<option value="">Cargando...</option>';
         serieDocumentoSelect.disabled = true;
-
         if (!tipoDocId) {
             serieDocumentoSelect.innerHTML = '<option value="">--</option>';
             return;
         }
-
         try {
             const response = await fetch(`${apiBaseUrl}series_documentos.php?id_tipo_documento=${tipoDocId}`);
             const data = await response.json();
-
             serieDocumentoSelect.innerHTML = '<option value="">Seleccione...</option>';
             if (data.records && data.records.length > 0) {
                 data.records.forEach(serie => {
                     const option = document.createElement('option');
                     option.value = serie.id;
                     option.textContent = serie.serie;
-                    if (selectedSerieId && serie.id == selectedSerieId) {
-                        option.selected = true;
-                    }
+                    if (selectedSerieId && serie.id == selectedSerieId) option.selected = true;
                     serieDocumentoSelect.appendChild(option);
                 });
                 serieDocumentoSelect.disabled = false;
@@ -612,34 +589,20 @@ document.addEventListener('DOMContentLoaded', function() {
             serieDocumentoSelect.innerHTML = '<option value="">Error</option>';
         }
     }
-
-    tipoComprobanteSelect.addEventListener('change', function() {
-        loadSeries(this.value);
-        // Limpiar el número de documento cuando cambia el tipo
-        document.getElementById('numero_documento').value = '';
-    });
-
+    tipoComprobanteSelect.addEventListener('change', () => loadSeries(tipoComprobanteSelect.value));
     serieDocumentoSelect.addEventListener('change', async function() {
         const serieId = this.value;
         const numeroDocumentoInput = document.getElementById('numero_documento');
-
         if (!serieId) {
             numeroDocumentoInput.value = '';
             return;
         }
-
         numeroDocumentoInput.value = 'Cargando...';
-
         try {
             const response = await fetch(`${apiBaseUrl}correlativo_serie.php?id_serie_documento=${serieId}`);
             if (!response.ok) throw new Error('Respuesta de red no fue OK');
             const data = await response.json();
-
-            if (data.next_correlativo) {
-                numeroDocumentoInput.value = String(data.next_correlativo).padStart(8, '0');
-            } else {
-                numeroDocumentoInput.value = 'Error';
-            }
+            numeroDocumentoInput.value = data.next_correlativo ? String(data.next_correlativo).padStart(8, '0') : 'Error';
         } catch (error) {
             console.error('Error fetching correlativo:', error);
             numeroDocumentoInput.value = 'Error al cargar';
@@ -668,11 +631,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     clienteSelect.appendChild(option);
                 });
             }
-        } catch (error) {
-            console.error('Error loading clients:', error);
-        }
+        } catch (error) { console.error('Error loading clients:', error); }
     }
-
     clienteSelect.addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
         if (selectedOption.value && selectedOption.dataset.clientData) {
@@ -692,15 +652,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     const option = document.createElement('option');
                     option.value = tipo.id;
                     option.textContent = tipo.nombre;
-                    if (isEditing && initialOrderData && initialOrderData.id_tipo_documento_venta == tipo.id) {
-                        option.selected = true;
-                    }
+                    if (isEditing && initialOrderData && initialOrderData.id_tipo_documento_venta == tipo.id) option.selected = true;
                     tipoComprobanteSelect.appendChild(option);
                 });
             }
-        } catch (error) {
-            console.error('Error loading sale document types:', error);
-        }
+        } catch (error) { console.error('Error loading sale document types:', error); }
     }
 
     async function loadIdentityDocumentTypes(selectElement) {
@@ -716,9 +672,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     selectElement.appendChild(option.cloneNode(true));
                 });
             }
-        } catch (error) {
-            console.error('Error loading identity document types:', error);
-        }
+        } catch (error) { console.error('Error loading identity document types:', error); }
     }
 
     function clearClienteSelection() {
@@ -728,7 +682,6 @@ document.addEventListener('DOMContentLoaded', function() {
         clienteRucInput.value = '';
         clienteDireccionInput.value = '';
         clienteUbigeoInput.value = '';
-
         [clienteNombreInput, clienteRucInput, clienteDireccionInput, clienteUbigeoInput].forEach(el => el.readOnly = false);
         clienteTipoDocIdentidadSelect.disabled = false;
     }
@@ -740,9 +693,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clienteRucInput.value = cliente.numero_documento;
         clienteDireccionInput.value = cliente.direccion;
         clienteUbigeoInput.value = cliente.codigo_ubigeo;
-
         clienteSelect.value = cliente.id;
-
         [clienteNombreInput, clienteRucInput, clienteDireccionInput, clienteUbigeoInput].forEach(el => el.readOnly = false);
         clienteTipoDocIdentidadSelect.disabled = false;
     }
@@ -756,7 +707,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         let queryType = (docCode === '1') ? 'dni' : 'ruc';
-
         btnSunatMain.textContent = 'Buscando...';
         btnSunatMain.disabled = true;
         try {
@@ -775,19 +725,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     async function initializeForm() {
-        // Esperar a que ambos tipos de documentos se carguen
         await Promise.all([
             loadSaleDocumentTypes(),
             loadIdentityDocumentTypes(clienteTipoDocIdentidadSelect),
             loadClientsForSelect()
         ]);
 
-        // Si hay un tipo de comprobante ya seleccionado al cargar, cargar sus series
         if (tipoComprobanteSelect.value) {
             await loadSeries(tipoComprobanteSelect.value);
         }
 
-        // Ahora que los <select> están poblados, podemos establecer los valores de forma segura
         if (isEditing && initialOrderData && initialOrderData.id_cliente) {
             selectCliente({
                 id: initialOrderData.id_cliente,
