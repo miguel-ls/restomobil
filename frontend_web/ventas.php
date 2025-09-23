@@ -103,24 +103,18 @@ $ventas_data = getVentas($filters);
 </div>
 
 <style>
-.form-filters {
+.filter-container .filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
     align-items: flex-end;
+    gap: 15px;
+    padding-bottom: 1rem; /* Add some space below filters */
 }
-.filter-group {
-    display: flex;
-    flex-direction: column;
-}
-.filter-group label {
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-.filter-group input, .filter-group .btn {
-    height: 38px; /* Align height with buttons */
+.filter-container .filters input,
+.filter-container .filters button,
+.filter-container .filters a {
+    margin: 0;
 }
 </style>
 
-
-
+<?php include_once __DIR__ . '/templates/footer.php'; ?>
