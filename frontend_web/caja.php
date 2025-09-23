@@ -6,7 +6,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
-$page_title = 'Pedidos Finalizados';
+$page_title = 'Caja - Pedidos';
 include_once 'templates/header.php';
 include_once __DIR__ . '/config.php';
 ?>
@@ -17,7 +17,7 @@ include_once __DIR__ . '/config.php';
     <main class="main-content">
         <div class="container">
             <div class="page-header">
-                <h1>Pedidos Completados y Cancelados</h1>
+                <h1>Caja - Pedidos</h1>
                 <a href="pedido_form.php?view=caja_create" class="btn">Crear Pedido Nuevo</a>
             </div>
 
@@ -189,15 +189,25 @@ document.addEventListener('DOMContentLoaded', function() {
 .filter-container .filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 10px;
     align-items: center;
     padding-bottom: 20px;
 }
 .filter-container .filters select,
-.filter-container .filters input,
-.filter-container .filters button {
-    padding: 8px 12px;
+.filter-container .filters input {
+    padding: 8px;
     border-radius: 5px;
     border: 1px solid #ccc;
+    flex-grow: 1;
+    flex-basis: 150px; /* Base width before growing/shrinking */
+}
+.filter-container .filters button {
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: 1px solid #007bff;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    flex-grow: 0;
 }
 </style>
