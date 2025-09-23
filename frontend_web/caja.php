@@ -179,7 +179,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const today = new Date();
     yearSelect.value = today.getFullYear();
     monthSelect.value = today.getMonth() + 1;
+    statusSelect.value = 'completado'; // Estado por defecto
     updateDateFields();
     fetchOrders(); // Carga inicial
 });
 </script>
+
+<style>
+.filter-container .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+    padding-bottom: 20px;
+}
+.filter-container .filters select,
+.filter-container .filters input,
+.filter-container .filters button {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+</style>
