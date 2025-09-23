@@ -44,10 +44,10 @@ $ventas_data = getVentas($filters);
             </div>
 
             <div class="filter-container">
-                <form id="filter-form" method="GET" action="ventas.php" style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 15px; padding-bottom: 1rem;">
-                    <div class="filter-group">
-                        <label for="filtro_anio">Año</label>
+                <form id="filter-form" method="GET" action="ventas.php">
+                    <div class="filters">
                         <select id="filtro_anio" name="filtro_anio">
+                            <option value="">Año</option>
                             <?php
                                 $current_year = date('Y');
                                 for ($i = $current_year; $i >= $current_year - 5; $i--) {
@@ -56,10 +56,8 @@ $ventas_data = getVentas($filters);
                                 }
                             ?>
                         </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="filtro_mes">Mes</label>
                         <select id="filtro_mes" name="filtro_mes">
+                            <option value="">Mes</option>
                             <?php
                                 $meses = ["01"=>"Enero", "02"=>"Febrero", "03"=>"Marzo", "04"=>"Abril", "05"=>"Mayo", "06"=>"Junio", "07"=>"Julio", "08"=>"Agosto", "09"=>"Septiembre", "10"=>"Octubre", "11"=>"Noviembre", "12"=>"Diciembre"];
                                 foreach ($meses as $num => $nombre) {
@@ -68,31 +66,15 @@ $ventas_data = getVentas($filters);
                                 }
                             ?>
                         </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="fecha_inicio">Fecha Inicio</label>
-                        <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?php echo htmlspecialchars($_GET['fecha_inicio'] ?? ''); ?>">
-                    </div>
-                    <div class="filter-group">
-                        <label for="fecha_fin">Fecha Fin</label>
-                        <input type="date" id="fecha_fin" name="fecha_fin" value="<?php echo htmlspecialchars($_GET['fecha_fin'] ?? ''); ?>">
-                    </div>
-                    <div class="filter-group">
-                        <label for="estado">Estado</label>
+                        <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?php echo htmlspecialchars($_GET['fecha_inicio'] ?? ''); ?>" title="Fecha desde">
+                        <input type="date" id="fecha_fin" name="fecha_fin" value="<?php echo htmlspecialchars($_GET['fecha_fin'] ?? ''); ?>" title="Fecha hasta">
                         <select id="estado" name="estado">
-                            <option value="Todos" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'Todos') ? 'selected' : ''; ?>>Todos</option>
+                            <option value="Todos">Todos los Estados</option>
                             <option value="emitida" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'emitida') ? 'selected' : ''; ?>>Emitida</option>
                             <option value="anulada" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'anulada') ? 'selected' : ''; ?>>Anulada</option>
                         </select>
-                    </div>
-                    <div class="filter-group" style="flex: 1;">
-                        <label for="search">Buscar</label>
-                        <input type="text" id="search" name="search" placeholder="Cliente, Doc..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
-                    </div>
-                    <div class="filter-group">
+                        <input type="text" id="search" name="search" placeholder="Buscar..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
                         <button type="submit" class="btn">Filtrar</button>
-                    </div>
-                    <div class="filter-group">
                         <a href="ventas.php" class="btn btn-secondary">Limpiar</a>
                     </div>
                 </form>
@@ -177,3 +159,36 @@ document.addEventListener('DOMContentLoaded', function() {
     // updateDateFields();
 });
 </script>
+
+<style>
+.filter-container .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    padding-bottom: 20px;
+}
+.filter-container .filters select,
+.filter-container .filters input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    flex-grow: 1;
+    flex-basis: 150px; /* Base width before growing/shrinking */
+}
+.filter-container .filters button,
+.filter-container .filters a.btn { /* Target the anchor tag as well */
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: 1px solid #007bff;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    flex-grow: 0;
+    text-decoration: none; /* Ensure link buttons look like buttons */
+}
+.filter-container .filters a.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+</style>
