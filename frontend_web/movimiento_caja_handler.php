@@ -19,10 +19,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         'usuario_id' => $_SESSION['user_id']
     ];
 
+    // Cerramos la sesión para evitar bloqueos. La API la reabrirá.
+    session_write_close();
+
     $ch = curl_init();
 
     // Para que la API pueda acceder a la sesión, debemos pasar el ID de sesión
-    curl_setopt($ch, CURLOPT_COOKIE, "PHPSESSID=" . session_id());
+    curl_setopt($ch, CURLOPT_COOKIE, "PHPSESSID=" . $_COOKIE['PHPSESSID']);
 
     if ($action == 'create') {
         curl_setopt($ch, CURLOPT_URL, $api_url);
