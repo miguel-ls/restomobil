@@ -44,10 +44,58 @@ $ventas_data = getVentas($filters);
             </div>
 
             <div class="filter-container">
-                <form method="GET" action="ventas.php" style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 15px; padding-bottom: 1rem;">
-                    <input type="date" name="fecha_inicio" value="<?php echo htmlspecialchars($_GET['fecha_inicio'] ?? ''); ?>" title="Fecha desde">
-                    <input type="date" name="fecha_fin" value="<?php echo htmlspecialchars($_GET['fecha_fin'] ?? ''); ?>" title="Fecha hasta">
-                    <input type="text" name="search" placeholder="Buscar..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" style="flex: 1;">
+                <form id="filter-form" method="GET" action="ventas.php" style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; padding-bottom: 1rem;">
+
+                    <div class="filter-group">
+                        <label for="filtro_anio">Año</label>
+                        <select id="filtro_anio" name="filtro_anio">
+                            <?php
+                                $current_year = date('Y');
+                                for ($i = $current_year; $i >= $current_year - 5; $i--) {
+                                    $selected = (isset($_GET['filtro_anio']) && $_GET['filtro_anio'] == $i) ? 'selected' : '';
+                                    echo "<option value=\"$i\" $selected>$i</option>";
+                                }
+                            ?>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="filtro_mes">Mes</label>
+                        <select id="filtro_mes" name="filtro_mes">
+                            <?php
+                                $meses = ["01"=>"Enero", "02"=>"Febrero", "03"=>"Marzo", "04"=>"Abril", "05"=>"Mayo", "06"=>"Junio", "07"=>"Julio", "08"=>"Agosto", "09"=>"Septiembre", "10"=>"Octubre", "11"=>"Noviembre", "12"=>"Diciembre"];
+                                foreach ($meses as $num => $nombre) {
+                                    $selected = (isset($_GET['filtro_mes']) && $_GET['filtro_mes'] == $num) ? 'selected' : '';
+                                    echo "<option value=\"$num\" $selected>$nombre</option>";
+                                }
+                            ?>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="fecha_inicio">Fecha Inicio</label>
+                        <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?php echo htmlspecialchars($_GET['fecha_inicio'] ?? ''); ?>" title="Fecha desde">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="fecha_fin">Fecha Fin</label>
+                        <input type="date" id="fecha_fin" name="fecha_fin" value="<?php echo htmlspecialchars($_GET['fecha_fin'] ?? ''); ?>" title="Fecha hasta">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="estado">Estado</label>
+                        <select id="estado" name="estado">
+                            <option value="Todos" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'Todos') ? 'selected' : ''; ?>>Todos</option>
+                            <option value="emitida" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'emitida') ? 'selected' : ''; ?>>Emitida</option>
+                            <option value="anulada" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'anulada') ? 'selected' : ''; ?>>Anulada</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="search">Buscar</label>
+                        <input type="text" id="search" name="search" placeholder="Cliente, Doc..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" style="flex: 1;">
+                    </div>
+
                     <button type="submit" class="btn">Filtrar</button>
                     <a href="ventas.php" class="btn btn-secondary">Limpiar</a>
                 </form>
@@ -99,3 +147,36 @@ $ventas_data = getVentas($filters);
         </div>
     </main>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const anioSelect = document.getElementById('filtro_anio');
+    const mesSelect = document.getElementById('filtro_mes');
+    const fechaInicioInput = document.getElementById('fecha_inicio');
+    const fechaFinInput = document.getElementById('fecha_fin');
+
+    function updateDateFields() {
+        const year = anioSelect.value;
+        const month = mesSelect.value;
+
+        if (year && month) {
+            // Calcular primer y último día del mes
+            const primerDia = `${year}-${month}-01`;
+            const ultimoDia = new Date(year, month, 0).getDate(); // El día 0 del siguiente mes es el último día del mes actual
+            const fechaFin = `${year}-${month}-${ultimoDia}`;
+
+            fechaInicioInput.value = primerDia;
+            fechaFinInput.value = fechaFin;
+        }
+    }
+
+    // Actualizar al cambiar año o mes
+    anioSelect.addEventListener('change', updateDateFields);
+    mesSelect.addEventListener('change', updateDateFields);
+
+    // Opcional: Ejecutar al cargar la página si hay valores seleccionados
+    // Esto podría sobreescribir fechas específicas que el usuario haya puesto,
+    // así que lo dejamos comentado por si se prefiere un control manual.
+    // updateDateFields();
+});
+</script>
