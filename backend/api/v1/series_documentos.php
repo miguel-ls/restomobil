@@ -21,7 +21,24 @@ switch ($request_method) {
                 http_response_code(404);
                 echo json_encode(["message" => "Serie no encontrada."]);
             }
+        } else if (!empty($_GET["id_tipo_documento"])) {
+            // Listar series por tipo de documento
+            $id_tipo_documento = intval($_GET["id_tipo_documento"]);
+            $stmt = $serieDocumento->readByTipoDocumento($id_tipo_documento);
+            $num = $stmt->rowCount();
+            if ($num > 0) {
+                $series_arr = ["records" => []];
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    array_push($series_arr["records"], $row);
+                }
+                http_response_code(200);
+                echo json_encode($series_arr);
+            } else {
+                http_response_code(200);
+                echo json_encode(["records" => []]);
+            }
         } else {
+            // Listar todas las series (comportamiento original)
             $stmt = $serieDocumento->readAll();
             $num = $stmt->rowCount();
             if ($num > 0) {
