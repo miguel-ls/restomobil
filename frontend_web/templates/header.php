@@ -9,6 +9,7 @@
     <!-- Main Stylesheet -->
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="assets/css/modal.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="assets/css/print-ticket.css?v=<?php echo time(); ?>" media="print">
 </head>
 <body id="page-body">
 <?php include_once __DIR__ . '/modal_alert.php'; ?>
