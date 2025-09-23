@@ -45,7 +45,7 @@ $ventas_data = getVentas($filters);
 
             <div class="filter-container">
                 <form method="GET" action="ventas.php">
-                    <div class="filters">
+                    <div class="filters" style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 15px;">
                         <input type="date" name="fecha_inicio" value="<?php echo htmlspecialchars($_GET['fecha_inicio'] ?? ''); ?>" title="Fecha desde">
                         <input type="date" name="fecha_fin" value="<?php echo htmlspecialchars($_GET['fecha_fin'] ?? ''); ?>" title="Fecha hasta">
                         <input type="text" name="search" placeholder="Buscar..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
@@ -101,20 +101,5 @@ $ventas_data = getVentas($filters);
         </div>
     </main>
 </div>
-
-<style>
-.filter-container .filters {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: 15px;
-    padding-bottom: 1rem; /* Add some space below filters */
-}
-.filter-container .filters input,
-.filter-container .filters button,
-.filter-container .filters a {
-    margin: 0;
-}
-</style>
 
 <?php include_once __DIR__ . '/templates/footer.php'; ?>
