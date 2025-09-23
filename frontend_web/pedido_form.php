@@ -244,7 +244,9 @@ if ($is_pago_view) {
                                 <?php if ($order_data['estado'] !== 'completado'): ?>
                                     <button type="button" class="btn btn-completado status-btn" data-status="completado">Completar</button>
                                 <?php endif; ?>
-                                <button type="button" class="btn btn-cancelado status-btn" data-status="cancelado">Cancelar</button>
+                                <?php if ($order_data['estado'] !== 'cancelado'): ?>
+                                    <button type="button" class="btn btn-cancelado status-btn" data-status="cancelado">Cancelar</button>
+                                <?php endif; ?>
                             </div>
                         </fieldset>
                         <?php endif; ?>
