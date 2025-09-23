@@ -134,10 +134,11 @@ $ventas_data = getVentas($filters);
                                         </span>
                                     </td>
                                     <td data-label="Acciones" class="actions-cell">
-                                        <a href="venta_form.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-edit">Ver</a>
+                                        <a href="venta_form.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-edit" title="Ver Venta"><i class="bi bi-eye"></i></a>
                                         <?php if ($venta['estado'] === 'emitida'): ?>
-                                            <button type="button" class="btn btn-sm btn-cancelado btn-anular" data-id="<?php echo $venta['id']; ?>">Anular</button>
+                                            <button type="button" class="btn btn-sm btn-cancelado btn-anular" data-id="<?php echo $venta['id']; ?>" title="Anular Venta"><i class="bi bi-slash-circle"></i></button>
                                         <?php endif; ?>
+                                        <button type="button" class="btn btn-sm btn-delete btn-eliminar" data-id="<?php echo $venta['id']; ?>" title="Eliminar Venta"><i class="bi bi-trash"></i></button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -164,59 +165,70 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateDateFields() {
         const year = anioSelect.value;
         const month = mesSelect.value;
-
-        // Solo actualiza si ambos, año y mes, están seleccionados
         if (year && month) {
             const primerDia = `${year}-${month}-01`;
             const ultimoDia = new Date(year, month, 0).getDate();
             const fechaFin = `${year}-${month}-${ultimoDia}`;
-
             fechaInicioInput.value = primerDia;
             fechaFinInput.value = fechaFin;
         }
     }
-
     anioSelect.addEventListener('change', updateDateFields);
     mesSelect.addEventListener('change', updateDateFields);
 
+    const apiBaseUrl = '<?php echo API_BASE_URL; ?>';
+
     // Lógica para anular venta
-    const anularButtons = document.querySelectorAll('.btn-anular');
-    anularButtons.forEach(button => {
+    document.querySelectorAll('.btn-anular').forEach(button => {
         button.addEventListener('click', function() {
             const ventaId = this.dataset.id;
-
             if (confirm('¿Está seguro de que desea anular esta venta?')) {
-                const api_url = '<?php echo API_BASE_URL; ?>' + 'anular_venta.php';
-
-                fetch(api_url, {
+                fetch(`${apiBaseUrl}anular_venta.php`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ id_venta: ventaId })
                 })
                 .then(response => response.json().then(data => ({ status: response.status, body: data })))
                 .then(result => {
                     if (result.status === 200) {
-                        // Actualizar la UI
                         const row = this.closest('tr');
                         const statusCell = row.querySelector('.status');
                         if (statusCell) {
                             statusCell.classList.remove('status-emitida');
-                            statusCell.classList.add('status-cancelado'); // Re-usando la clase existente
+                            statusCell.classList.add('status-cancelado');
                             statusCell.textContent = 'Anulada';
                         }
-                        this.disabled = true;
-                        this.textContent = 'Anulado';
+                        this.remove(); // Eliminar el botón de anular
                         alert(result.body.message);
                     } else {
                         throw new Error(result.body.message || 'Error desconocido');
                     }
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error al anular la venta: ' + error.message);
-                });
+                .catch(error => alert('Error al anular la venta: ' + error.message));
+            }
+        });
+    });
+
+    // Lógica para eliminar venta
+    document.querySelectorAll('.btn-eliminar').forEach(button => {
+        button.addEventListener('click', function() {
+            const ventaId = this.dataset.id;
+            if (confirm('¿Está seguro de que desea ELIMINAR esta venta? Esta acción es irreversible.')) {
+                fetch(`${apiBaseUrl}eliminar_venta.php`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ id_venta: ventaId })
+                })
+                .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                .then(result => {
+                    if (result.status === 200) {
+                        this.closest('tr').remove();
+                        alert(result.body.message);
+                    } else {
+                        throw new Error(result.body.message || 'Error desconocido');
+                    }
+                })
+                .catch(error => alert('Error al eliminar la venta: ' + error.message));
             }
         });
     });
