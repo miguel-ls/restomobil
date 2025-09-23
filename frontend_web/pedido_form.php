@@ -187,12 +187,25 @@ if ($is_pago_view) {
                                 </div>
                             </div>
                             <div id="tab-client" class="tab-pane">
-                                <div class="form-group">
-                                    <label for="id_tipo_documento_venta">Tipo de Comprobante</label>
-                                    <select id="id_tipo_documento_venta" name="id_tipo_documento_venta">
-                                        <option value="">Seleccione...</option>
-                                    </select>
+                                <div class="form-group-row">
+                                    <div class="form-group" style="flex-grow: 1;">
+                                        <label for="id_tipo_documento_venta">Tipo de Comprobante</label>
+                                        <select id="id_tipo_documento_venta" name="id_tipo_documento_venta" <?php if ($is_paid) echo 'disabled'; ?>>
+                                            <option value="">Seleccione...</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="flex-grow: 1;">
+                                        <label for="id_serie_documento">Serie</label>
+                                        <select id="id_serie_documento" name="id_serie_documento" <?php if ($is_paid) echo 'disabled'; ?>>
+                                            <option value="">--</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="flex-grow: 1;">
+                                        <label for="numero_documento">Número</label>
+                                        <input type="text" id="numero_documento" name="numero_documento" readonly>
+                                    </div>
                                 </div>
+
                                 <div class="form-group">
                                     <label for="cliente_search">Buscar Cliente (Nombre o RUC)</label>
                                     <div style="display: flex; gap: 10px;">
@@ -462,7 +475,50 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    orderForm.addEventListener('submit', function(e) {
+    orderForm.addEventListener('submit', async function(e) {
+        e.preventDefault(); // Prevenir siempre el envío síncrono para manejarlo con JS
+
+        // --- Lógica de PAGO (cuando view=pago) ---
+        if (isPagoView) {
+            const serieSelect = document.getElementById('id_serie_documento');
+            if (!serieSelect.value) {
+                alert('Por favor, seleccione una serie para el comprobante.');
+                return;
+            }
+
+            const submitButton = this.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Procesando...';
+
+            const formData = new FormData();
+            formData.append('id_pedido', initialOrderData.id);
+            formData.append('id_serie_documento', serieSelect.value);
+
+            try {
+                const response = await fetch(`${apiBaseUrl}procesar_venta.php`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Error desconocido en el servidor.');
+                }
+
+                alert(`Venta generada con éxito. Número: ${result.numero_documento}`);
+                window.location.href = 'ventas.php';
+
+            } catch (error) {
+                console.error('Error al procesar el pago:', error);
+                alert('Error al procesar el pago: ' + error.message);
+                submitButton.disabled = false;
+                submitButton.textContent = 'Pagar';
+            }
+            return; // Detener la ejecución aquí para la vista de pago
+        }
+
+        // --- Lógica de CREACIÓN/EDICIÓN normal ---
         const tipoComprobanteSelect = document.getElementById('id_tipo_documento_venta');
         const selectedComprobante = tipoComprobanteSelect.options[tipoComprobanteSelect.selectedIndex];
 
@@ -472,14 +528,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const clienteDireccion = document.getElementById('cliente_direccion').value;
 
             if (!idCliente || !clienteNombre || !clienteDireccion) {
-                e.preventDefault();
                 alert('Para emitir una Factura, debe seleccionar un cliente con RUC, nombre y dirección.');
                 return;
             }
         } else if (document.getElementById('id_cliente').value) {
             const clienteNombre = document.getElementById('cliente_nombre').value;
             if (!clienteNombre) {
-                e.preventDefault();
                 alert('El campo nombre del cliente es obligatorio si se ha seleccionado un cliente.');
                 return;
             }
@@ -490,6 +544,9 @@ document.addEventListener('DOMContentLoaded', function() {
         itemsInput.name = 'items';
         itemsInput.value = JSON.stringify(Object.values(currentOrder));
         this.appendChild(itemsInput);
+
+        // Si todas las validaciones pasan, se envía el formulario
+        this.submit();
     });
 
     categoryFilters.addEventListener('click', function(e) {
@@ -515,6 +572,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Client tab logic
     const tipoComprobanteSelect = document.getElementById('id_tipo_documento_venta');
+    const serieDocumentoSelect = document.getElementById('id_serie_documento');
+
+    async function loadSeries(tipoDocId, selectedSerieId = null) {
+        serieDocumentoSelect.innerHTML = '<option value="">Cargando...</option>';
+        serieDocumentoSelect.disabled = true;
+
+        if (!tipoDocId) {
+            serieDocumentoSelect.innerHTML = '<option value="">--</option>';
+            return;
+        }
+
+        try {
+            const response = await fetch(`${apiBaseUrl}series_documentos.php?id_tipo_documento=${tipoDocId}`);
+            const data = await response.json();
+
+            serieDocumentoSelect.innerHTML = '<option value="">Seleccione...</option>';
+            if (data.records && data.records.length > 0) {
+                data.records.forEach(serie => {
+                    const option = document.createElement('option');
+                    option.value = serie.id;
+                    option.textContent = serie.serie;
+                    if (selectedSerieId && serie.id == selectedSerieId) {
+                        option.selected = true;
+                    }
+                    serieDocumentoSelect.appendChild(option);
+                });
+                serieDocumentoSelect.disabled = false;
+            } else {
+                 serieDocumentoSelect.innerHTML = '<option value="">No hay series</option>';
+            }
+        } catch (error) {
+            console.error('Error loading series:', error);
+            serieDocumentoSelect.innerHTML = '<option value="">Error</option>';
+        }
+    }
+
+    tipoComprobanteSelect.addEventListener('change', function() {
+        loadSeries(this.value);
+    });
+
     const clienteSearchInput = document.getElementById('cliente_search');
     const clienteSearchResults = document.getElementById('cliente_search_results');
     const idClienteInput = document.getElementById('id_cliente');
@@ -648,6 +745,11 @@ document.addEventListener('DOMContentLoaded', function() {
             loadSaleDocumentTypes(),
             loadIdentityDocumentTypes(clienteTipoDocIdentidadSelect)
         ]);
+
+        // Si hay un tipo de comprobante ya seleccionado al cargar, cargar sus series
+        if (tipoComprobanteSelect.value) {
+            await loadSeries(tipoComprobanteSelect.value);
+        }
 
         // Ahora que los <select> están poblados, podemos establecer los valores de forma segura
         if (isEditing && initialOrderData && initialOrderData.id_cliente) {
