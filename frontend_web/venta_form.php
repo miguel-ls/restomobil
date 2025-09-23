@@ -159,4 +159,4 @@ $is_anulada = ($venta_data && $venta_data['estado'] === 'anulada');
 input[readonly] { background-color: #e9ecef; opacity: 1; }
 </style>
 
-<?php include_once 'templates/footer.php'; ?>
+
