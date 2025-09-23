@@ -122,4 +122,4 @@ $ventas_data = getVentas($filters);
 }
 </style>
 
-<?php include_once __DIR__ . '/templates/footer.php'; ?>
+
