@@ -44,8 +44,7 @@ $ventas_data = getVentas($filters);
             </div>
 
             <div class="filter-container">
-                <form id="filter-form" method="GET" action="ventas.php" style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; padding-bottom: 1rem;">
-
+                <form id="filter-form" method="GET" action="ventas.php" style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 15px; padding-bottom: 1rem;">
                     <div class="filter-group">
                         <label for="filtro_anio">Año</label>
                         <select id="filtro_anio" name="filtro_anio">
@@ -58,7 +57,6 @@ $ventas_data = getVentas($filters);
                             ?>
                         </select>
                     </div>
-
                     <div class="filter-group">
                         <label for="filtro_mes">Mes</label>
                         <select id="filtro_mes" name="filtro_mes">
@@ -71,17 +69,14 @@ $ventas_data = getVentas($filters);
                             ?>
                         </select>
                     </div>
-
                     <div class="filter-group">
                         <label for="fecha_inicio">Fecha Inicio</label>
-                        <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?php echo htmlspecialchars($_GET['fecha_inicio'] ?? ''); ?>" title="Fecha desde">
+                        <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?php echo htmlspecialchars($_GET['fecha_inicio'] ?? ''); ?>">
                     </div>
-
                     <div class="filter-group">
                         <label for="fecha_fin">Fecha Fin</label>
-                        <input type="date" id="fecha_fin" name="fecha_fin" value="<?php echo htmlspecialchars($_GET['fecha_fin'] ?? ''); ?>" title="Fecha hasta">
+                        <input type="date" id="fecha_fin" name="fecha_fin" value="<?php echo htmlspecialchars($_GET['fecha_fin'] ?? ''); ?>">
                     </div>
-
                     <div class="filter-group">
                         <label for="estado">Estado</label>
                         <select id="estado" name="estado">
@@ -90,14 +85,16 @@ $ventas_data = getVentas($filters);
                             <option value="anulada" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'anulada') ? 'selected' : ''; ?>>Anulada</option>
                         </select>
                     </div>
-
-                    <div class="filter-group">
+                    <div class="filter-group" style="flex: 1;">
                         <label for="search">Buscar</label>
-                        <input type="text" id="search" name="search" placeholder="Cliente, Doc..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" style="flex: 1;">
+                        <input type="text" id="search" name="search" placeholder="Cliente, Doc..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
                     </div>
-
-                    <button type="submit" class="btn">Filtrar</button>
-                    <a href="ventas.php" class="btn btn-secondary">Limpiar</a>
+                    <div class="filter-group">
+                        <button type="submit" class="btn">Filtrar</button>
+                    </div>
+                    <div class="filter-group">
+                        <a href="ventas.php" class="btn btn-secondary">Limpiar</a>
+                    </div>
                 </form>
             </div>
 
