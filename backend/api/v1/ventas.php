@@ -90,6 +90,10 @@ try {
         $where_clauses[] = "(c.nombres_apellidos LIKE :search OR v.numero_documento LIKE :search OR sd.serie LIKE :search)";
         $params[':search'] = '%' . $_GET['search'] . '%';
     }
+    if (!empty($_GET['estado']) && $_GET['estado'] !== 'Todos') {
+        $where_clauses[] = "v.estado = :estado";
+        $params[':estado'] = $_GET['estado'];
+    }
 
     if (!empty($where_clauses)) {
         $query .= " WHERE " . implode(' AND ', $where_clauses);
