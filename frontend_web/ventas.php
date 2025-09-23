@@ -44,14 +44,12 @@ $ventas_data = getVentas($filters);
             </div>
 
             <div class="filter-container">
-                <form method="GET" action="ventas.php">
-                    <div class="filters" style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 15px;">
-                        <input type="date" name="fecha_inicio" value="<?php echo htmlspecialchars($_GET['fecha_inicio'] ?? ''); ?>" title="Fecha desde">
-                        <input type="date" name="fecha_fin" value="<?php echo htmlspecialchars($_GET['fecha_fin'] ?? ''); ?>" title="Fecha hasta">
-                        <input type="text" name="search" placeholder="Buscar..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
-                        <button type="submit" class="btn">Filtrar</button>
-                        <a href="ventas.php" class="btn btn-secondary">Limpiar</a>
-                    </div>
+                <form method="GET" action="ventas.php" style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 15px; padding-bottom: 1rem;">
+                    <input type="date" name="fecha_inicio" value="<?php echo htmlspecialchars($_GET['fecha_inicio'] ?? ''); ?>" title="Fecha desde">
+                    <input type="date" name="fecha_fin" value="<?php echo htmlspecialchars($_GET['fecha_fin'] ?? ''); ?>" title="Fecha hasta">
+                    <input type="text" name="search" placeholder="Buscar..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" style="flex: 1;">
+                    <button type="submit" class="btn">Filtrar</button>
+                    <a href="ventas.php" class="btn btn-secondary">Limpiar</a>
                 </form>
             </div>
 
@@ -101,5 +99,3 @@ $ventas_data = getVentas($filters);
         </div>
     </main>
 </div>
-
-<?php include_once __DIR__ . '/templates/footer.php'; ?>
