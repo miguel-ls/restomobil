@@ -208,10 +208,7 @@ if ($is_pago_view) {
 
                                 <div class="form-group">
                                     <label for="cliente_search">Buscar Cliente (Nombre o RUC)</label>
-                                    <div style="display: flex; gap: 10px;">
-                                        <input type="text" id="cliente_search" placeholder="Escriba para buscar..." style="flex-grow: 1;">
-                                        <button type="button" id="btn-sunat-main" class="btn" style="flex-shrink: 0;">Sunat</button>
-                                    </div>
+                                    <input type="text" id="cliente_search" placeholder="Escriba para buscar..." style="flex-grow: 1;">
                                     <div id="cliente_search_results"></div>
                                 </div>
                                 <input type="hidden" id="id_cliente" name="id_cliente" value="<?php echo htmlspecialchars($order_data['id_cliente'] ?? ''); ?>">
@@ -225,7 +222,10 @@ if ($is_pago_view) {
                                     </div>
                                     <div class="form-group" style="flex-grow: 2;">
                                         <label for="cliente_ruc">RUC / DNI</label>
-                                        <input type="text" id="cliente_ruc" name="cliente_ruc" value="<?php echo htmlspecialchars($order_data['ruc_cliente'] ?? ''); ?>">
+                                        <div style="display: flex; gap: 10px;">
+                                            <input type="text" id="cliente_ruc" name="cliente_ruc" value="<?php echo htmlspecialchars($order_data['ruc_cliente'] ?? ''); ?>" style="flex-grow: 1;">
+                                            <button type="button" id="btn-sunat-main" class="btn" style="flex-shrink: 0;">Sunat</button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -493,6 +493,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = new FormData();
             formData.append('id_pedido', initialOrderData.id);
             formData.append('id_serie_documento', serieSelect.value);
+            formData.append('id_tipo_documento_venta', document.getElementById('id_tipo_documento_venta').value);
+
 
             try {
                 const response = await fetch(`${apiBaseUrl}procesar_venta.php`, {
