@@ -113,6 +113,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function formatDateTime(isoString) {
+        const date = new Date(isoString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexados
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${day}/${month}/${year} ${hours}:${minutes}`;
+    }
+
     function renderTable(movimientos) {
         tbody.innerHTML = '';
         if (!movimientos || movimientos.length === 0) {
@@ -126,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const importeSign = mov.tipo_movimiento === 'entrada' ? '+' : '-';
 
             tr.innerHTML = `
-                <td data-label="Fecha">${new Date(mov.fecha).toLocaleString()}</td>
+                <td data-label="Fecha">${formatDateTime(mov.fecha)}</td>
                 <td data-label="Tipo">${mov.tipo_movimiento.charAt(0).toUpperCase() + mov.tipo_movimiento.slice(1)}</td>
                 <td data-label="Importe" class="${importeClass}">${importeSign} <?php echo CURRENCY_SYMBOL; ?>${parseFloat(mov.importe).toFixed(2)}</td>
                 <td data-label="Descripción">${mov.descripcion || ''}</td>
@@ -251,5 +261,17 @@ document.addEventListener('DOMContentLoaded', function() {
     font-weight: bold;
     background-color: #007bff;
     color: white;
+}
+.filter-container .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+.filter-container .filters input,
+.filter-container .filters select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 </style>
