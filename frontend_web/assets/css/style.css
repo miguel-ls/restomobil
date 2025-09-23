@@ -226,13 +226,14 @@ table th { background-color: var(--light-bg); font-weight: 600; }
     text-transform: capitalize;
 }
 
-/* Pedidos */
+/* Pedidos y Ventas */
 .status-recibido { background-color: #cfe2ff; color: #0a58ca; }
 .status-en_preparacion { background-color: #fff3cd; color: #664d03; }
 .status-listo_para_servir { background-color: #d1e7dd; color: #0f5132; }
 .status-abierto { background-color: #cfe2ff; color: #0a58ca; } /* Usando el mismo color que recibido para 'Abierto' */
 .status-completado { background-color: #d4edda; color: #155724; }
-.status-cancelado { background-color: #f8d7da; color: #842029; }
+.status-emitida { background-color: #d4edda; color: #155724; } /* Verde para ventas emitidas */
+.status-cancelado, .status-anulada { background-color: #f8d7da; color: #842029; } /* Rojo para cancelado/anulado */
 
 /* Mesas */
 .status-disponible { background-color: #d1e7dd; color: #0f5132; }
