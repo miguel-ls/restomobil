@@ -123,6 +123,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function formatCustomDateTime(isoString) {
+        const date = new Date(isoString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexados
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${day}/${month}/${year} ${hours}:${minutes}`;
+    }
+
     function renderOrders(orders) {
         orderCardsContainer.innerHTML = '';
         if (!orders || orders.length === 0) {
@@ -154,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="card-body">
                     <p><strong>Mesa:</strong> ${order.numero_mesa || 'N/A'}</p>
                     <p><strong>Mozo:</strong> ${order.nombre_mozo || 'N/A'}</p>
-                    <p><strong>Fecha:</strong> ${new Date(order.fecha_creacion).toLocaleString('es-ES')}</p>
+                    <p><strong>Fecha:</strong> ${formatCustomDateTime(order.fecha_creacion)}</p>
                     <p class="total"><strong>Total:</strong> <?php echo CURRENCY_SYMBOL; ?>${parseFloat(order.total).toFixed(2)}</p>
                 </div>
                 <div class="card-footer">
