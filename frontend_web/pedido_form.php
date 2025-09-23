@@ -610,6 +610,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
     tipoComprobanteSelect.addEventListener('change', function() {
         loadSeries(this.value);
+        // Limpiar el número de documento cuando cambia el tipo
+        document.getElementById('numero_documento').value = '';
+    });
+
+    serieDocumentoSelect.addEventListener('change', async function() {
+        const serieId = this.value;
+        const numeroDocumentoInput = document.getElementById('numero_documento');
+
+        if (!serieId) {
+            numeroDocumentoInput.value = '';
+            return;
+        }
+
+        numeroDocumentoInput.value = 'Cargando...';
+
+        try {
+            const response = await fetch(`${apiBaseUrl}correlativo_serie.php?id_serie_documento=${serieId}`);
+            if (!response.ok) throw new Error('Respuesta de red no fue OK');
+            const data = await response.json();
+
+            if (data.next_correlativo) {
+                numeroDocumentoInput.value = String(data.next_correlativo).padStart(8, '0');
+            } else {
+                numeroDocumentoInput.value = 'Error';
+            }
+        } catch (error) {
+            console.error('Error fetching correlativo:', error);
+            numeroDocumentoInput.value = 'Error al cargar';
+        }
     });
 
     const clienteSearchInput = document.getElementById('cliente_search');
