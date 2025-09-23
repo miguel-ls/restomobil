@@ -265,13 +265,21 @@ document.addEventListener('DOMContentLoaded', function() {
 .filter-container .filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 10px; /* Reducir el espacio para un look más compacto */
     align-items: center;
 }
 .filter-container .filters input,
-.filter-container .filters select {
+.filter-container .filters select,
+.filter-container .filters button {
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+.filter-container .filters input[type="date"] {
+    width: auto; /* El navegador determinará el ancho */
     padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+}
+.filter-container .filters select {
+    width: 150px; /* Ancho fijo para el desplegable */
+    padding: 8px;
 }
 </style>
