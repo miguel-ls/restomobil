@@ -1,4 +1,19 @@
+/*
+ * CSS para impresión de tickets.
+ * Este archivo se incluye en `templates/header.php` con media="print".
+ * Se utiliza para dar formato a la vista de impresión en `venta_form.php`.
+ */
 @media print {
+    /*
+     * Define el tamaño del papel para la impresión.
+     * `80mm` es el ancho estándar para impresoras de recibos térmicos.
+     * `auto` permite que la altura se ajuste al contenido del recibo.
+     */
+    @page {
+        size: 80mm auto;
+        margin: 0;
+    }
+
     /* Ocultar todo por defecto */
     body * {
         visibility: hidden;
