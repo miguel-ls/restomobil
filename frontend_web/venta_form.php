@@ -47,106 +47,106 @@ $is_anulada = ($venta_data && $venta_data['estado'] === 'anulada');
                 <h1><?php echo $page_title; ?></h1>
             </div>
 
-            <form id="venta-form" method="POST" action="venta_handler.php?id=<?php echo $venta_id; ?>">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Datos del Comprobante</h3>
-                        <?php if ($is_editing && isset($venta_data['estado'])): ?>
-                            <span class="status status-<?php echo htmlspecialchars($venta_data['estado']); ?>">
-                                <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $venta_data['estado']))); ?>
-                            </span>
-                        <?php endif; ?>
-                    </div>
-                    <div class="card-body">
-                         <div class="form-group-row">
-                            <div class="form-group" style="flex-grow: 1;">
-                                <label>Tipo de Comprobante</label>
-                                <input type="text" value="<?php echo htmlspecialchars($venta_data['tipo_documento'] ?? ''); ?>" readonly>
-                            </div>
-                            <div class="form-group" style="flex-grow: 1;">
-                                <label>Serie</label>
-                                <input type="text" value="<?php echo htmlspecialchars($venta_data['serie'] ?? ''); ?>" readonly>
-                            </div>
-                            <div class="form-group" style="flex-grow: 1;">
-                                <label>Número</label>
-                                <input type="text" value="<?php echo htmlspecialchars($venta_data['numero_documento'] ?? ''); ?>" readonly>
-                            </div>
-                             <div class="form-group" style="flex-grow: 1;">
-                                <label>Fecha de Emisión</label>
-                                <input type="text" value="<?php echo htmlspecialchars(date("d/m/Y H:i", strtotime($venta_data['fecha_emision']))); ?>" readonly>
+            <div id="printable-receipt">
+                <form id="venta-form" method="POST" action="venta_handler.php?id=<?php echo $venta_id; ?>">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Datos del Comprobante</h3>
+                            <?php if ($is_editing && isset($venta_data['estado'])): ?>
+                                <span class="status status-<?php echo htmlspecialchars($venta_data['estado']); ?>">
+                                    <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $venta_data['estado']))); ?>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group-row">
+                                <div class="form-group" style="flex-grow: 1;">
+                                    <label>Tipo de Comprobante</label>
+                                    <input type="text" value="<?php echo htmlspecialchars($venta_data['tipo_documento'] ?? ''); ?>" readonly>
+                                </div>
+                                <div class="form-group" style="flex-grow: 1;">
+                                    <label>Serie</label>
+                                    <input type="text" value="<?php echo htmlspecialchars($venta_data['serie'] ?? ''); ?>" readonly>
+                                </div>
+                                <div class="form-group" style="flex-grow: 1;">
+                                    <label>Número</label>
+                                    <input type="text" value="<?php echo htmlspecialchars($venta_data['numero_documento'] ?? ''); ?>" readonly>
+                                </div>
+                                <div class="form-group" style="flex-grow: 1;">
+                                    <label>Fecha de Emisión</label>
+                                    <input type="text" value="<?php echo htmlspecialchars(date("d/m/Y H:i", strtotime($venta_data['fecha_emision']))); ?>" readonly>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3>Datos del Cliente</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label>Nombre del Cliente</label>
-                            <input type="text" value="<?php echo htmlspecialchars($venta_data['nombre_cliente'] ?? 'Varios'); ?>" readonly>
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h3>Datos del Cliente</h3>
                         </div>
-                        <div class="form-group-row">
-                            <div class="form-group" style="flex-grow: 2;">
-                                <label>RUC / DNI</label>
-                                <input type="text" value="<?php echo htmlspecialchars($venta_data['ruc_cliente'] ?? ''); ?>" readonly>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Nombre del Cliente</label>
+                                <input type="text" value="<?php echo htmlspecialchars($venta_data['nombre_cliente'] ?? 'Varios'); ?>" readonly>
                             </div>
-                            <div class="form-group" style="flex-grow: 3;">
-                                <label>Dirección</label>
-                                <input type="text" value="<?php echo htmlspecialchars($venta_data['direccion_cliente'] ?? ''); ?>" readonly>
+                            <div class="form-group-row">
+                                <div class="form-group" style="flex-grow: 2;">
+                                    <label>RUC / DNI</label>
+                                    <input type="text" value="<?php echo htmlspecialchars($venta_data['ruc_cliente'] ?? ''); ?>" readonly>
+                                </div>
+                                <div class="form-group" style="flex-grow: 3;">
+                                    <label>Dirección</label>
+                                    <input type="text" value="<?php echo htmlspecialchars($venta_data['direccion_cliente'] ?? ''); ?>" readonly>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3>Detalle de la Venta</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Producto</th>
-                                        <th>Cantidad</th>
-                                        <th>Precio Unit.</th>
-                                        <th>Subtotal</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (!empty($venta_data['items'])): ?>
-                                        <?php foreach ($venta_data['items'] as $item): ?>
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h3>Detalle de la Venta</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
                                         <tr>
-                                            <td><?php echo htmlspecialchars($item['nombre_producto']); ?></td>
-                                            <td><?php echo htmlspecialchars($item['cantidad']); ?></td>
-                                            <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['precio_unitario'], 2)); ?></td>
-                                            <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['subtotal'], 2)); ?></td>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio Unit.</th>
+                                            <th>Subtotal</th>
                                         </tr>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th colspan="3" style="text-align: right;">Total:</th>
-                                        <th><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta_data['total'], 2)); ?></th>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        <?php if (!empty($venta_data['items'])): ?>
+                                            <?php foreach ($venta_data['items'] as $item): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($item['nombre_producto']); ?></td>
+                                                <td><?php echo htmlspecialchars($item['cantidad']); ?></td>
+                                                <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['precio_unitario'], 2)); ?></td>
+                                                <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['subtotal'], 2)); ?></td>
+                                            </tr>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="3" style="text-align: right;">Total:</th>
+                                            <th><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta_data['total'], 2)); ?></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="form-actions mt-4">
-                    <a href="ventas.php" class="btn btn-secondary">Volver a la Lista</a>
-                    <?php if (!$is_anulada): ?>
-                        <!-- Aquí se podrían agregar acciones futuras como "Imprimir" o "Enviar por Email" -->
-                        <a href="reimprimir_venta.php?id=<?php echo $venta_id; ?>" class="btn">Imprimir</a>
-                    <?php endif; ?>
-                </div>
-            </form>
+                </form>
+            </div>
+            <div class="form-actions mt-4">
+                <a href="ventas.php" class="btn btn-secondary">Volver a la Lista</a>
+                <?php if (!$is_anulada): ?>
+                    <button type="button" class="btn" onclick="window.print();">Imprimir</button>
+                <?php endif; ?>
+            </div>
         </div>
     </main>
 </div>
