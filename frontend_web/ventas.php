@@ -136,7 +136,7 @@ $ventas_data = getVentas($filters);
                                     <td data-label="Acciones" class="actions-cell">
                                         <a href="venta_form.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-edit">Ver</a>
                                         <?php if ($venta['estado'] === 'emitida'): ?>
-                                            <a href="venta_anular_handler.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-cancelado" onclick="return confirm('¿Está seguro de que desea anular esta venta?');">Anular</a>
+                                            <button type="button" class="btn btn-sm btn-cancelado btn-anular" data-id="<?php echo $venta['id']; ?>">Anular</button>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -155,6 +155,7 @@ $ventas_data = getVentas($filters);
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Lógica de filtros existente
     const anioSelect = document.getElementById('filtro_anio');
     const mesSelect = document.getElementById('filtro_mes');
     const fechaInicioInput = document.getElementById('fecha_inicio');
@@ -178,8 +179,47 @@ document.addEventListener('DOMContentLoaded', function() {
     anioSelect.addEventListener('change', updateDateFields);
     mesSelect.addEventListener('change', updateDateFields);
 
-    // Al cargar la página, si no hay filtros aplicados, la lógica de PHP ya ha establecido los valores por defecto.
-    // El JS no necesita hacer nada extra.
+    // Lógica para anular venta
+    const anularButtons = document.querySelectorAll('.btn-anular');
+    anularButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const ventaId = this.dataset.id;
+
+            if (confirm('¿Está seguro de que desea anular esta venta?')) {
+                const api_url = '<?php echo API_BASE_URL; ?>' + 'anular_venta.php';
+
+                fetch(api_url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id_venta: ventaId })
+                })
+                .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                .then(result => {
+                    if (result.status === 200) {
+                        // Actualizar la UI
+                        const row = this.closest('tr');
+                        const statusCell = row.querySelector('.status');
+                        if (statusCell) {
+                            statusCell.classList.remove('status-emitida');
+                            statusCell.classList.add('status-cancelado'); // Re-usando la clase existente
+                            statusCell.textContent = 'Anulada';
+                        }
+                        this.disabled = true;
+                        this.textContent = 'Anulado';
+                        alert(result.body.message);
+                    } else {
+                        throw new Error(result.body.message || 'Error desconocido');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al anular la venta: ' + error.message);
+                });
+            }
+        });
+    });
 });
 </script>
 
