@@ -102,24 +102,4 @@ $ventas_data = getVentas($filters);
     </main>
 </div>
 
-<style>
-.form-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    align-items: flex-end;
-}
-.filter-group {
-    display: flex;
-    flex-direction: column;
-}
-.filter-group label {
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-.filter-group input, .filter-group .btn {
-    height: 38px; /* Align height with buttons */
-}
-</style>
-
 <?php include_once __DIR__ . '/templates/footer.php'; ?>
