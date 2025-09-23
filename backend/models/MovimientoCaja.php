@@ -10,7 +10,8 @@ class MovimientoCaja {
     }
 
     public function readAll($filters = [], $page = 1, $page_size = 10) {
-        $query = "SELECT m.id, m.fecha, m.tipo_movimiento, m.importe, m.descripcion, m.usuario_id, u.nombre_completo as usuario_nombre
+        $query = "SELECT m.id, m.fecha, m.tipo_movimiento, m.importe, m.descripcion, m.usuario_id, u.nombre_completo as usuario_nombre,
+                         (SELECT COUNT(*) FROM apertura_cierre_caja acc WHERE acc.fecha_movimiento = DATE(m.fecha) AND acc.tipo_movimiento = 'cierre') > 0 as is_closed
                   FROM " . $this->table_name . " m
                   LEFT JOIN usuarios u ON m.usuario_id = u.id";
         $where_clauses = [];
