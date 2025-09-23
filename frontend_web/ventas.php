@@ -43,34 +43,20 @@ $ventas_data = getVentas($filters);
                 <a href="caja.php" class="btn">Ir a Caja para Pagar</a>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h4>Filtros</h4>
-                </div>
-                <div class="card-body">
-                    <form method="GET" action="ventas.php" class="form-filters">
-                        <div class="filter-group">
-                            <label for="fecha_inicio">Desde:</label>
-                            <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?php echo htmlspecialchars($_GET['fecha_inicio'] ?? ''); ?>">
-                        </div>
-                        <div class="filter-group">
-                            <label for="fecha_fin">Hasta:</label>
-                            <input type="date" id="fecha_fin" name="fecha_fin" value="<?php echo htmlspecialchars($_GET['fecha_fin'] ?? ''); ?>">
-                        </div>
-                        <div class="filter-group">
-                            <label for="search">Buscar:</label>
-                            <input type="text" id="search" name="search" placeholder="Cliente, Serie, Número..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
-                        </div>
-                        <div class="filter-group">
-                            <button type="submit" class="btn">Filtrar</button>
-                            <a href="ventas.php" class="btn btn-secondary">Limpiar</a>
-                        </div>
-                    </form>
-                </div>
+            <div class="filter-container">
+                <form method="GET" action="ventas.php">
+                    <div class="filters">
+                        <input type="date" name="fecha_inicio" value="<?php echo htmlspecialchars($_GET['fecha_inicio'] ?? ''); ?>" title="Fecha desde">
+                        <input type="date" name="fecha_fin" value="<?php echo htmlspecialchars($_GET['fecha_fin'] ?? ''); ?>" title="Fecha hasta">
+                        <input type="text" name="search" placeholder="Buscar..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
+                        <button type="submit" class="btn">Filtrar</button>
+                        <a href="ventas.php" class="btn btn-secondary">Limpiar</a>
+                    </div>
+                </form>
             </div>
 
-            <div class="table-responsive">
-                <table class="table">
+            <div class="table-container">
+                <table>
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -86,18 +72,18 @@ $ventas_data = getVentas($filters);
                         <?php if (isset($ventas_data['records']) && !empty($ventas_data['records'])): ?>
                             <?php foreach ($ventas_data['records'] as $venta): ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($venta['id']); ?></td>
-                                    <td><?php echo htmlspecialchars(date("d/m/Y H:i", strtotime($venta['fecha_emision']))); ?></td>
-                                    <td><?php echo htmlspecialchars($venta['nombre_cliente'] ?? 'Varios'); ?></td>
-                                    <td><?php echo htmlspecialchars($venta['tipo_documento'] . ' ' . $venta['serie'] . '-' . $venta['numero_documento']); ?></td>
-                                    <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta['total'], 2)); ?></td>
-                                    <td>
+                                    <td data-label="ID"><?php echo htmlspecialchars($venta['id']); ?></td>
+                                    <td data-label="Fecha Emisión"><?php echo htmlspecialchars(date("d/m/Y H:i", strtotime($venta['fecha_emision']))); ?></td>
+                                    <td data-label="Cliente"><?php echo htmlspecialchars($venta['nombre_cliente'] ?? 'Varios'); ?></td>
+                                    <td data-label="Documento"><?php echo htmlspecialchars($venta['tipo_documento'] . ' ' . $venta['serie'] . '-' . $venta['numero_documento']); ?></td>
+                                    <td data-label="Total"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta['total'], 2)); ?></td>
+                                    <td data-label="Estado">
                                         <span class="status status-<?php echo htmlspecialchars($venta['estado']); ?>">
                                             <?php echo htmlspecialchars(ucfirst($venta['estado'])); ?>
                                         </span>
                                     </td>
-                                    <td>
-                                        <a href="venta_form.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-edit">Editar</a>
+                                    <td data-label="Acciones" class="actions-cell">
+                                        <a href="venta_form.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-edit">Ver</a>
                                         <?php if ($venta['estado'] === 'emitida'): ?>
                                             <a href="venta_anular_handler.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-cancelado" onclick="return confirm('¿Está seguro de que desea anular esta venta?');">Anular</a>
                                         <?php endif; ?>
@@ -136,4 +122,4 @@ $ventas_data = getVentas($filters);
 }
 </style>
 
-<?php include_once 'templates/footer.php'; ?>
+<?php include_once __DIR__ . '/templates/footer.php'; ?>
