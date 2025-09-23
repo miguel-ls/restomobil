@@ -129,20 +129,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    if (!isEditing) {
-        fechaInput.addEventListener('change', validateDate);
-        validateDate(); // Validar la fecha inicial al cargar
-    }
+    // Validar siempre, tanto en creación como en edición
+    fechaInput.addEventListener('change', validateDate);
+    validateDate(); // Validar la fecha inicial al cargar
 
     form.addEventListener('submit', async function(e) {
-        if (isEditing) return; // No validar en modo edición desde aquí
-
         const fechaValue = fechaInput.value.split('T')[0];
         const isClosed = await checkIfDateIsClosed(fechaValue);
 
         if (isClosed) {
             e.preventDefault();
-            alert('La fecha está cerrada y no se puede guardar el movimiento.');
+            alert('La fecha seleccionada está cerrada y no se puede guardar el movimiento.');
             toggleSubmitButton(false, 'La fecha seleccionada está cerrada y no se pueden realizar cambios.');
         }
     });

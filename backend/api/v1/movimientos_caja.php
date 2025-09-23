@@ -74,6 +74,12 @@ switch ($request_method) {
                 echo json_encode(["message" => "La fecha del movimiento original está cerrada. No se puede actualizar."]);
                 break;
             }
+            // Adicionalmente, verificar si la nueva fecha a la que se mueve está cerrada
+            if ($aperturaCierre->isDateClosed($data->fecha)) {
+                http_response_code(403);
+                echo json_encode(["message" => "La nueva fecha a la que intenta mover el movimiento está cerrada."]);
+                break;
+            }
             if ($movimientoCaja->update($data->id, $data->fecha, $data->tipo_movimiento, $data->importe, $data->descripcion ?? '')) {
                 http_response_code(200);
                 echo json_encode(["message" => "Movimiento actualizado."]);

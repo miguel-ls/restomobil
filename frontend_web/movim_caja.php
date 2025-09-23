@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const importeSign = mov.tipo_movimiento === 'entrada' ? '+' : '-';
 
             let actionButtons = '';
-            if (!mov.is_closed) {
+            if (mov.is_closed == 0) {
                 actionButtons = `
                     <a href="movimiento_caja_form.php?id=${mov.id}" class="btn btn-edit">Editar</a>
                     <button class="btn btn-delete" data-id="${mov.id}">Eliminar</button>
