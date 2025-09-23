@@ -1,0 +1,90 @@
+@media print {
+    /* Ocultar todo por defecto */
+    body * {
+        visibility: hidden;
+    }
+
+    /* Hacer visible solo el contenedor del recibo y su contenido */
+    #printable-receipt, #printable-receipt * {
+        visibility: visible;
+    }
+
+    /* Posicionar el recibo en la esquina superior izquierda de la página */
+    #printable-receipt {
+        position: absolute;
+        left: 0;
+        top: 0;
+        margin: 0;
+        padding: 0;
+        width: 80mm; /* Ancho típico para impresoras de tickets */
+        font-family: 'Courier New', Courier, monospace; /* Fuente de ancho fijo para apariencia de ticket */
+        font-size: 10pt;
+        color: #000;
+    }
+
+    /* Estilos para el contenido del recibo */
+    #printable-receipt .card {
+        border: none;
+        box-shadow: none;
+        margin: 0;
+        padding: 5px;
+    }
+
+    #printable-receipt .card-header h3 {
+        font-size: 12pt;
+        font-weight: bold;
+        text-align: center;
+        margin: 10px 0;
+        width: 100%;
+    }
+
+    #printable-receipt .status {
+        display: none; /* No imprimir el estado en el ticket */
+    }
+
+    #printable-receipt .form-group label {
+        font-size: 9pt;
+        font-weight: bold;
+        margin-bottom: 2px;
+    }
+
+    #printable-receipt .form-group input[readonly] {
+        border: none;
+        background-color: transparent;
+        padding: 1px;
+        font-family: inherit;
+        font-size: 10pt;
+    }
+
+    #printable-receipt .form-group-row {
+        flex-wrap: wrap;
+    }
+
+    #printable-receipt .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    #printable-receipt .table th,
+    #printable-receipt .table td {
+        padding: 2px;
+        font-size: 9pt;
+        border-bottom: 1px dashed #666;
+    }
+
+    #printable-receipt .table th {
+        text-align: left;
+    }
+
+    #printable-receipt .table tfoot th,
+    #printable-receipt .table tfoot td {
+        font-weight: bold;
+        font-size: 11pt;
+        border-top: 1px solid #000;
+    }
+
+    /* No imprimir botones de acción */
+    .form-actions {
+        display: none;
+    }
+}
