@@ -9,17 +9,6 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $page_title = 'Pedidos Finalizados';
 include_once 'templates/header.php';
 include_once __DIR__ . '/config.php';
-
-function getCompletedOrders() {
-    $api_url = API_BASE_URL . 'pedidos.php?estado=completado,cancelado';
-    $ch = curl_init($api_url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    $response = curl_exec($ch);
-    curl_close($ch);
-    return json_decode($response, true);
-}
-
-$orders_data = getCompletedOrders();
 ?>
 
 <div class="dashboard-container">
@@ -32,6 +21,25 @@ $orders_data = getCompletedOrders();
                 <a href="pedido_form.php?view=caja_create" class="btn">Crear Pedido Nuevo</a>
             </div>
 
+            <div class="filter-container">
+                <form id="filter-form">
+                    <div class="filters">
+                        <select id="filter-year" name="year"></select>
+                        <select id="filter-month" name="month"></select>
+                        <input type="date" id="filter-start-date" name="start_date" title="Fecha desde">
+                        <input type="date" id="filter-end-date" name="end_date" title="Fecha hasta">
+                        <select id="filter-status" name="status">
+                            <option value="">Todos los Estados</option>
+                            <option value="recibido">Recibido</option>
+                            <option value="completado">Completado</option>
+                            <option value="cancelado">Cancelado</option>
+                            <option value="pagado">Pagado</option>
+                        </select>
+                        <button type="submit" class="btn">Filtrar</button>
+                    </div>
+                </form>
+            </div>
+
             <?php
             if (isset($_GET['success'])) {
                 echo '<p class="success-message">' . htmlspecialchars($_GET['success']) . '</p>';
@@ -41,37 +49,137 @@ $orders_data = getCompletedOrders();
             }
             ?>
 
-            <div class="order-cards-container">
-                <?php if (isset($orders_data['records']) && !empty($orders_data['records'])): ?>
-                    <?php foreach ($orders_data['records'] as $order): ?>
-                        <div class="order-card">
-                            <div class="card-header">
-                                <strong>Pedido #<?php echo htmlspecialchars($order['id']); ?></strong>
-                                <span class="status status-<?php echo htmlspecialchars($order['estado']); ?>">
-                                    <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $order['estado']))); ?>
-                                </span>
-                            </div>
-                            <div class="card-body">
-                                <p><strong>Mesa:</strong> <?php echo htmlspecialchars($order['numero_mesa'] ?? 'N/A'); ?></p>
-                                <p><strong>Mozo:</strong> <?php echo htmlspecialchars($order['nombre_mozo'] ?? 'N/A'); ?></p>
-                                <p><strong>Fecha:</strong> <?php echo htmlspecialchars(date("d/m/Y H:i", strtotime($order['fecha_creacion']))); ?></p>
-                                <p class="total"><strong>Total:</strong> <?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($order['total'], 2)); ?></p>
-                            </div>
-                            <div class="card-footer">
-                                <?php if ($order['estado'] == 'completado'): ?>
-                                    <a href="pedido_form.php?id=<?php echo $order['id']; ?>&view=pago" class="btn-card btn-edit">Pagar</a>
-                                <?php elseif ($order['estado'] == 'cancelado'): ?>
-                                    <a href="pedido_form.php?id=<?php echo $order['id']; ?>&view=pago" class="btn-card btn-edit" style="background-color: green; color: white;">Editar</a>
-                                <?php elseif ($order['estado'] == 'pagado'): ?>
-                                    <a href="pedido_form.php?id=<?php echo $order['id']; ?>&view=pago" class="btn-card btn-view">Ver Detalle</a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p>No se encontraron pedidos completados o cancelados.</p>
-                <?php endif; ?>
+            <div id="order-cards-container" class="order-cards-container">
+                <!-- Las tarjetas de pedidos se cargarán aquí dinámicamente -->
             </div>
         </div>
     </main>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const API_URL = '<?php echo API_BASE_URL; ?>pedidos.php';
+    const yearSelect = document.getElementById('filter-year');
+    const monthSelect = document.getElementById('filter-month');
+    const startDateInput = document.getElementById('filter-start-date');
+    const endDateInput = document.getElementById('filter-end-date');
+    const statusSelect = document.getElementById('filter-status');
+    const filterForm = document.getElementById('filter-form');
+    const orderCardsContainer = document.getElementById('order-cards-container');
+
+    function populateYears() {
+        const currentYear = new Date().getFullYear();
+        for (let year = currentYear; year >= currentYear - 5; year--) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            yearSelect.appendChild(option);
+        }
+    }
+
+    function populateMonths() {
+        const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        months.forEach((month, index) => {
+            const option = document.createElement('option');
+            option.value = index + 1;
+            option.textContent = month;
+            monthSelect.appendChild(option);
+        });
+    }
+
+    function updateDateFields() {
+        const year = yearSelect.value;
+        const month = monthSelect.value;
+        if (year && month) {
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 0);
+            startDateInput.value = startDate.toISOString().split('T')[0];
+            endDateInput.value = endDate.toISOString().split('T')[0];
+        }
+    }
+
+    async function fetchOrders() {
+        const year = yearSelect.value;
+        const month = monthSelect.value;
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        const status = statusSelect.value;
+
+        let queryParams = `?`;
+        if (status) queryParams += `estado=${status}&`;
+        if (startDate) queryParams += `start_date=${startDate}&`;
+        if (endDate) queryParams += `end_date=${endDate}&`;
+
+        // Remove trailing '&' or '?'
+        queryParams = queryParams.length > 1 ? queryParams.slice(0, -1) : '';
+
+        try {
+            const response = await fetch(API_URL + queryParams);
+            const data = await response.json();
+            renderOrders(data.records);
+        } catch (error) {
+            console.error('Error al obtener los pedidos:', error);
+            orderCardsContainer.innerHTML = '<p>Error al cargar los datos. Por favor, intente de nuevo.</p>';
+        }
+    }
+
+    function renderOrders(orders) {
+        orderCardsContainer.innerHTML = '';
+        if (!orders || orders.length === 0) {
+            orderCardsContainer.innerHTML = '<p>No se encontraron pedidos que coincidan con los filtros.</p>';
+            return;
+        }
+
+        orders.forEach(order => {
+            const card = document.createElement('div');
+            card.className = 'order-card';
+
+            const statusClass = `status-${order.estado || 'desconocido'}`;
+            const statusText = (order.estado || 'desconocido').replace('_', ' ');
+
+            let footerButtons = '';
+            if (order.estado === 'completado') {
+                footerButtons = `<a href="pedido_form.php?id=${order.id}&view=pago" class="btn-card btn-edit">Pagar</a>`;
+            } else if (order.estado === 'cancelado') {
+                footerButtons = `<a href="pedido_form.php?id=${order.id}&view=pago" class="btn-card btn-edit" style="background-color: green; color: white;">Editar</a>`;
+            } else if (order.estado === 'pagado') {
+                 footerButtons = `<a href="pedido_form.php?id=${order.id}&view=pago" class="btn-card btn-view">Ver Detalle</a>`;
+            }
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <strong>Pedido #${order.id}</strong>
+                    <span class="status ${statusClass}">${statusText.charAt(0).toUpperCase() + statusText.slice(1)}</span>
+                </div>
+                <div class="card-body">
+                    <p><strong>Mesa:</strong> ${order.numero_mesa || 'N/A'}</p>
+                    <p><strong>Mozo:</strong> ${order.nombre_mozo || 'N/A'}</p>
+                    <p><strong>Fecha:</strong> ${new Date(order.fecha_creacion).toLocaleString('es-ES')}</p>
+                    <p class="total"><strong>Total:</strong> <?php echo CURRENCY_SYMBOL; ?>${parseFloat(order.total).toFixed(2)}</p>
+                </div>
+                <div class="card-footer">
+                    ${footerButtons}
+                </div>
+            `;
+            orderCardsContainer.appendChild(card);
+        });
+    }
+
+    // Event Listeners
+    yearSelect.addEventListener('change', updateDateFields);
+    monthSelect.addEventListener('change', updateDateFields);
+    filterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        fetchOrders();
+    });
+
+    // Initial setup
+    populateYears();
+    populateMonths();
+    const today = new Date();
+    yearSelect.value = today.getFullYear();
+    monthSelect.value = today.getMonth() + 1;
+    updateDateFields();
+    fetchOrders(); // Carga inicial
+});
+</script>

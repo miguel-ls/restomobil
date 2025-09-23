@@ -10,10 +10,8 @@ session_start();
 include_once __DIR__ . '/../../config/app_config.php';
 include_once __DIR__ . '/../../core/Database.php';
 include_once __DIR__ . '/../../models/MovimientoCaja.php';
-include_once __DIR__ . '/../../models/AperturaCierre.php';
 
 $movimientoCaja = new MovimientoCaja();
-$aperturaCierre = new AperturaCierre();
 $request_method = $_SERVER["REQUEST_METHOD"];
 
 switch ($request_method) {
@@ -41,11 +39,6 @@ switch ($request_method) {
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
         if (!empty($data->fecha) && !empty($data->tipo_movimiento) && isset($data->importe) && isset($_SESSION['user_id'])) {
-            if ($aperturaCierre->isDateClosed($data->fecha)) {
-                http_response_code(403);
-                echo json_encode(["message" => "La fecha seleccionada está cerrada. No se pueden agregar nuevos movimientos."]);
-                break;
-            }
             $new_id = $movimientoCaja->create($data->fecha, $data->tipo_movimiento, $data->importe, $data->descripcion ?? '', $_SESSION['user_id']);
             if ($new_id) {
                 http_response_code(201);
@@ -63,23 +56,6 @@ switch ($request_method) {
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
         if (!empty($data->id) && !empty($data->fecha) && !empty($data->tipo_movimiento) && isset($data->importe)) {
-            $movimiento_actual = $movimientoCaja->readOne($data->id);
-            if (!$movimiento_actual) {
-                http_response_code(404);
-                echo json_encode(["message" => "Movimiento no encontrado."]);
-                break;
-            }
-            if ($aperturaCierre->isDateClosed($movimiento_actual['fecha'])) {
-                http_response_code(403);
-                echo json_encode(["message" => "La fecha del movimiento original está cerrada. No se puede actualizar."]);
-                break;
-            }
-            // Adicionalmente, verificar si la nueva fecha a la que se mueve está cerrada
-            if ($aperturaCierre->isDateClosed($data->fecha)) {
-                http_response_code(403);
-                echo json_encode(["message" => "La nueva fecha a la que intenta mover el movimiento está cerrada."]);
-                break;
-            }
             if ($movimientoCaja->update($data->id, $data->fecha, $data->tipo_movimiento, $data->importe, $data->descripcion ?? '')) {
                 http_response_code(200);
                 echo json_encode(["message" => "Movimiento actualizado."]);
@@ -96,17 +72,6 @@ switch ($request_method) {
     case 'DELETE':
         if (!empty($_GET["id"])) {
             $id = intval($_GET["id"]);
-            $movimiento_actual = $movimientoCaja->readOne($id);
-            if (!$movimiento_actual) {
-                http_response_code(404);
-                echo json_encode(["message" => "Movimiento no encontrado."]);
-                break;
-            }
-            if ($aperturaCierre->isDateClosed($movimiento_actual['fecha'])) {
-                http_response_code(403);
-                echo json_encode(["message" => "La fecha del movimiento está cerrada. No se puede eliminar."]);
-                break;
-            }
             if ($movimientoCaja->delete($id)) {
                 http_response_code(200);
                 echo json_encode(["message" => "Movimiento eliminado."]);

@@ -26,9 +26,6 @@ switch ($request_method) {
                 http_response_code(404);
                 echo json_encode(["message" => "Registro no encontrado."]);
             }
-        } else if (isset($_GET['action']) && $_GET['action'] == 'is_date_closed' && isset($_GET['fecha'])) {
-            $is_closed = $aperturaCierre->isDateClosed($_GET['fecha']);
-            echo json_encode(['is_closed' => $is_closed]);
         } else {
             $filters = [
                 'fecha_inicio' => $_GET['fecha_inicio'] ?? null,
