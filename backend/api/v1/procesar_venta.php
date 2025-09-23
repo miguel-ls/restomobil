@@ -55,6 +55,11 @@ try {
         throw new Exception("Debe seleccionar una serie para el documento de venta.");
     }
 
+    $id_tipo_documento_venta = isset($_POST['id_tipo_documento_venta']) ? intval($_POST['id_tipo_documento_venta']) : 0;
+    if (empty($id_tipo_documento_venta)) {
+        throw new Exception("Debe seleccionar un tipo de documento para la venta.");
+    }
+
     // 2. Obtener el siguiente número de documento para la serie seleccionada
     $stmt = $pdo->prepare("SELECT IFNULL(MAX(CAST(numero_documento AS UNSIGNED)), 0) + 1 AS next_num FROM ventas WHERE id_serie_documento = ?");
     $stmt->execute([$id_serie_documento]);
@@ -74,7 +79,7 @@ try {
         ':id_pedido' => $id_pedido,
         ':id_cliente' => $pedido['id_cliente'],
         ':id_usuario_cajero' => $id_usuario_cajero,
-        ':id_tipo_documento_venta' => $pedido['id_tipo_documento_venta'],
+        ':id_tipo_documento_venta' => $id_tipo_documento_venta,
         ':id_serie_documento' => $id_serie_documento,
         ':numero_documento' => str_pad($numero_documento, 8, '0', STR_PAD_LEFT), // Formatear a 8 dígitos
         ':total' => $pedido['total']
