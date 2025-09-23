@@ -30,7 +30,7 @@ include_once __DIR__ . '/config.php';
                         <input type="date" id="filter-end-date" name="end_date" title="Fecha hasta">
                         <select id="filter-status" name="status">
                             <option value="">Todos los Estados</option>
-                            <option value="recibido">Recibido</option>
+                            <option value="abierto">Abierto</option>
                             <option value="completado">Completado</option>
                             <option value="cancelado">Cancelado</option>
                             <option value="pagado">Pagado</option>
