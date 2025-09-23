@@ -77,11 +77,35 @@ include_once __DIR__ . '/config.php';
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const API_URL = '<?php echo API_BASE_URL; ?>movimientos_caja.php';
+    const API_URL_CIERRE = '<?php echo API_BASE_URL; ?>apertura_cierre.php';
     const tbody = document.getElementById('movimientos-tbody');
     const filterForm = document.getElementById('filter-form');
     const paginationControls = document.getElementById('pagination-controls');
     const pageSizeSelector = document.getElementById('page-size');
+    const newMovementBtn = document.querySelector('a[href="movimiento_caja_form.php"]');
     let currentPage = 1;
+
+    async function checkIfDateIsClosed(date) {
+        try {
+            const response = await fetch(`${API_URL_CIERRE}?action=is_date_closed&fecha=${date}`);
+            const data = await response.json();
+            return data.is_closed;
+        } catch (error) {
+            console.error('Error al verificar si la fecha está cerrada:', error);
+            return true;
+        }
+    }
+
+    newMovementBtn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        const today = new Date().toISOString().slice(0, 10);
+        const isClosed = await checkIfDateIsClosed(today);
+        if (isClosed) {
+            alert('La fecha está cerrada y no se pueden registrar nuevos movimientos.');
+        } else {
+            window.location.href = this.href;
+        }
+    });
 
     async function fetchMovimientos() {
         const pageSize = pageSizeSelector.value;
@@ -122,6 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         movimientos.forEach(mov => {
             const tr = document.createElement('tr');
+            tr.dataset.fecha = mov.fecha.split(' ')[0];
             const importeClass = mov.tipo_movimiento === 'entrada' ? 'text-success' : 'text-danger';
             const importeSign = mov.tipo_movimiento === 'entrada' ? '+' : '-';
 
@@ -187,9 +212,30 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchMovimientos();
     });
 
-    tbody.addEventListener('click', (e) => {
-        if (e.target.classList.contains('btn-delete')) {
-            const movimientoId = e.target.getAttribute('data-id');
+    tbody.addEventListener('click', async (e) => {
+        const target = e.target;
+        const tr = target.closest('tr');
+        if (!tr) return;
+
+        const fechaMovimiento = tr.dataset.fecha;
+
+        if (target.classList.contains('btn-edit')) {
+            e.preventDefault();
+            const isClosed = await checkIfDateIsClosed(fechaMovimiento);
+            if (isClosed) {
+                alert('La fecha está cerrada y no se puede editar el movimiento.');
+            } else {
+                window.location.href = target.href;
+            }
+        }
+
+        if (target.classList.contains('btn-delete')) {
+            const movimientoId = target.getAttribute('data-id');
+            const isClosed = await checkIfDateIsClosed(fechaMovimiento);
+            if (isClosed) {
+                alert('La fecha está cerrada y no se puede eliminar el movimiento.');
+                return;
+            }
             if (confirm('¿Estás seguro de que quieres eliminar este movimiento?')) {
                 deleteMovimiento(movimientoId);
             }
