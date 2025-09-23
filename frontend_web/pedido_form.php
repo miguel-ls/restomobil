@@ -143,34 +143,36 @@ if ($is_pago_view) {
 
                         <div class="tab-content">
                             <div id="tab-details" class="tab-pane active">
-                                <div class="form-group">
-                                    <label for="id_mesa">Mesa</label>
-                                    <select id="id_mesa" name="id_mesa" required <?php if ($is_paid) echo 'disabled'; ?>>
-                                        <?php
-                                        if (empty($mesas) && $is_editing && $order_data) {
-                                            echo "<option value=\"{$order_data['id_mesa']}\" selected>Mesa {$order_data['id_mesa']} (Actual)</option>";
-                                        }
+                                <div class="form-group-row">
+                                    <div class="form-group" style="flex-grow: 1;">
+                                        <label for="id_mesa">Mesa</label>
+                                        <select id="id_mesa" name="id_mesa" required <?php if ($is_paid) echo 'disabled'; ?>>
+                                            <?php
+                                            if (empty($mesas) && $is_editing && $order_data) {
+                                                echo "<option value=\"{$order_data['id_mesa']}\" selected>Mesa {$order_data['id_mesa']} (Actual)</option>";
+                                            }
 
-                                        foreach ($mesas as $mesa):
-                                            $is_selected = $is_editing && isset($order_data['id_mesa']) && $order_data['id_mesa'] == $mesa['id'];
-                                            $is_available = $mesa['estado'] == 'disponible';
-                                            $is_selectable = $is_available || $is_selected;
-                                        ?>
-                                            <option value="<?php echo $mesa['id']; ?>" <?php if ($is_selected) echo 'selected'; ?> <?php if (!$is_selectable && !$is_pago_view) echo 'disabled'; ?>>
-                                                <?php echo htmlspecialchars($mesa['numero_mesa'] . ' (' . ucfirst($mesa['estado']) . ')'); ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="id_usuario_mozo">Mozo</label>
-                                    <select id="id_usuario_mozo" name="id_usuario_mozo" required <?php if ($is_paid) echo 'disabled'; ?>>
-                                         <?php foreach ($mozos as $mozo): ?>
-                                            <option value="<?php echo $mozo['id']; ?>" <?php if($is_editing && $order_data['id_usuario_mozo'] == $mozo['id']) echo 'selected'; ?>>
-                                                <?php echo htmlspecialchars($mozo['nombre_completo']); ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
+                                            foreach ($mesas as $mesa):
+                                                $is_selected = $is_editing && isset($order_data['id_mesa']) && $order_data['id_mesa'] == $mesa['id'];
+                                                $is_available = $mesa['estado'] == 'disponible';
+                                                $is_selectable = $is_available || $is_selected;
+                                            ?>
+                                                <option value="<?php echo $mesa['id']; ?>" <?php if ($is_selected) echo 'selected'; ?> <?php if (!$is_selectable && !$is_pago_view) echo 'disabled'; ?>>
+                                                    <?php echo htmlspecialchars($mesa['numero_mesa'] . ' (' . ucfirst($mesa['estado']) . ')'); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="flex-grow: 1;">
+                                        <label for="id_usuario_mozo">Mozo</label>
+                                        <select id="id_usuario_mozo" name="id_usuario_mozo" required <?php if ($is_paid) echo 'disabled'; ?>>
+                                            <?php foreach ($mozos as $mozo): ?>
+                                                <option value="<?php echo $mozo['id']; ?>" <?php if($is_editing && $order_data['id_usuario_mozo'] == $mozo['id']) echo 'selected'; ?>>
+                                                    <?php echo htmlspecialchars($mozo['nombre_completo']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <div class="table-container desktop-only">
@@ -207,9 +209,10 @@ if ($is_pago_view) {
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="cliente_search">Buscar Cliente (Nombre o RUC)</label>
-                                    <input type="text" id="cliente_search" placeholder="Escriba para buscar..." style="flex-grow: 1;">
-                                    <div id="cliente_search_results"></div>
+                                    <label for="cliente_select">Buscar Cliente</label>
+                                    <select id="cliente_select" name="cliente_select">
+                                        <option value="">Seleccione un cliente...</option>
+                                    </select>
                                 </div>
                                 <input type="hidden" id="id_cliente" name="id_cliente" value="<?php echo htmlspecialchars($order_data['id_cliente'] ?? ''); ?>">
 
@@ -643,8 +646,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    const clienteSearchInput = document.getElementById('cliente_search');
-    const clienteSearchResults = document.getElementById('cliente_search_results');
+    const clienteSelect = document.getElementById('cliente_select');
     const idClienteInput = document.getElementById('id_cliente');
     const clienteNombreInput = document.getElementById('cliente_nombre');
     const clienteTipoDocIdentidadSelect = document.getElementById('id_tipo_documento_identidad_cliente');
@@ -652,6 +654,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const clienteDireccionInput = document.getElementById('cliente_direccion');
     const clienteUbigeoInput = document.getElementById('cliente_ubigeo');
     const btnSunatMain = document.getElementById('btn-sunat-main');
+
+    async function loadClientsForSelect() {
+        try {
+            const response = await fetch(`${apiBaseUrl}clientes.php`);
+            const data = await response.json();
+            if (data.records) {
+                data.records.forEach(cliente => {
+                    const option = document.createElement('option');
+                    option.value = cliente.id;
+                    option.textContent = `${cliente.nombres_apellidos} - ${cliente.numero_documento}`;
+                    option.dataset.clientData = JSON.stringify(cliente);
+                    clienteSelect.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading clients:', error);
+        }
+    }
+
+    clienteSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption.value && selectedOption.dataset.clientData) {
+            const clientData = JSON.parse(selectedOption.dataset.clientData);
+            selectCliente(clientData);
+        } else {
+            clearClienteSelection();
+        }
+    });
 
     async function loadSaleDocumentTypes() {
         try {
@@ -711,37 +741,11 @@ document.addEventListener('DOMContentLoaded', function() {
         clienteDireccionInput.value = cliente.direccion;
         clienteUbigeoInput.value = cliente.codigo_ubigeo;
 
+        clienteSelect.value = cliente.id;
+
         [clienteNombreInput, clienteRucInput, clienteDireccionInput, clienteUbigeoInput].forEach(el => el.readOnly = false);
         clienteTipoDocIdentidadSelect.disabled = false;
     }
-
-    clienteSearchInput.addEventListener('keyup', async function() {
-        const query = this.value.trim();
-        if (query.length < 2) {
-            clienteSearchResults.innerHTML = '';
-            return;
-        }
-        try {
-            const response = await fetch(`${apiBaseUrl}clientes.php?search=${encodeURIComponent(query)}`);
-            const data = await response.json();
-            clienteSearchResults.innerHTML = '';
-            if (data.records) {
-                data.records.forEach(cliente => {
-                    const div = document.createElement('div');
-                    div.textContent = `${cliente.nombres_apellidos} - ${cliente.numero_documento}`;
-                    div.classList.add('search-result-item');
-                    div.addEventListener('click', () => {
-                        selectCliente(cliente);
-                        clienteSearchResults.innerHTML = '';
-                        clienteSearchInput.value = '';
-                    });
-                    clienteSearchResults.appendChild(div);
-                });
-            }
-        } catch (error) {
-            console.error('Error searching clients:', error);
-        }
-    });
 
     btnSunatMain.addEventListener('click', async () => {
         const docNumber = clienteRucInput.value.trim();
@@ -774,7 +778,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Esperar a que ambos tipos de documentos se carguen
         await Promise.all([
             loadSaleDocumentTypes(),
-            loadIdentityDocumentTypes(clienteTipoDocIdentidadSelect)
+            loadIdentityDocumentTypes(clienteTipoDocIdentidadSelect),
+            loadClientsForSelect()
         ]);
 
         // Si hay un tipo de comprobante ya seleccionado al cargar, cargar sus series
