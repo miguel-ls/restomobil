@@ -133,15 +133,5 @@ class AperturaCierre {
         }
         return false;
     }
-
-    public function isDateClosed($fecha) {
-        $query = "SELECT COUNT(*) as count FROM " . $this->table_name . " WHERE fecha_movimiento = :fecha AND tipo_movimiento = 'cierre'";
-        $stmt = $this->conn->prepare($query);
-        $fecha_movimiento = date('Y-m-d', strtotime($fecha));
-        $stmt->bindParam(':fecha', $fecha_movimiento);
-        $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row['count'] > 0;
-    }
 }
 ?>

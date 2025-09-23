@@ -77,35 +77,11 @@ include_once __DIR__ . '/config.php';
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const API_URL = '<?php echo API_BASE_URL; ?>movimientos_caja.php';
-    const API_URL_CIERRE = '<?php echo API_BASE_URL; ?>apertura_cierre.php';
     const tbody = document.getElementById('movimientos-tbody');
     const filterForm = document.getElementById('filter-form');
     const paginationControls = document.getElementById('pagination-controls');
     const pageSizeSelector = document.getElementById('page-size');
-    const newMovementBtn = document.querySelector('a[href="movimiento_caja_form.php"]');
     let currentPage = 1;
-
-    async function checkIfDateIsClosed(date) {
-        try {
-            const response = await fetch(`${API_URL_CIERRE}?action=is_date_closed&fecha=${date}`);
-            const data = await response.json();
-            return data.is_closed;
-        } catch (error) {
-            console.error('Error al verificar si la fecha está cerrada:', error);
-            return true;
-        }
-    }
-
-    newMovementBtn.addEventListener('click', async function(e) {
-        e.preventDefault();
-        const today = new Date().toISOString().slice(0, 10);
-        const isClosed = await checkIfDateIsClosed(today);
-        if (isClosed) {
-            alert('La fecha está cerrada y no se pueden registrar nuevos movimientos.');
-        } else {
-            window.location.href = this.href;
-        }
-    });
 
     async function fetchMovimientos() {
         const pageSize = pageSizeSelector.value;
@@ -146,17 +122,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         movimientos.forEach(mov => {
             const tr = document.createElement('tr');
-            tr.dataset.fecha = mov.fecha.split(' ')[0];
             const importeClass = mov.tipo_movimiento === 'entrada' ? 'text-success' : 'text-danger';
             const importeSign = mov.tipo_movimiento === 'entrada' ? '+' : '-';
-
-            let actionButtons = '';
-            if (mov.is_closed == 0) {
-                actionButtons = `
-                    <a href="movimiento_caja_form.php?id=${mov.id}" class="btn btn-edit">Editar</a>
-                    <button class="btn btn-delete" data-id="${mov.id}">Eliminar</button>
-                `;
-            }
 
             tr.innerHTML = `
                 <td data-label="Fecha">${formatDateTime(mov.fecha)}</td>
@@ -165,7 +132,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td data-label="Descripción">${mov.descripcion || ''}</td>
                 <td data-label="Usuario">${mov.usuario_nombre || 'N/A'}</td>
                 <td data-label="Acciones" class="actions-cell">
-                    ${actionButtons}
+                    <a href="movimiento_caja_form.php?id=${mov.id}" class="btn btn-edit">Editar</a>
+                    <button class="btn btn-delete" data-id="${mov.id}">Eliminar</button>
                 </td>
             `;
             tbody.appendChild(tr);

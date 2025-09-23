@@ -72,10 +72,6 @@ switch ($request_method) {
 }
 
 function handleGetAllOrders($order) {
-    // El parámetro 'estado' puede ser una cadena de estados separados por comas (ej. "completado,pagado").
-    // El procedimiento almacenado sp_getOrdersByStatus utiliza FIND_IN_SET de MySQL,
-    // que está diseñado para buscar una cadena dentro de un conjunto de cadenas separadas por comas.
-    // Por lo tanto, no es necesario explotar la cadena en un array en PHP.
     if (!empty($_GET["estado"])) {
         $status = htmlspecialchars(strip_tags($_GET["estado"]));
         $stmt = $order->readByStatus($status);
@@ -83,15 +79,26 @@ function handleGetAllOrders($order) {
         $stmt = $order->readAll();
     }
 
-    $num = $stmt->rowCount();
+    $all_records = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $filtered_records = $all_records;
 
-    if ($num > 0) {
-        $orders_arr = ["records" => []];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            array_push($orders_arr["records"], $row);
-        }
+    // Filtrado por fecha en PHP
+    if (!empty($_GET['start_date']) && !empty($_GET['end_date'])) {
+        $start_date = new DateTime($_GET['start_date']);
+        $end_date = new DateTime($_GET['end_date']);
+        // La hora se establece al final del día para incluir todos los pedidos de la fecha de fin
+        $end_date->setTime(23, 59, 59);
+
+        $filtered_records = array_filter($all_records, function($record) use ($start_date, $end_date) {
+            $record_date = new DateTime($record['fecha_creacion']);
+            return $record_date >= $start_date && $record_date <= $end_date;
+        });
+    }
+
+    if (count($filtered_records) > 0) {
         http_response_code(200);
-        echo json_encode($orders_arr);
+        // Re-indexar el array para asegurar que sea un array JSON y no un objeto
+        echo json_encode(["records" => array_values($filtered_records)]);
     } else {
         http_response_code(200);
         echo json_encode(["records" => []]);
