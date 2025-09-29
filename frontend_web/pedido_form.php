@@ -135,6 +135,25 @@ if ($is_pago_view) {
                         ?>
                         <input type="hidden" name="estado" id="estado" value="<?php echo htmlspecialchars($order_data['estado'] ?? $default_estado); ?>">
 
+                        <div class="form-actions" style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e0e0e0;">
+                            <button type="submit" class="btn" <?php if ($is_pago_view && !$is_paid) echo 'style="background-color: #28a745; color: white;"'; ?> <?php if ($is_paid) echo 'disabled'; ?>>
+                                <?php
+                                    if ($is_paid) {
+                                        echo 'Pagado';
+                                    } else if ($is_pago_view) {
+                                        echo 'Pagar';
+                                    } else if ($is_caja_create_view) {
+                                        echo 'Crear Pedido';
+                                    } else {
+                                        echo ($is_editing ? 'Actualizar' : 'Crear') . ' Pedido';
+                                    }
+                                ?>
+                            </button>
+                            <a href="<?php echo ($is_pago_view || $is_caja_create_view) ? 'caja.php' : 'pedidos.php'; ?>" class="btn btn-secondary">
+                                Volver a <?php echo ($is_pago_view || $is_caja_create_view) ? 'Caja' : 'Lista'; ?>
+                            </a>
+                        </div>
+
                         <div class="tab-nav">
                             <button type="button" class="tab-button active" data-tab="details">Detalles de Pedido</button>
                             <button type="button" class="tab-button" data-tab="client">Clientes</button>
@@ -265,24 +284,6 @@ if ($is_pago_view) {
                         </fieldset>
                         <?php endif; ?>
                         
-                        <div class="form-actions">
-                            <button type="submit" class="btn" <?php if ($is_pago_view && !$is_paid) echo 'style="background-color: #28a745; color: white;"'; ?> <?php if ($is_paid) echo 'disabled'; ?>>
-                                <?php
-                                    if ($is_paid) {
-                                        echo 'Pagado';
-                                    } else if ($is_pago_view) {
-                                        echo 'Pagar';
-                                    } else if ($is_caja_create_view) {
-                                        echo 'Crear Pedido';
-                                    } else {
-                                        echo ($is_editing ? 'Actualizar' : 'Crear') . ' Pedido';
-                                    }
-                                ?>
-                            </button>
-                            <a href="<?php echo ($is_pago_view || $is_caja_create_view) ? 'caja.php' : 'pedidos.php'; ?>" class="btn btn-secondary">
-                                Volver a <?php echo ($is_pago_view || $is_caja_create_view) ? 'Caja' : 'Lista'; ?>
-                            </a>
-                        </div>
                     </form>
                 </div>
             </div>
