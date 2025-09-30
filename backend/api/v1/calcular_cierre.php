@@ -2,7 +2,7 @@
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 
-require_once '../../includes/db_connect.php';
+require_once __DIR__ . '/../../config/database.php';
 
 $fecha = $_GET['fecha'] ?? null;
 
@@ -13,36 +13,19 @@ if (!$fecha) {
 }
 
 try {
-    // Calcular el total de movimientos de caja para la fecha dada
-    $stmt_movimientos = $pdo->prepare("
-        SELECT
-            SUM(CASE WHEN tipo_movimiento = 'ENTRADA' THEN importe ELSE 0 END) -
-            SUM(CASE WHEN tipo_movimiento = 'SALIDA' THEN importe ELSE 0 END) as total_movimientos
-        FROM movimientos_caja
-        WHERE DATE(fecha) = :fecha
-    ");
-    $stmt_movimientos->execute(['fecha' => $fecha]);
-    $total_movimientos = $stmt_movimientos->fetchColumn();
-    if ($total_movimientos === false) {
-        $total_movimientos = 0;
-    }
+    $pdo = new PDO(DB_DSN, DB_USER, DB_PASS);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Calcular el total de ventas emitidas para la fecha dada
-    $stmt_ventas = $pdo->prepare("
-        SELECT SUM(total) as total_ventas
-        FROM ventas
-        WHERE DATE(fecha_emision) = :fecha AND estado = 'Emitida'
-    ");
-    $stmt_ventas->execute(['fecha' => $fecha]);
-    $total_ventas = $stmt_ventas->fetchColumn();
-    if ($total_ventas === false) {
-        $total_ventas = 0;
-    }
+    // Llamar al procedimiento almacenado
+    $stmt = $pdo->prepare("CALL sp_calcular_cierre(:fecha)");
+    $stmt->execute(['fecha' => $fecha]);
 
-    // Calcular el total de cierre
-    $total_cierre = $total_movimientos + $total_ventas;
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    echo json_encode(['total_cierre' => $total_cierre]);
+    // El procedimiento almacenado devuelve una columna llamada 'total_cierre'
+    $total_cierre = $result['total_cierre'] ?? 0;
+
+    echo json_encode(['total_cierre' => (float)$total_cierre]);
 
 } catch (PDOException $e) {
     http_response_code(500);
