@@ -8,6 +8,7 @@ class ReportesModel {
 
     /**
      * Construye y ejecuta una consulta para obtener los datos del reporte dinámico usando PDO.
+     * Corregido para coincidir con `esquema_ventas.sql`.
      */
     public function getReportData($selectedColumns, $filters, $dictionary) {
         $columnMap = array_column($dictionary, 'friendly_name', 'key');
@@ -18,6 +19,7 @@ class ReportesModel {
 
         foreach ($selectedColumns as $colKey) {
             if (isset($columnMap[$colKey])) {
+                // El alias del resultado (AS `...`) ya viene del diccionario
                 $selectClause[] = "{$colKey} AS `{$columnMap[$colKey]}`";
 
                 $tableAlias = explode('.', $colKey)[0];
@@ -28,13 +30,16 @@ class ReportesModel {
                             $joinClauses['clientes'] = 'LEFT JOIN clientes c ON v.id_cliente = c.id';
                             break;
                         case 'u':
-                            $joinClauses['usuarios'] = 'LEFT JOIN usuarios u ON v.id_usuario = u.id';
+                            // Corregido: la columna es `id_usuario_cajero`
+                            $joinClauses['usuarios'] = 'LEFT JOIN usuarios u ON v.id_usuario_cajero = u.id';
                             break;
-                        case 'td':
-                            $joinClauses['tipos_documentos'] = 'LEFT JOIN tipos_documentos td ON v.id_tipo_documento = td.id';
+                        case 'tdv':
+                            // Corregido: la tabla es `tipo_documento_venta`
+                            $joinClauses['tipo_documento_venta'] = 'LEFT JOIN tipo_documento_venta tdv ON v.id_tipo_documento_venta = tdv.id';
                             break;
-                        case 'mp':
-                            $joinClauses['metodos_pago'] = 'LEFT JOIN metodos_pago mp ON v.id_metodo_pago = mp.id';
+                        case 'sd':
+                             // Corregido: la tabla es `series_documentos`
+                            $joinClauses['series_documentos'] = 'LEFT JOIN series_documentos sd ON v.id_serie_documento = sd.id';
                             break;
                     }
                 }
@@ -64,7 +69,6 @@ class ReportesModel {
                         $value = '%' . $value . '%';
                     }
 
-                    // Usamos placeholders nombrados para mayor claridad con PDO
                     $placeholder = ":" . str_replace('.', '_', $filter['column']) . count($params);
                     $conditions[] = "{$filter['column']} {$operator} {$placeholder}";
                     $params[$placeholder] = $value;
@@ -81,7 +85,7 @@ class ReportesModel {
                " " . $whereClause . " ORDER BY v.id DESC";
 
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params); // Pasamos el array de parámetros a execute
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

@@ -1,4 +1,18 @@
 <?php
+// --- Manejador de Errores Global ---
+// Se asegura de que cualquier error no capturado devuelva una respuesta JSON válida
+// en lugar de una página de error HTML, solucionando el error "Unexpected token '<'".
+function json_exception_handler($exception) {
+    error_log("Error no capturado en reportes_ventas_handler.php: " . $exception->getMessage());
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Ocurrió un error inesperado en el servidor. Por favor, contacte a soporte.'
+    ]);
+    exit();
+}
+set_exception_handler('json_exception_handler');
+
 // Incluir la configuración de la base de datos y las funciones comunes
 // Ajustamos las rutas para que sean correctas desde __DIR__
 require_once __DIR__ . '/../../core/Database.php'; // Incluir la clase Database
@@ -33,6 +47,7 @@ function send_success($data) {
 
 // --- Diccionario de Columnas para Reportes de Ventas ---
 function get_sales_dictionary() {
+    // Diccionario corregido según el esquema de la base de datos `esquema_ventas.sql`
     return [
         ['key' => 'v.id', 'friendly_name' => 'ID Venta', 'type' => 'number'],
         ['key' => 'v.fecha_emision', 'friendly_name' => 'Fecha de Emisión', 'type' => 'date'],
@@ -40,14 +55,11 @@ function get_sales_dictionary() {
         ['key' => 'v.estado', 'friendly_name' => 'Estado Venta', 'type' => 'string'],
         ['key' => 'c.nombre_razon_social', 'friendly_name' => 'Cliente', 'type' => 'string'],
         ['key' => 'c.numero_documento', 'friendly_name' => 'Documento Cliente', 'type' => 'string'],
-        ['key' => 'u.nombre_usuario', 'friendly_name' => 'Vendedor', 'type' => 'string'],
-        ['key' => 'td.nombre', 'friendly_name' => 'Tipo Documento', 'type' => 'string'],
-        ['key' => 'v.serie', 'friendly_name' => 'Serie Documento', 'type' => 'string'],
+        ['key' => 'u.nombre_usuario', 'friendly_name' => 'Cajero', 'type' => 'string'],
+        ['key' => 'tdv.nombre', 'friendly_name' => 'Tipo Documento', 'type' => 'string'],
+        ['key' => 'sd.serie', 'friendly_name' => 'Serie Documento', 'type' => 'string'],
         ['key' => 'v.numero_documento', 'friendly_name' => 'Número Documento', 'type' => 'string'],
-        // Asumimos que existe una tabla metodos_pago, si no, comentar o eliminar la siguiente línea
-        // ['key' => 'mp.nombre', 'friendly_name' => 'Método de Pago', 'type' => 'string'],
-        ['key' => 'v.total_neto', 'friendly_name' => 'Total Neto', 'type' => 'number'],
-        ['key' => 'v.total_igv', 'friendly_name' => 'Total IGV', 'type' => 'number'],
+        // Las columnas total_neto y total_igv no existen en la tabla ventas, se eliminan.
     ];
 }
 
@@ -77,27 +89,35 @@ switch ($action) {
 
     case 'get_report':
         if ($request_method === 'POST') {
-            $json_data = file_get_contents('php://input');
-            $data = json_decode($json_data, true);
+            try {
+                $json_data = file_get_contents('php://input');
+                $data = json_decode($json_data, true);
 
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                send_error('JSON inválido.');
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    send_error('JSON inválido.');
+                }
+
+                $columns = $data['columns'] ?? [];
+                $filters = $data['filters'] ?? [];
+
+                if (empty($columns)) {
+                    send_error('Debe seleccionar al menos una columna.');
+                }
+
+                $dictionary = get_sales_dictionary();
+                $reportData = $reportesModel->getReportData($columns, $filters, $dictionary);
+
+                send_success(['data' => $reportData]);
+
+            } catch (PDOException $e) {
+                // Captura errores específicos de la base de datos (ej. SQL inválido)
+                error_log('Error de base de datos en get_report: ' . $e->getMessage());
+                send_error('Ocurrió un error al consultar la base de datos. Revise los filtros y columnas.', 500);
+            } catch (Exception $e) {
+                // Captura otros errores inesperados
+                error_log('Error inesperado en get_report: ' . $e->getMessage());
+                send_error('Ocurrió un error inesperado en el servidor.', 500);
             }
-
-            $columns = $data['columns'] ?? [];
-            $filters = $data['filters'] ?? [];
-
-            if (empty($columns)) {
-                send_error('Debe seleccionar al menos una columna.');
-            }
-
-            $dictionary = get_sales_dictionary();
-            $reportData = $reportesModel->getReportData($columns, $filters, $dictionary);
-
-            if ($reportData === false) {
-                send_error('Error al generar el reporte.', 500);
-            }
-            send_success(['data' => $reportData]);
         } else {
             send_error('Método no permitido.', 405);
         }
