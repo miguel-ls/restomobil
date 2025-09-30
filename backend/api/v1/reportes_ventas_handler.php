@@ -68,7 +68,8 @@ $request_method = $_SERVER['REQUEST_METHOD'];
 switch ($action) {
     case 'get_dictionary':
         if ($request_method === 'GET') {
-            send_success(get_sales_dictionary());
+            // Se envuelve el resultado en un array asociativo para una respuesta JSON consistente
+            send_success(['columns' => get_sales_dictionary()]);
         } else {
             send_error('Método no permitido para esta acción.', 405);
         }
