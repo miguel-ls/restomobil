@@ -527,12 +527,12 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const cierreExistente = await verificarCierreExistente(fechaDelPedido);
             if (cierreExistente) {
-                alert('La fecha del pedido tiene un cierre de caja. No se puede crear ni modificar el pedido.');
+                showAlert('Operación Bloqueada', 'La fecha del pedido tiene un cierre de caja. No se puede crear ni modificar el pedido.');
                 return; // Detener el envío del formulario.
             }
         } catch (error) {
             // Si la API falla, mostramos un error y detenemos la operación.
-            alert(`Error de Verificación: No se pudo verificar el estado de la caja: ${error.message}. Por favor, intente de nuevo.`);
+            showAlert('Error de Verificación', `No se pudo verificar el estado de la caja: ${error.message}. Por favor, intente de nuevo.`);
             return;
         }
         // --- FIN: VALIDACIÓN DE CIERRE DE CAJA ---
