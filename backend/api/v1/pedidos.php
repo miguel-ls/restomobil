@@ -51,6 +51,23 @@ switch ($request_method) {
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
         $order_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
+
+        if ($order_id && !empty($_GET['action']) && $_GET['action'] == 'update_status') {
+            if (!empty($data->estado)) {
+                if ($order->updateStatus($order_id, $data->estado)) {
+                    http_response_code(200);
+                    echo json_encode(["message" => "Estado del pedido actualizado exitosamente."]);
+                } else {
+                    http_response_code(503);
+                    echo json_encode(["message" => "No se pudo actualizar el estado del pedido."]);
+                }
+            } else {
+                http_response_code(400);
+                echo json_encode(["message" => "Falta el campo 'estado'."]);
+            }
+            break;
+        }
+
         if ($order_id && !empty($data->id_mesa) && !empty($data->id_usuario_mozo) && isset($data->estado) && isset($data->items) && is_array($data->items)) {
             $id_cliente = !empty($data->id_cliente) ? $data->id_cliente : null;
             $id_tipo_documento_venta = !empty($data->id_tipo_documento_venta) ? $data->id_tipo_documento_venta : null;
