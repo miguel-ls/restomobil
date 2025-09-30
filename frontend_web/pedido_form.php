@@ -117,7 +117,6 @@ if ($is_pago_view) {
 
                 <div class="order-details" id="order-details">
                     <div class="order-details-header">
-                        <h3>Detalles del Pedido</h3>
                         <?php if ($is_editing && isset($order_data['estado'])): ?>
                             <span class="status status-<?php echo htmlspecialchars($order_data['estado']); ?>">
                                 <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $order_data['estado']))); ?>
@@ -126,7 +125,7 @@ if ($is_pago_view) {
                     </div>
                     <form id="order-form" method="POST" action="<?php echo $form_action; ?>">
                         <?php
-                            $default_estado = 'recibido';
+                            $default_estado = 'abierto';
                             if ($is_pago_view) {
                                 $default_estado = 'pagado';
                             } else if ($is_caja_create_view) {
@@ -155,8 +154,8 @@ if ($is_pago_view) {
                         </div>
 
                         <div class="tab-nav">
-                            <button type="button" class="tab-button active" data-tab="details">Detalles de Pedido</button>
-                            <button type="button" class="tab-button" data-tab="client">Clientes</button>
+                            <button type="button" class="tab-button active" data-tab="details">Detalle</button>
+                            <button type="button" class="tab-button" data-tab="client">Cliente</button>
                         </div>
 
                         <div class="tab-content">
