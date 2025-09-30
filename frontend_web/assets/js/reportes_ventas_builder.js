@@ -69,8 +69,8 @@ document.addEventListener('DOMContentLoaded', function () {
         availableColumnsEl.innerHTML = '';
         columns.forEach(col => {
             const item = document.createElement('div');
-            // Usar clases de Bootstrap para un estilo consistente
-            item.className = 'list-group-item list-group-item-action';
+            // Usar una clase de Bootstrap que no interfiera con los eventos de JS
+            item.className = 'list-group-item';
             item.dataset.key = col.key;
             item.textContent = col.friendly_name;
             item.style.cursor = 'pointer'; // Añadir cursor para indicar que es clickeable
