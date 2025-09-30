@@ -62,10 +62,13 @@ if (isset($_GET['id'])) {
 
                     <div class="form-group">
                         <label for="tipo_movimiento">Tipo de Movimiento</label>
-                        <select id="tipo_movimiento" name="tipo_movimiento" required>
-                            <option value="apertura" <?php echo (isset($registro_data['tipo_movimiento']) && $registro_data['tipo_movimiento'] == 'apertura') ? 'selected' : ''; ?>>Apertura</option>
-                            <option value="cierre" <?php echo (isset($registro_data['tipo_movimiento']) && $registro_data['tipo_movimiento'] == 'cierre') ? 'selected' : ''; ?>>Cierre</option>
-                        </select>
+                        <div style="display: flex; align-items: center;">
+                            <select id="tipo_movimiento" name="tipo_movimiento" required style="flex-grow: 1;">
+                                <option value="apertura" <?php echo (isset($registro_data['tipo_movimiento']) && $registro_data['tipo_movimiento'] == 'apertura') ? 'selected' : ''; ?>>Apertura</option>
+                                <option value="cierre" <?php echo (isset($registro_data['tipo_movimiento']) && $registro_data['tipo_movimiento'] == 'cierre') ? 'selected' : ''; ?>>Cierre</option>
+                            </select>
+                            <button type="button" id="btnCalcularCierre" class="btn" style="margin-left: 10px; display: none;">Calcular Cierre</button>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -86,3 +89,55 @@ if (isset($_GET['id'])) {
         </div>
     </main>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoMovimiento = document.getElementById('tipo_movimiento');
+    const btnCalcularCierre = document.getElementById('btnCalcularCierre');
+    const importeInput = document.getElementById('importe');
+    const fechaInput = document.getElementById('fecha');
+
+    function toggleCalcularCierreButton() {
+        if (tipoMovimiento.value === 'cierre') {
+            btnCalcularCierre.style.display = 'block';
+        } else {
+            btnCalcularCierre.style.display = 'none';
+        }
+    }
+
+    tipoMovimiento.addEventListener('change', toggleCalcularCierreButton);
+
+    btnCalcularCierre.addEventListener('click', function() {
+        const fecha = fechaInput.value;
+        if (!fecha) {
+            alert('Por favor, seleccione una fecha y hora.');
+            return;
+        }
+
+        const fechaISO = new Date(fecha).toISOString().split('T')[0];
+        const apiUrl = `<?php echo API_BASE_URL; ?>calcular_cierre.php?fecha=${fechaISO}`;
+
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('La solicitud a la API falló con el estado ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.total_cierre !== undefined) {
+                    importeInput.value = data.total_cierre;
+                } else {
+                    alert('No se pudo calcular el importe de cierre.');
+                }
+            })
+            .catch(error => {
+                console.error('Error al calcular el cierre:', error);
+                alert('Ocurrió un error al calcular el importe de cierre: ' + error.message);
+            });
+    });
+
+    // Llamada inicial para establecer el estado correcto del botón al cargar la página
+    toggleCalcularCierreButton();
+});
+</script>
