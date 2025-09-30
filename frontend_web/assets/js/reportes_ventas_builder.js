@@ -230,31 +230,47 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // --- Event Listeners ---
+    function sortAvailableList() {
+        const items = Array.from(availableColumnsEl.children);
+        items.sort((a, b) => a.textContent.localeCompare(b.textContent));
+        items.forEach(item => availableColumnsEl.appendChild(item));
+    }
+
     function moveItems(from, to, items) {
         items.forEach(item => {
-            // Usar la clase 'active' de Bootstrap para la selección
             item.classList.remove('active');
             to.appendChild(item);
         });
+        // Si los elementos se mueven de vuelta a la lista de disponibles, reordenarla.
+        if (to === availableColumnsEl) {
+            sortAvailableList();
+        }
     }
 
-    // Actualizar selectores para usar la nueva clase de item y la clase 'active'
-    addColBtn.addEventListener('click', () => moveItems(availableColumnsEl, selectedColumnsEl, availableColumnsEl.querySelectorAll('.list-group-item.active')));
-    addAllColsBtn.addEventListener('click', () => moveItems(availableColumnsEl, selectedColumnsEl, availableColumnsEl.querySelectorAll('.list-group-item')));
-    removeColBtn.addEventListener('click', () => moveItems(selectedColumnsEl, availableColumnsEl, selectedColumnsEl.querySelectorAll('.list-group-item.active')));
-    removeAllColsBtn.addEventListener('click', () => moveItems(selectedColumnsEl, availableColumnsEl, selectedColumnsEl.querySelectorAll('.list-group-item')));
+    // Ocultar botones de movimiento individual ya que el clic directo los reemplaza
+    addColBtn.style.display = 'none';
+    removeColBtn.style.display = 'none';
 
-    // Event listener más robusto para la selección de items
-    document.getElementById('dual-list-container').addEventListener('click', e => {
-        // Usar .closest() para encontrar el elemento de la lista, sin importar si se hizo clic en el texto o en el div
+    // Event listeners para los botones de "mover todo"
+    addAllColsBtn.addEventListener('click', () => moveItems(availableColumnsEl, selectedColumnsEl, Array.from(availableColumnsEl.children)));
+    removeAllColsBtn.addEventListener('click', () => moveItems(selectedColumnsEl, availableColumnsEl, Array.from(selectedColumnsEl.children)));
+
+    // --- One-Click Item Move ---
+    // Implementar la funcionalidad de mover con un solo clic
+    availableColumnsEl.addEventListener('click', e => {
         const item = e.target.closest('.list-group-item');
-
-        // Asegurarse de que el item existe y pertenece a este contenedor
-        if (item && document.getElementById('dual-list-container').contains(item)) {
-            e.preventDefault();
-            item.classList.toggle('active');
+        if (item) {
+            moveItems(availableColumnsEl, selectedColumnsEl, [item]);
         }
     });
+
+    selectedColumnsEl.addEventListener('click', e => {
+        const item = e.target.closest('.list-group-item');
+        if (item) {
+            moveItems(selectedColumnsEl, availableColumnsEl, [item]);
+        }
+    });
+
 
     addFilterBtn.addEventListener('click', addFilterRow);
 
@@ -263,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     generateReportBtn.addEventListener('click', () => {
-        const selectedColumns = Array.from(selectedColumnsEl.querySelectorAll('.list-item')).map(item => item.dataset.key);
+        const selectedColumns = Array.from(selectedColumnsEl.querySelectorAll('.list-group-item')).map(item => item.dataset.key);
         if (selectedColumns.length === 0) {
             showAlert('Por favor, seleccione al menos una columna.');
             return;
