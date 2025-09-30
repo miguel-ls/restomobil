@@ -516,11 +516,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const tipoComprobanteSelect = document.getElementById('id_tipo_documento_venta');
         const selectedComprobante = tipoComprobanteSelect.options[tipoComprobanteSelect.selectedIndex];
         if (selectedComprobante && selectedComprobante.textContent === 'Factura') {
-            const idCliente = document.getElementById('id_cliente').value;
+            const clienteRuc = document.getElementById('cliente_ruc').value;
             const clienteNombre = document.getElementById('cliente_nombre').value;
             const clienteDireccion = document.getElementById('cliente_direccion').value;
-            if (!idCliente || !clienteNombre || !clienteDireccion) {
-                alert('Para emitir una Factura, debe seleccionar un cliente con RUC, nombre y dirección.');
+            if (!clienteRuc || !clienteNombre || !clienteDireccion) {
+                alert('Para emitir una Factura, debe ingresar un RUC, nombre y dirección para el cliente.');
                 return;
             }
         } else if (document.getElementById('id_cliente').value) {
