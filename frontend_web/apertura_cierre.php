@@ -121,10 +121,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         registros.forEach(reg => {
+            const tipoMovimiento = reg.tipo_movimiento.charAt(0).toUpperCase() + reg.tipo_movimiento.slice(1);
+            const tipoClass = reg.tipo_movimiento === 'apertura' ? 'tipo-apertura' : 'tipo-cierre';
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td data-label="Fecha">${formatDateTime(reg.fecha)}</td>
-                <td data-label="Tipo">${reg.tipo_movimiento.charAt(0).toUpperCase() + reg.tipo_movimiento.slice(1)}</td>
+                <td data-label="Tipo"><span class="badge ${tipoClass}">${tipoMovimiento}</span></td>
                 <td data-label="Importe"><?php echo CURRENCY_SYMBOL; ?>${parseFloat(reg.importe).toFixed(2)}</td>
                 <td data-label="Descripción">${reg.descripcion || ''}</td>
                 <td data-label="Usuario">${reg.usuario_nombre || 'N/A'}</td>
@@ -224,4 +226,21 @@ document.addEventListener('DOMContentLoaded', function() {
 .filter-container .filters input, .filter-container .filters select, .filter-container .filters button { flex-grow: 0; flex-shrink: 0; }
 .filter-container .filters input[type="date"] { width: auto; padding: 8px; }
 .filter-container .filters select { width: 150px; padding: 8px; }
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 12px;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.8em;
+}
+
+.tipo-apertura {
+    background-color: #28a745; /* Verde */
+}
+
+.tipo-cierre {
+    background-color: #dc3545; /* Rojo */
+}
 </style>
