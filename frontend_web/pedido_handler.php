@@ -31,6 +31,8 @@ $cliente_nombre = $_POST['cliente_nombre'] ?? null;
 $cliente_direccion = $_POST['cliente_direccion'] ?? null;
 $cliente_ubigeo = $_POST['cliente_ubigeo'] ?? null;
 $id_tipo_documento_venta = $_POST['id_tipo_documento_venta'] ?? null;
+$id_serie_documento = $_POST['id_serie_documento'] ?? null;
+$numero_documento = $_POST['numero_documento'] ?? null;
 
 require_once 'config.php';
 
@@ -114,7 +116,9 @@ $api_data = [
     'estado' => $estado,
     'items' => $items,
     'id_cliente' => $id_cliente,
-    'id_tipo_documento_venta' => $id_tipo_documento_venta
+    'id_tipo_documento_venta' => $id_tipo_documento_venta,
+    'id_serie_documento' => $id_serie_documento,
+    'numero_documento' => $numero_documento
 ];
 
 // Incluir configuración de la API

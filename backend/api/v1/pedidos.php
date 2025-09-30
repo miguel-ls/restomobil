@@ -31,7 +31,9 @@ switch ($request_method) {
         if (!empty($data->id_mesa) && !empty($data->id_usuario_mozo) && !empty($data->items) && is_array($data->items) && !empty($data->estado)) {
             $id_cliente = !empty($data->id_cliente) ? $data->id_cliente : null;
             $id_tipo_documento_venta = !empty($data->id_tipo_documento_venta) ? $data->id_tipo_documento_venta : null;
-            $stmt = $order->create($data->id_mesa, $data->id_usuario_mozo, $data->items, $data->estado, $id_cliente, $id_tipo_documento_venta);
+            $id_serie_documento = !empty($data->id_serie_documento) ? $data->id_serie_documento : null;
+            $numero_documento = !empty($data->numero_documento) ? $data->numero_documento : null;
+            $stmt = $order->create($data->id_mesa, $data->id_usuario_mozo, $data->items, $data->estado, $id_cliente, $id_tipo_documento_venta, $id_serie_documento, $numero_documento);
             if ($stmt) {
                 $new_order = $stmt->fetch(PDO::FETCH_ASSOC);
                 http_response_code(201);
@@ -52,7 +54,9 @@ switch ($request_method) {
         if ($order_id && !empty($data->id_mesa) && !empty($data->id_usuario_mozo) && isset($data->estado) && isset($data->items) && is_array($data->items)) {
             $id_cliente = !empty($data->id_cliente) ? $data->id_cliente : null;
             $id_tipo_documento_venta = !empty($data->id_tipo_documento_venta) ? $data->id_tipo_documento_venta : null;
-            if ($order->update($order_id, $data->id_mesa, $data->id_usuario_mozo, $data->estado, $data->items, $id_cliente, $id_tipo_documento_venta)) {
+            $id_serie_documento = !empty($data->id_serie_documento) ? $data->id_serie_documento : null;
+            $numero_documento = !empty($data->numero_documento) ? $data->numero_documento : null;
+            if ($order->update($order_id, $data->id_mesa, $data->id_usuario_mozo, $data->estado, $data->items, $id_cliente, $id_tipo_documento_venta, $id_serie_documento, $numero_documento)) {
                 http_response_code(200);
                 echo json_encode(["message" => "Pedido actualizado exitosamente."]);
             } else {

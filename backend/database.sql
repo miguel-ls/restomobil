@@ -193,6 +193,8 @@ BEGIN
         p.fecha_actualizacion,
         p.id_cliente,
         p.id_tipo_documento_venta,
+        p.id_serie_documento,
+        p.numero_documento,
         c.nombres_apellidos AS nombre_cliente,
         c.numero_documento AS ruc_cliente,
         c.id_tipo_documento_identidad AS id_tipo_documento_identidad_cliente,
