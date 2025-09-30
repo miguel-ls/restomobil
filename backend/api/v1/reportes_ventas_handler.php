@@ -54,7 +54,8 @@ function get_sales_dictionary() {
 
 // --- Lógica Principal ---
 try {
-    $db = (new Database())->getConnection();
+    // Obtener la instancia de PDO usando el método estático correcto
+    $db = Database::getInstance();
     $reportesModel = new ReportesModel($db);
 } catch (Exception $e) {
     send_error('Error de conexión con la base de datos: ' . $e->getMessage(), 500);
