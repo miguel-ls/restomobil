@@ -1,6 +1,7 @@
 <?php
 // Incluir la configuración de la base de datos y las funciones comunes
 // Ajustamos las rutas para que sean correctas desde __DIR__
+require_once __DIR__ . '/../../core/Database.php'; // Incluir la clase Database
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/app_config.php';
 require_once __DIR__ . '/../../models/ReportesModel.php';
