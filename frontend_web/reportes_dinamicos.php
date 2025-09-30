@@ -85,8 +85,8 @@ include_once 'templates/header.php';
                             <div class="card-body">
                                 <div class="row" id="dual-list-container">
                                     <div class="col-sm-5">
-                                        <label class="form-label">Columnas Disponibles</label>
-                                        <div id="available-columns" class="list-box border rounded p-2"></div>
+                                        <label class="form-label" for="available-columns">Columnas Disponibles</label>
+                                        <div id="available-columns" class="list-group list-box border rounded"></div>
                                     </div>
                                     <div class="col-sm-2 d-flex flex-column justify-content-center align-items-center actions-col">
                                         <button id="add-col" class="btn btn-light border mb-2" title="Añadir">&gt;</button>
@@ -95,8 +95,8 @@ include_once 'templates/header.php';
                                         <button id="remove-all-cols" class="btn btn-light border" title="Quitar Todos">&lt;&lt;</button>
                                     </div>
                                     <div class="col-sm-5">
-                                        <label class="form-label">Columnas Seleccionadas</label>
-                                        <div id="selected-columns" class="list-box border rounded p-2"></div>
+                                        <label class="form-label" for="selected-columns">Columnas Seleccionadas</label>
+                                        <div id="selected-columns" class="list-group list-box border rounded"></div>
                                     </div>
                                 </div>
                             </div>
@@ -177,14 +177,24 @@ include_once 'templates/header.php';
 
 <!-- Estilos específicos para el generador de reportes -->
 <style>
-    .list-box { width: 100%; border: 1px solid #ccc; padding: 5px; height: 250px; overflow-y: auto; border-radius: 5px; }
-    .list-item { padding: 8px 10px; border-bottom: 1px solid #eee; cursor: grab; user-select: none; background-color: #fff; }
-    .list-item:last-child { border-bottom: none; }
-    .list-item:hover { background-color: #f0f0f0; }
-    .list-item.selected { background-color: #dcedff; font-weight: bold; }
-    .actions-col button { margin-bottom: 10px; width: 60px; }
-    .filter-row .form-select, .filter-row .form-control { min-width: 150px; }
-    .pagination { display: flex; justify-content: center; }
+    .list-box {
+        height: 280px; /* Altura fija para las cajas de listas */
+        overflow-y: auto; /* Scroll vertical si el contenido excede la altura */
+    }
+    .actions-col button {
+        width: 50px;
+    }
+    /* Asegurar que los items de la lista tengan un cursor de puntero */
+    .list-group-item {
+        cursor: pointer;
+    }
+    .list-group-item.active {
+        /* Estilo de selección de Bootstrap */
+        z-index: 2;
+        color: #fff;
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
 </style>
 
 <!-- Incluir el JS del constructor de reportes y SortableJS -->
