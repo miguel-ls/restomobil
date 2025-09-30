@@ -85,5 +85,13 @@ class Order {
         $stmt->bindParam(':numero_documento', $numero_documento);
         return $stmt->execute();
     }
+
+    public function updateStatus($id, $status) {
+        $query = "CALL sp_updateOrderStatus(:id, :status)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':status', $status);
+        return $stmt->execute();
+    }
 }
 ?>

@@ -117,6 +117,7 @@ if ($is_pago_view) {
 
                 <div class="order-details" id="order-details">
                     <div class="order-details-header">
+                        <h3>Detalles del Pedido</h3>
                         <?php if ($is_editing && isset($order_data['estado'])): ?>
                             <span class="status status-<?php echo htmlspecialchars($order_data['estado']); ?>">
                                 <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $order_data['estado']))); ?>
@@ -125,7 +126,7 @@ if ($is_pago_view) {
                     </div>
                     <form id="order-form" method="POST" action="<?php echo $form_action; ?>">
                         <?php
-                            $default_estado = 'abierto';
+                            $default_estado = 'recibido';
                             if ($is_pago_view) {
                                 $default_estado = 'pagado';
                             } else if ($is_caja_create_view) {
@@ -154,8 +155,8 @@ if ($is_pago_view) {
                         </div>
 
                         <div class="tab-nav">
-                            <button type="button" class="tab-button active" data-tab="details">Detalle</button>
-                            <button type="button" class="tab-button" data-tab="client">Cliente</button>
+                            <button type="button" class="tab-button active" data-tab="details">Detalles de Pedido</button>
+                            <button type="button" class="tab-button" data-tab="client">Clientes</button>
                         </div>
 
                         <div class="tab-content">
@@ -470,9 +471,41 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.querySelectorAll('.status-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            estadoInput.value = this.dataset.status;
-            orderForm.requestSubmit();
+        button.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const newStatus = this.dataset.status;
+
+            if (newStatus === 'abierto' || newStatus === 'cancelado') {
+                if (!confirm(`¿Está seguro de que desea cambiar el estado del pedido a "${newStatus}"?`)) {
+                    return;
+                }
+
+                const orderId = initialOrderData.id;
+                this.disabled = true;
+                this.textContent = 'Actualizando...';
+
+                try {
+                    const response = await fetch(`${apiBaseUrl}pedidos.php?id=${orderId}&action=update_status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ estado: newStatus })
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.message || 'Error al actualizar el estado.');
+
+                    alert('Estado del pedido actualizado con éxito.');
+                    window.location.href = 'pedidos.php';
+                } catch (error) {
+                    alert('Error: ' + error.message);
+                    this.disabled = false;
+                    const originalText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                    this.textContent = originalText;
+                }
+            } else {
+                // Para otros estados como 'completado', mantener el envío del formulario para validación
+                estadoInput.value = newStatus;
+                orderForm.requestSubmit();
+            }
         });
     });
 

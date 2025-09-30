@@ -19,7 +19,7 @@ $is_caja_create_view = $view === 'caja_create';
 // Recoger los datos del formulario
 $id_mesa = $_POST['id_mesa'] ?? null;
 $id_usuario_mozo = $_POST['id_usuario_mozo'] ?? null;
-$estado = $_POST['estado'] ?? 'abierto';
+$estado = $_POST['estado'] ?? 'recibido';
 $items_json = $_POST['items'] ?? '[]';
 $items = json_decode($items_json);
 
