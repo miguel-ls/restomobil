@@ -47,19 +47,20 @@ function send_success($data) {
 
 // --- Diccionario de Columnas para Reportes de Ventas ---
 function get_sales_dictionary() {
-    // Diccionario corregido según el esquema de la base de datos `esquema_ventas.sql`
+    // Diccionario final corregido para coincidir con el código funcional de `ventas.php`
     return [
         ['key' => 'v.id', 'friendly_name' => 'ID Venta', 'type' => 'number'],
         ['key' => 'v.fecha_emision', 'friendly_name' => 'Fecha de Emisión', 'type' => 'date'],
         ['key' => 'v.total', 'friendly_name' => 'Total Venta', 'type' => 'number'],
         ['key' => 'v.estado', 'friendly_name' => 'Estado Venta', 'type' => 'string'],
-        ['key' => 'c.nombre_razon_social', 'friendly_name' => 'Cliente', 'type' => 'string'],
+        // Corregido: `nombres_apellidos` en lugar de `nombre_razon_social`
+        ['key' => 'c.nombres_apellidos', 'friendly_name' => 'Cliente', 'type' => 'string'],
         ['key' => 'c.numero_documento', 'friendly_name' => 'Documento Cliente', 'type' => 'string'],
-        ['key' => 'u.nombre_usuario', 'friendly_name' => 'Cajero', 'type' => 'string'],
+        // Eliminado: La unión con `usuarios` se quita para coincidir con `ventas.php` y asegurar estabilidad.
+        // ['key' => 'u.nombre_usuario', 'friendly_name' => 'Cajero', 'type' => 'string'],
         ['key' => 'tdv.nombre', 'friendly_name' => 'Tipo Documento', 'type' => 'string'],
         ['key' => 'sd.serie', 'friendly_name' => 'Serie Documento', 'type' => 'string'],
         ['key' => 'v.numero_documento', 'friendly_name' => 'Número Documento', 'type' => 'string'],
-        // Las columnas total_neto y total_igv no existen en la tabla ventas, se eliminan.
     ];
 }
 
