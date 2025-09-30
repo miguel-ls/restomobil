@@ -7,6 +7,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 $page_title = 'Reportes Dinámicos de Ventas';
+include_once 'config.php'; // Cargar la configuración de la API
 include_once 'templates/header.php';
 // Incluimos la librería de SheetJS para exportar a Excel.
 // La descargaremos y guardaremos localmente para asegurar su disponibilidad.
