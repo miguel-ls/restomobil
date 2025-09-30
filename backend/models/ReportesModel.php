@@ -29,10 +29,7 @@ class ReportesModel {
                         case 'c':
                             $joinClauses['clientes'] = 'LEFT JOIN clientes c ON v.id_cliente = c.id';
                             break;
-                        case 'u':
-                            // Corregido: la columna es `id_usuario_cajero`
-                            $joinClauses['usuarios'] = 'LEFT JOIN usuarios u ON v.id_usuario_cajero = u.id';
-                            break;
+                        // Eliminado: La unión con `usuarios` se quita para coincidir con `ventas.php` y asegurar estabilidad.
                         case 'tdv':
                             // Corregido: la tabla es `tipo_documento_venta`
                             $joinClauses['tipo_documento_venta'] = 'LEFT JOIN tipo_documento_venta tdv ON v.id_tipo_documento_venta = tdv.id';
