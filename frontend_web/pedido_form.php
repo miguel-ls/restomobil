@@ -476,8 +476,66 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // --- INICIO: Funciones para validación de cierre de caja ---
+
+    /**
+     * Devuelve una fecha en formato YYYY-MM-DD.
+     * Si no se proporciona una fecha, se utiliza la fecha actual.
+     * @param {string|null} dateString - La fecha en formato ISO o similar.
+     * @returns {string} La fecha formateada.
+     */
+    function getFormattedDate(dateString = null) {
+        const date = dateString ? new Date(dateString) : new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    /**
+     * Llama a la API para verificar si existe un cierre de caja para una fecha dada.
+     * @param {string} fecha - La fecha a verificar en formato YYYY-MM-DD.
+     * @returns {Promise<boolean>} - True si existe un cierre, false en caso contrario.
+     */
+    async function verificarCierreExistente(fecha) {
+        try {
+            const response = await fetch(`${apiBaseUrl}verificar_cierre.php?fecha=${fecha}`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error de comunicación con la API de verificación.');
+            }
+            const data = await response.json();
+            return data.cierre_existente;
+        } catch (error) {
+            console.error('Error al verificar el cierre:', error);
+            // Relanzamos el error para que sea manejado por quien llama a la función.
+            throw error;
+        }
+    }
+
+    // --- FIN: Funciones para validación de cierre de caja ---
+
     orderForm.addEventListener('submit', async function(e) {
         e.preventDefault();
+
+        // --- INICIO: VALIDACIÓN DE CIERRE DE CAJA ---
+        // Determinar la fecha del pedido: la de creación si se edita, o la actual si es nuevo.
+        const fechaDelPedido = isEditing && initialOrderData.fecha_creacion
+            ? getFormattedDate(initialOrderData.fecha_creacion)
+            : getFormattedDate();
+
+        try {
+            const cierreExistente = await verificarCierreExistente(fechaDelPedido);
+            if (cierreExistente) {
+                alert('La fecha del pedido tiene un cierre de caja. No se puede crear ni modificar el pedido.');
+                return; // Detener el envío del formulario.
+            }
+        } catch (error) {
+            // Si la API falla, mostramos un error y detenemos la operación.
+            alert(`Error de Verificación: No se pudo verificar el estado de la caja: ${error.message}. Por favor, intente de nuevo.`);
+            return;
+        }
+        // --- FIN: VALIDACIÓN DE CIERRE DE CAJA ---
 
         if (isPagoView) {
             const serieSelect = document.getElementById('id_serie_documento');
