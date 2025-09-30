@@ -52,8 +52,8 @@ class Order {
         return $order_details;
     }
 
-    public function create($id_mesa, $id_usuario_mozo, $items, $estado = 'recibido', $id_cliente = null, $id_tipo_documento_venta = null) {
-        $query = "CALL sp_createOrder(:id_mesa, :id_usuario_mozo, :items_json, :estado, :id_cliente, :id_tipo_documento_venta)";
+    public function create($id_mesa, $id_usuario_mozo, $items, $estado = 'recibido', $id_cliente = null, $id_tipo_documento_venta = null, $id_serie_documento = null, $numero_documento = null) {
+        $query = "CALL sp_createOrder(:id_mesa, :id_usuario_mozo, :items_json, :estado, :id_cliente, :id_tipo_documento_venta, :id_serie_documento, :numero_documento)";
         $stmt = $this->conn->prepare($query);
         $items_json = json_encode($items);
         $stmt->bindParam(':id_mesa', $id_mesa);
@@ -62,14 +62,16 @@ class Order {
         $stmt->bindParam(':estado', $estado);
         $stmt->bindParam(':id_cliente', $id_cliente);
         $stmt->bindParam(':id_tipo_documento_venta', $id_tipo_documento_venta);
+        $stmt->bindParam(':id_serie_documento', $id_serie_documento);
+        $stmt->bindParam(':numero_documento', $numero_documento);
         if ($stmt->execute()) {
             return $stmt;
         }
         return false;
     }
 
-    public function update($id, $id_mesa, $id_usuario_mozo, $status, $items, $id_cliente = null, $id_tipo_documento_venta = null) {
-        $query = "CALL sp_updateOrder(:id, :id_mesa, :id_usuario_mozo, :status, :items_json, :id_cliente, :id_tipo_documento_venta)";
+    public function update($id, $id_mesa, $id_usuario_mozo, $status, $items, $id_cliente = null, $id_tipo_documento_venta = null, $id_serie_documento = null, $numero_documento = null) {
+        $query = "CALL sp_updateOrder(:id, :id_mesa, :id_usuario_mozo, :status, :items_json, :id_cliente, :id_tipo_documento_venta, :id_serie_documento, :numero_documento)";
         $stmt = $this->conn->prepare($query);
         $items_json = json_encode($items);
         $stmt->bindParam(':id', $id);
@@ -79,6 +81,8 @@ class Order {
         $stmt->bindParam(':items_json', $items_json);
         $stmt->bindParam(':id_cliente', $id_cliente);
         $stmt->bindParam(':id_tipo_documento_venta', $id_tipo_documento_venta);
+        $stmt->bindParam(':id_serie_documento', $id_serie_documento);
+        $stmt->bindParam(':numero_documento', $numero_documento);
         return $stmt->execute();
     }
 }

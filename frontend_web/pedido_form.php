@@ -733,18 +733,23 @@ document.addEventListener('DOMContentLoaded', function() {
         ]);
 
         if (tipoComprobanteSelect.value) {
-            await loadSeries(tipoComprobanteSelect.value);
+            await loadSeries(tipoComprobanteSelect.value, isEditing ? initialOrderData.id_serie_documento : null);
         }
 
-        if (isEditing && initialOrderData && initialOrderData.id_cliente) {
-            selectCliente({
-                id: initialOrderData.id_cliente,
-                nombres_apellidos: initialOrderData.nombre_cliente,
-                id_tipo_documento_identidad: initialOrderData.id_tipo_documento_identidad_cliente,
-                numero_documento: initialOrderData.ruc_cliente,
-                direccion: initialOrderData.direccion_cliente,
-                codigo_ubigeo: initialOrderData.codigo_ubigeo
-            });
+        if (isEditing && initialOrderData) {
+            if (initialOrderData.numero_documento) {
+                document.getElementById('numero_documento').value = initialOrderData.numero_documento;
+            }
+            if (initialOrderData.id_cliente) {
+                selectCliente({
+                    id: initialOrderData.id_cliente,
+                    nombres_apellidos: initialOrderData.nombre_cliente,
+                    id_tipo_documento_identidad: initialOrderData.id_tipo_documento_identidad_cliente,
+                    numero_documento: initialOrderData.ruc_cliente,
+                    direccion: initialOrderData.direccion_cliente,
+                    codigo_ubigeo: initialOrderData.codigo_ubigeo
+                });
+            }
         } else {
             clearClienteSelection();
         }
