@@ -336,7 +336,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Initial Load ---
     fetchFromAPI('get_dictionary')
         .then(data => {
-            reportColumns = data;
+            // Accedemos a la propiedad 'columns' de la respuesta de la API
+            reportColumns = data.columns;
             populateAvailableColumns(reportColumns);
             addFilterRow();
             loadTemplates();
