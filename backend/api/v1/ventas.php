@@ -9,7 +9,7 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     if (!empty($_GET['id'])) {
-        // --- Obtener una sola venta con su detalle ---
+        // --- Obtener una sola venta con su detalle (sin cambios) ---
         $id_venta = intval($_GET['id']);
         $query = "
             SELECT
@@ -51,17 +51,13 @@ try {
         exit;
     }
 
-    // --- Obtener todas las ventas (lista) ---
-    $query = "
-        SELECT
-            v.id,
-            v.fecha_emision,
-            c.nombres_apellidos AS nombre_cliente,
-            tdv.nombre AS tipo_documento,
-            sd.serie,
-            v.numero_documento,
-            v.total,
-            v.estado
+    // --- Lógica de Paginación y Filtros para la lista de ventas ---
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+    $offset = ($page - 1) * $limit;
+
+    // --- Construcción de la consulta con filtros ---
+    $base_query = "
         FROM
             ventas v
         LEFT JOIN
@@ -71,17 +67,14 @@ try {
         LEFT JOIN
             series_documentos sd ON v.id_serie_documento = sd.id
     ";
-
     $where_clauses = [];
     $params = [];
 
-    // Lógica de filtros (ejemplo)
     if (!empty($_GET['fecha_inicio'])) {
         $where_clauses[] = "v.fecha_emision >= :fecha_inicio";
         $params[':fecha_inicio'] = $_GET['fecha_inicio'];
     }
     if (!empty($_GET['fecha_fin'])) {
-        // Añadir 1 día para incluir todo el día de la fecha fin
         $fecha_fin = date('Y-m-d', strtotime($_GET['fecha_fin'] . ' +1 day'));
         $where_clauses[] = "v.fecha_emision < :fecha_fin";
         $params[':fecha_fin'] = $fecha_fin;
@@ -94,27 +87,64 @@ try {
         $where_clauses[] = "v.estado = :estado";
         $params[':estado'] = $_GET['estado'];
     }
-
-    if (!empty($where_clauses)) {
-        $query .= " WHERE " . implode(' AND ', $where_clauses);
+    if (!empty($_GET['id_tipo_documento'])) {
+        $where_clauses[] = "v.id_tipo_documento_venta = :id_tipo_documento";
+        $params[':id_tipo_documento'] = $_GET['id_tipo_documento'];
     }
 
-    $query .= " ORDER BY v.fecha_emision DESC";
+    $where_sql = "";
+    if (!empty($where_clauses)) {
+        $where_sql = " WHERE " . implode(' AND ', $where_clauses);
+    }
 
-    // Lógica de paginación (a implementar si es necesario)
-    // $query .= " LIMIT :offset, :limit";
+    // --- Contar el total de registros para la paginación ---
+    $count_query = "SELECT COUNT(v.id) as total " . $base_query . $where_sql;
+    $stmt_count = $pdo->prepare($count_query);
+    $stmt_count->execute($params);
+    $total_records = (int)$stmt_count->fetch(PDO::FETCH_ASSOC)['total'];
+    $total_pages = ceil($total_records / $limit);
+
+    // --- Obtener los registros para la página actual ---
+    $query = "
+        SELECT
+            v.id, v.fecha_emision,
+            c.nombres_apellidos AS nombre_cliente,
+            tdv.nombre AS tipo_documento,
+            sd.serie, v.numero_documento, v.total, v.estado
+        " . $base_query . $where_sql . "
+        ORDER BY v.fecha_emision DESC
+        LIMIT :limit OFFSET :offset
+    ";
 
     $stmt = $pdo->prepare($query);
-    $stmt->execute($params);
+    foreach ($params as $key => &$val) {
+        $stmt->bindParam($key, $val);
+    }
+    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
 
     $ventas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    if ($ventas) {
+    // --- Preparar la respuesta ---
+    $response = [
+        "records" => $ventas,
+        "pagination" => [
+            "total_records" => $total_records,
+            "total_pages" => $total_pages,
+            "current_page" => $page,
+            "limit" => $limit
+        ]
+    ];
+
+    if ($total_records > 0) {
         http_response_code(200);
-        echo json_encode(["records" => $ventas]);
+        echo json_encode($response);
     } else {
         http_response_code(404);
-        echo json_encode(["message" => "No se encontraron ventas."]);
+        // Devolvemos la misma estructura para consistencia
+        $response["message"] = "No se encontraron ventas con los filtros aplicados.";
+        echo json_encode($response);
     }
 
 } catch (PDOException $e) {

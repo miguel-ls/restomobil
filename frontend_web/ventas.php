@@ -9,54 +9,62 @@ $page_title = 'Gestión de Ventas';
 include_once 'templates/header.php';
 include_once __DIR__ . '/config.php';
 
-function getVentas($filters = []) {
-    $api_url = API_BASE_URL . 'ventas.php';
-    if (!empty($filters)) {
-        $api_url .= '?' . http_build_query($filters);
-    }
+// --- Funciones de API ---
+function fetchFromAPI($endpoint) {
+    $api_url = API_BASE_URL . $endpoint;
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $response = curl_exec($ch);
     if (curl_errno($ch)) {
-        return ['error' => 'Error de comunicación con la API: ' . curl_error($ch)];
+        error_log("cURL Error fetching $api_url: " . curl_error($ch));
+        return ['error' => 'Error de comunicación con la API.'];
     }
     curl_close($ch);
-    return json_decode($response, true);
+    $data = json_decode($response, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log("JSON Decode Error for $api_url. Response: $response");
+        return ['error' => 'Respuesta inválida de la API.'];
+    }
+    return $data;
 }
 
-// --- Lógica de Filtros ---
+// --- Obtener datos para filtros ---
+$tipos_documento_data = fetchFromAPI('tipos_documentos.php');
+$tipos_documento = $tipos_documento_data['records'] ?? [];
+
+// --- Lógica de Filtros y Paginación ---
 $is_filtering = !empty($_GET);
 
-// Definir valores por defecto para los filtros
-$default_anio = date('Y');
-$default_mes = date('m');
+// Valores de paginación
+$page = $_GET['page'] ?? 1;
+$limit = $_GET['limit'] ?? 10;
+
+// Valores de filtros
 $default_fecha_inicio = date('Y-m-01');
 $default_fecha_fin = date('Y-m-t');
 
-// Usar valores por defecto solo si NO hay filtros en la URL
-$anio_seleccionado = $_GET['filtro_anio'] ?? ($is_filtering ? '' : $default_anio);
-$mes_seleccionado = $_GET['filtro_mes'] ?? ($is_filtering ? '' : $default_mes);
 $fecha_inicio_seleccionada = $_GET['fecha_inicio'] ?? ($is_filtering ? '' : $default_fecha_inicio);
 $fecha_fin_seleccionada = $_GET['fecha_fin'] ?? ($is_filtering ? '' : $default_fecha_fin);
 $estado_seleccionado = $_GET['estado'] ?? 'Todos';
+$tipo_documento_seleccionado = $_GET['id_tipo_documento'] ?? '';
 $search_query = $_GET['search'] ?? '';
 
-// Recoger filtros para la API
-$filters = [];
-// Si el usuario no está filtrando activamente, usamos los defaults
-if (!$is_filtering) {
-    $filters['fecha_inicio'] = $default_fecha_inicio;
-    $filters['fecha_fin'] = $default_fecha_fin;
-} else {
-    // Si está filtrando, usamos los valores de la URL
-    if ($fecha_inicio_seleccionada) $filters['fecha_inicio'] = $fecha_inicio_seleccionada;
-    if ($fecha_fin_seleccionada) $filters['fecha_fin'] = $fecha_fin_seleccionada;
-    if ($search_query) $filters['search'] = $search_query;
-    if ($estado_seleccionado !== 'Todos') $filters['estado'] = $estado_seleccionado;
-}
+// Construir los parámetros para la API
+$filters = [
+    'page' => $page,
+    'limit' => $limit
+];
+
+if ($fecha_inicio_seleccionada) $filters['fecha_inicio'] = $fecha_inicio_seleccionada;
+if ($fecha_fin_seleccionada) $filters['fecha_fin'] = $fecha_fin_seleccionada;
+if ($search_query) $filters['search'] = $search_query;
+if ($estado_seleccionado !== 'Todos') $filters['estado'] = $estado_seleccionado;
+if ($tipo_documento_seleccionado) $filters['id_tipo_documento'] = $tipo_documento_seleccionado;
 
 
-$ventas_data = getVentas($filters);
+$ventas_data = fetchFromAPI('ventas.php?' . http_build_query($filters));
+$ventas = $ventas_data['records'] ?? [];
+$pagination = $ventas_data['pagination'] ?? null;
 ?>
 
 <div class="dashboard-container">
@@ -72,36 +80,39 @@ $ventas_data = getVentas($filters);
             <div class="filter-container">
                 <form id="filter-form" method="GET" action="ventas.php">
                     <div class="filters">
-                        <select id="filtro_anio" name="filtro_anio" title="Año">
-                            <option value="">Año</option>
-                            <?php
-                                $current_year = date('Y');
-                                for ($i = $current_year; $i >= $current_year - 5; $i--) {
-                                    $selected = ($anio_seleccionado == $i) ? 'selected' : '';
-                                    echo "<option value=\"$i\" $selected>$i</option>";
-                                }
-                            ?>
-                        </select>
-                        <select id="filtro_mes" name="filtro_mes" title="Mes">
-                            <option value="">Mes</option>
-                            <?php
-                                $meses = ["01"=>"Enero", "02"=>"Febrero", "03"=>"Marzo", "04"=>"Abril", "05"=>"Mayo", "06"=>"Junio", "07"=>"Julio", "08"=>"Agosto", "09"=>"Septiembre", "10"=>"Octubre", "11"=>"Noviembre", "12"=>"Diciembre"];
-                                foreach ($meses as $num => $nombre) {
-                                    $selected = ($mes_seleccionado == $num) ? 'selected' : '';
-                                    echo "<option value=\"$num\" $selected>$nombre</option>";
-                                }
-                            ?>
-                        </select>
                         <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?php echo htmlspecialchars($fecha_inicio_seleccionada); ?>" title="Fecha desde">
                         <input type="date" id="fecha_fin" name="fecha_fin" value="<?php echo htmlspecialchars($fecha_fin_seleccionada); ?>" title="Fecha hasta">
+
+                        <select id="id_tipo_documento" name="id_tipo_documento" title="Tipo de Comprobante">
+                            <option value="">Tipo de Comprobante</option>
+                            <?php foreach ($tipos_documento as $tipo): ?>
+                                <option value="<?php echo $tipo['id']; ?>" <?php echo ($tipo_documento_seleccionado == $tipo['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($tipo['nombre']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+
                         <select id="estado" name="estado" title="Estado">
                             <option value="Todos" <?php echo ($estado_seleccionado == 'Todos') ? 'selected' : ''; ?>>Todos los Estados</option>
                             <option value="emitida" <?php echo ($estado_seleccionado == 'emitida') ? 'selected' : ''; ?>>Emitida</option>
                             <option value="anulada" <?php echo ($estado_seleccionado == 'anulada') ? 'selected' : ''; ?>>Anulada</option>
                         </select>
-                        <input type="text" id="search" name="search" placeholder="Buscar..." value="<?php echo htmlspecialchars($search_query); ?>">
+
+                        <input type="text" id="search" name="search" placeholder="Buscar por cliente, n° doc..." value="<?php echo htmlspecialchars($search_query); ?>">
                         <button type="submit" class="btn">Filtrar</button>
                         <a href="ventas.php" class="btn btn-secondary">Limpiar</a>
+                    </div>
+                    <div class="pagination-controls-top">
+                        <select name="limit" onchange="this.form.submit()">
+                            <option value="10" <?php if ($limit == 10) echo 'selected'; ?>>10 por página</option>
+                            <option value="25" <?php if ($limit == 25) echo 'selected'; ?>>25 por página</option>
+                            <option value="50" <?php if ($limit == 50) echo 'selected'; ?>>50 por página</option>
+                        </select>
+                        <?php if ($pagination && $pagination['total_records'] > 0): ?>
+                        <span class="pagination-summary">
+                            Mostrando <?php echo count($ventas); ?> de <?php echo $pagination['total_records']; ?> registros
+                        </span>
+                        <?php endif; ?>
                     </div>
                 </form>
             </div>
@@ -120,8 +131,8 @@ $ventas_data = getVentas($filters);
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (isset($ventas_data['records']) && !empty($ventas_data['records'])): ?>
-                            <?php foreach ($ventas_data['records'] as $venta): ?>
+                        <?php if (!empty($ventas)): ?>
+                            <?php foreach ($ventas as $venta): ?>
                                 <tr>
                                     <td data-label="ID"><?php echo htmlspecialchars($venta['id']); ?></td>
                                     <td data-label="Fecha Emisión"><?php echo htmlspecialchars(date("d/m/Y H:i", strtotime($venta['fecha_emision']))); ?></td>
@@ -150,32 +161,47 @@ $ventas_data = getVentas($filters);
                     </tbody>
                 </table>
             </div>
+
+            <!-- Controles de Paginación Inferiores -->
+            <?php if ($pagination && $pagination['total_pages'] > 1): ?>
+            <div class="pagination-controls-bottom">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <?php
+                        // Botón "Anterior"
+                        if ($pagination['current_page'] > 1) {
+                            $prev_page_params = http_build_query(array_merge($_GET, ['page' => $pagination['current_page'] - 1]));
+                            echo "<li class='page-item'><a class='page-link' href='?$prev_page_params'>Anterior</a></li>";
+                        } else {
+                            echo "<li class='page-item disabled'><span class='page-link'>Anterior</span></li>";
+                        }
+
+                        // Números de página
+                        for ($i = 1; $i <= $pagination['total_pages']; $i++) {
+                            $page_params = http_build_query(array_merge($_GET, ['page' => $i]));
+                            $active_class = ($i == $pagination['current_page']) ? 'active' : '';
+                            echo "<li class='page-item $active_class'><a class='page-link' href='?$page_params'>$i</a></li>";
+                        }
+
+                        // Botón "Siguiente"
+                        if ($pagination['current_page'] < $pagination['total_pages']) {
+                            $next_page_params = http_build_query(array_merge($_GET, ['page' => $pagination['current_page'] + 1]));
+                            echo "<li class='page-item'><a class='page-link' href='?$next_page_params'>Siguiente</a></li>";
+                        } else {
+                            echo "<li class='page-item disabled'><span class='page-link'>Siguiente</span></li>";
+                        }
+                        ?>
+                    </ul>
+                </nav>
+            </div>
+            <?php endif; ?>
+
         </div>
     </main>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Lógica de filtros existente
-    const anioSelect = document.getElementById('filtro_anio');
-    const mesSelect = document.getElementById('filtro_mes');
-    const fechaInicioInput = document.getElementById('fecha_inicio');
-    const fechaFinInput = document.getElementById('fecha_fin');
-
-    function updateDateFields() {
-        const year = anioSelect.value;
-        const month = mesSelect.value;
-        if (year && month) {
-            const primerDia = `${year}-${month}-01`;
-            const ultimoDia = new Date(year, month, 0).getDate();
-            const fechaFin = `${year}-${month}-${ultimoDia}`;
-            fechaInicioInput.value = primerDia;
-            fechaFinInput.value = fechaFin;
-        }
-    }
-    anioSelect.addEventListener('change', updateDateFields);
-    mesSelect.addEventListener('change', updateDateFields);
-
     const apiBaseUrl = '<?php echo API_BASE_URL; ?>';
 
     // Lógica para anular venta
@@ -191,15 +217,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json().then(data => ({ status: response.status, body: data })))
                 .then(result => {
                     if (result.status === 200) {
-                        const row = this.closest('tr');
-                        const statusCell = row.querySelector('.status');
-                        if (statusCell) {
-                            statusCell.classList.remove('status-emitida');
-                            statusCell.classList.add('status-cancelado');
-                            statusCell.textContent = 'Anulada';
-                        }
-                        this.remove(); // Eliminar el botón de anular
                         alert(result.body.message);
+                        window.location.reload();
                     } else {
                         throw new Error(result.body.message || 'Error desconocido');
                     }
@@ -222,8 +241,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json().then(data => ({ status: response.status, body: data })))
                 .then(result => {
                     if (result.status === 200) {
-                        this.closest('tr').remove();
                         alert(result.body.message);
+                        this.closest('tr').remove();
                     } else {
                         throw new Error(result.body.message || 'Error desconocido');
                     }
@@ -241,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
     flex-wrap: wrap;
     gap: 10px;
     align-items: center;
-    padding-bottom: 20px;
+    padding-bottom: 10px;
 }
 .filter-container .filters select,
 .filter-container .filters input {
@@ -249,32 +268,75 @@ document.addEventListener('DOMContentLoaded', function() {
     border-radius: 5px;
     border: 1px solid #ccc;
     flex-grow: 1;
-    flex-basis: 130px; /* Ancho base para la mayoría */
+    flex-basis: 150px;
 }
-#filtro_anio {
-    flex-grow: 0;
-    flex-basis: 90px; /* Ancho reducido para el año */
-}
-#filtro_mes {
-    flex-grow: 0.8;
-    flex-basis: 120px;
-}
-#search {
-    flex-grow: 2; /* Más espacio para la búsqueda */
-}
+#search { flex-grow: 2; }
 .filter-container .filters button,
 .filter-container .filters a.btn {
     padding: 8px 15px;
-    border-radius: 5px;
-    border: 1px solid #007bff;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
     flex-grow: 0;
+}
+.pagination-controls-top {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 20px;
+}
+.pagination-controls-top select {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+.pagination-summary {
+    font-size: 0.9em;
+    color: #555;
+}
+.pagination-controls-bottom {
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+}
+.pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.page-item .page-link {
+    padding: 10px 15px;
+    display: block;
+    color: #007bff;
+    background-color: #fff;
+    border: 1px solid #ddd;
     text-decoration: none;
 }
-.filter-container .filters a.btn-secondary {
-    background-color: #6c757d;
-    border-color: #6c757d;
+.page-item:first-child .page-link {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+.page-item:last-child .page-link {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.page-item.active .page-link {
+    z-index: 1;
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+}
+.page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #fff;
+    border-color: #ddd;
+}
+.page-item:not(:first-child) .page-link {
+    margin-left: -1px;
+}
+.page-item .page-link:hover {
+    background-color: #e9ecef;
 }
 </style>
