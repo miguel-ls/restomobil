@@ -32,14 +32,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const API_URL = `${API_BASE_URL}/reportes_ventas_handler.php`;
 
     // --- Initialization ---
+    // Aplicar SortableJS solo a la lista de seleccionadas para reordenar.
+    // Esto evita que la librería interfiera con los eventos de clic en la lista de disponibles.
     new Sortable(selectedColumnsEl, {
         animation: 150,
-        ghostClass: 'active', // Usar la clase 'active' de Bootstrap para el estilo de arrastre
-        group: 'shared'
-    });
-    new Sortable(availableColumnsEl, {
-        group: 'shared',
-        animation: 150
+        ghostClass: 'active' // Usar la clase 'active' de Bootstrap para el estilo de arrastre
     });
 
     function showAlert(message, type = 'danger') {
@@ -247,11 +244,15 @@ document.addEventListener('DOMContentLoaded', function () {
     removeColBtn.addEventListener('click', () => moveItems(selectedColumnsEl, availableColumnsEl, selectedColumnsEl.querySelectorAll('.list-group-item.active')));
     removeAllColsBtn.addEventListener('click', () => moveItems(selectedColumnsEl, availableColumnsEl, selectedColumnsEl.querySelectorAll('.list-group-item')));
 
+    // Event listener más robusto para la selección de items
     document.getElementById('dual-list-container').addEventListener('click', e => {
-        if (e.target.classList.contains('list-group-item')) {
+        // Usar .closest() para encontrar el elemento de la lista, sin importar si se hizo clic en el texto o en el div
+        const item = e.target.closest('.list-group-item');
+
+        // Asegurarse de que el item existe y pertenece a este contenedor
+        if (item && document.getElementById('dual-list-container').contains(item)) {
             e.preventDefault();
-            // Usar la clase 'active' de Bootstrap para marcar la selección
-            e.target.classList.toggle('active');
+            item.classList.toggle('active');
         }
     });
 
