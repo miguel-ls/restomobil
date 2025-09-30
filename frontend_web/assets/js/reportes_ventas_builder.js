@@ -168,10 +168,61 @@ document.addEventListener('DOMContentLoaded', function () {
             showAlert('La librería de exportación (XLSX) no está disponible.');
             return;
         }
+
+        // 1. Crear la hoja de cálculo a partir de los datos
         const ws = XLSX.utils.json_to_sheet(data);
+
+        // 2. Añadir filtros automáticos a la cabecera
+        ws['!autofilter'] = { ref: ws['!ref'] };
+        // Congelar la primera fila
+        ws['!view'] = { state: 'frozen', ySplit: 1 };
+
+        // 3. Definir estilos (colores azules, bordes, etc.)
+        const borderStyle = { style: 'thin', color: { rgb: "FF000000" } };
+        const headerStyle = {
+            font: { bold: true, color: { rgb: "FFFFFFFF" } },
+            fill: { fgColor: { rgb: "FF4F81BD" } }, // Azul oscuro
+            border: { top: borderStyle, bottom: borderStyle, left: borderStyle, right: borderStyle }
+        };
+        const oddRowStyle = { fill: { fgColor: { rgb: "FFDCE6F1" } } }; // Azul claro
+
+        // 4. Aplicar estilos y calcular el ancho de las columnas
+        let colWidths = [];
+        const range = XLSX.utils.decode_range(ws['!ref']);
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+            let maxWidth = 0;
+            for (let R = range.s.r; R <= range.e.r; ++R) {
+                const cell_ref = XLSX.utils.encode_cell({ c: C, r: R });
+                if (!ws[cell_ref]) continue;
+
+                // Aplicar estilo a la cabecera
+                if (R === 0) {
+                    ws[cell_ref].s = headerStyle;
+                }
+                // Aplicar estilo a las filas impares para un efecto de bandas
+                else if (R % 2 !== 0) {
+                     ws[cell_ref].s = oddRowStyle;
+                }
+
+                // Calcular el ancho máximo de la columna
+                const cellTextLength = ws[cell_ref].v ? String(ws[cell_ref].v).length : 0;
+                if (cellTextLength > maxWidth) {
+                    maxWidth = cellTextLength;
+                }
+            }
+            // Asegurarse de que el ancho de la cabecera también se considere
+            const headerCell = XLSX.utils.encode_cell({c: C, r: 0});
+            const headerTextLength = ws[headerCell] ? String(ws[headerCell].v).length : 0;
+            maxWidth = Math.max(maxWidth, headerTextLength);
+
+            colWidths[C] = { wch: maxWidth + 2 }; // Añadir un poco de padding
+        }
+        ws['!cols'] = colWidths;
+
+        // 5. Crear el libro de trabajo y exportar el archivo
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Reporte");
-        XLSX.writeFile(wb, "Reporte_Ventas.xlsx");
+        XLSX.writeFile(wb, "Reporte_Ventas.xlsx", { bookSST: true });
     }
 
     // --- Event Listeners ---
