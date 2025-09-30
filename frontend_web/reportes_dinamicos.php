@@ -77,26 +77,26 @@ include_once 'templates/header.php';
                 <!-- Fila para Selectores y Filtros -->
                 <div class="row">
                     <!-- Selector de Columnas -->
-                    <div class="col-12 mb-4">
-                        <div class="card">
+                    <div class="col-lg-7 mb-4">
+                        <div class="card h-100">
                             <div class="card-header">
                                 <h5 class="card-title mb-0">1. Seleccione y Ordene las Columnas</h5>
                             </div>
                             <div class="card-body">
                                 <div class="row" id="dual-list-container">
-                                    <div class="col-md-5">
-                                        <strong>Columnas Disponibles</strong>
-                                        <div id="available-columns" class="list-box"></div>
+                                    <div class="col-sm-5">
+                                        <label class="form-label">Columnas Disponibles</label>
+                                        <div id="available-columns" class="list-box border rounded p-2"></div>
                                     </div>
-                                    <div class="col-md-2 d-flex flex-column justify-content-center align-items-center actions-col">
-                                        <button id="add-col" class="btn btn-sm btn-outline-secondary" title="Añadir">&gt;</button>
-                                        <button id="add-all-cols" class="btn btn-sm btn-outline-secondary" title="Añadir Todos">&gt;&gt;</button>
-                                        <button id="remove-col" class="btn btn-sm btn-outline-secondary" title="Quitar">&lt;</button>
-                                        <button id="remove-all-cols" class="btn btn-sm btn-outline-secondary" title="Quitar Todos">&lt;&lt;</button>
+                                    <div class="col-sm-2 d-flex flex-column justify-content-center align-items-center actions-col">
+                                        <button id="add-col" class="btn btn-light border mb-2" title="Añadir">&gt;</button>
+                                        <button id="add-all-cols" class="btn btn-light border mb-2" title="Añadir Todos">&gt;&gt;</button>
+                                        <button id="remove-col" class="btn btn-light border mb-2" title="Quitar">&lt;</button>
+                                        <button id="remove-all-cols" class="btn btn-light border" title="Quitar Todos">&lt;&lt;</button>
                                     </div>
-                                    <div class="col-md-5">
-                                        <strong>Columnas Seleccionadas (arrastre para ordenar)</strong>
-                                        <div id="selected-columns" class="list-box"></div>
+                                    <div class="col-sm-5">
+                                        <label class="form-label">Columnas Seleccionadas</label>
+                                        <div id="selected-columns" class="list-box border rounded p-2"></div>
                                     </div>
                                 </div>
                             </div>
@@ -104,17 +104,17 @@ include_once 'templates/header.php';
                     </div>
 
                     <!-- Constructor de Filtros -->
-                    <div class="col-12 mb-4">
-                        <div class="card">
+                    <div class="col-lg-5 mb-4">
+                        <div class="card h-100">
                             <div class="card-header">
                                 <h5 class="card-title mb-0">2. Construya los Filtros (Opcional)</h5>
                             </div>
                             <div class="card-body">
-                                <p class="card-text">Añada condiciones para filtrar los datos. Todos los filtros se aplican con un "Y" lógico.</p>
+                                <p class="card-text small text-muted">Añada condiciones para filtrar los datos. Todos los filtros se aplican con un "Y" lógico.</p>
                                 <div id="filterContainer">
                                     <!-- Los filtros se añadirán aquí dinámicamente -->
                                 </div>
-                                <button id="addFilterBtn" class="btn btn-sm btn-outline-primary mt-2">
+                                <button id="addFilterBtn" class="btn btn-outline-primary mt-2">
                                     <i class="bi bi-plus-circle"></i> Añadir Filtro
                                 </button>
                             </div>

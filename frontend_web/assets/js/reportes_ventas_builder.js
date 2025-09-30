@@ -34,7 +34,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Initialization ---
     new Sortable(selectedColumnsEl, {
         animation: 150,
-        ghostClass: 'selected'
+        ghostClass: 'active', // Usar la clase 'active' de Bootstrap para el estilo de arrastre
+        group: 'shared'
+    });
+    new Sortable(availableColumnsEl, {
+        group: 'shared',
+        animation: 150
     });
 
     function showAlert(message, type = 'danger') {
@@ -64,9 +69,11 @@ document.addEventListener('DOMContentLoaded', function () {
         availableColumnsEl.innerHTML = '';
         columns.forEach(col => {
             const item = document.createElement('div');
-            item.className = 'list-item';
+            // Usar clases de Bootstrap para un estilo consistente
+            item.className = 'list-group-item list-group-item-action';
             item.dataset.key = col.key;
             item.textContent = col.friendly_name;
+            item.style.cursor = 'pointer'; // Añadir cursor para indicar que es clickeable
             availableColumnsEl.appendChild(item);
         });
     }
@@ -228,18 +235,24 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Event Listeners ---
     function moveItems(from, to, items) {
         items.forEach(item => {
-            item.classList.remove('selected');
+            // Usar la clase 'active' de Bootstrap para la selección
+            item.classList.remove('active');
             to.appendChild(item);
         });
     }
 
-    addColBtn.addEventListener('click', () => moveItems(availableColumnsEl, selectedColumnsEl, availableColumnsEl.querySelectorAll('.list-item.selected')));
-    addAllColsBtn.addEventListener('click', () => moveItems(availableColumnsEl, selectedColumnsEl, availableColumnsEl.querySelectorAll('.list-item')));
-    removeColBtn.addEventListener('click', () => moveItems(selectedColumnsEl, availableColumnsEl, selectedColumnsEl.querySelectorAll('.list-item.selected')));
-    removeAllColsBtn.addEventListener('click', () => moveItems(selectedColumnsEl, availableColumnsEl, selectedColumnsEl.querySelectorAll('.list-item')));
+    // Actualizar selectores para usar la nueva clase de item y la clase 'active'
+    addColBtn.addEventListener('click', () => moveItems(availableColumnsEl, selectedColumnsEl, availableColumnsEl.querySelectorAll('.list-group-item.active')));
+    addAllColsBtn.addEventListener('click', () => moveItems(availableColumnsEl, selectedColumnsEl, availableColumnsEl.querySelectorAll('.list-group-item')));
+    removeColBtn.addEventListener('click', () => moveItems(selectedColumnsEl, availableColumnsEl, selectedColumnsEl.querySelectorAll('.list-group-item.active')));
+    removeAllColsBtn.addEventListener('click', () => moveItems(selectedColumnsEl, availableColumnsEl, selectedColumnsEl.querySelectorAll('.list-group-item')));
 
     document.getElementById('dual-list-container').addEventListener('click', e => {
-        if (e.target.classList.contains('list-item')) e.target.classList.toggle('selected');
+        if (e.target.classList.contains('list-group-item')) {
+            e.preventDefault();
+            // Usar la clase 'active' de Bootstrap para marcar la selección
+            e.target.classList.toggle('active');
+        }
     });
 
     addFilterBtn.addEventListener('click', addFilterRow);
