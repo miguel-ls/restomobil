@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `impuestos` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `codigo` CHAR(3) NOT NULL,
   `fecha_inicial` DATE NOT NULL,
-  `fecha_final` DATE NOT NULL,
+  `fecha_final` DATE NULL, -- Modificado para ser opcional
   `valor` DECIMAL(10, 2) NOT NULL,
   `estado` BOOLEAN NOT NULL DEFAULT TRUE, -- 1 para Activo, 0 para Inactivo
   `fecha_creacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

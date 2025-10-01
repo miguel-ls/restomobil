@@ -59,8 +59,8 @@ include_once 'templates/header.php';
                     </div>
 
                     <div class="form-group">
-                        <label for="fecha_final">Fecha Final</label>
-                        <input type="date" id="fecha_final" name="fecha_final" value="<?php echo htmlspecialchars($impuesto_data['fecha_final']); ?>" required>
+                        <label for="fecha_final">Fecha Final (Opcional)</label>
+                        <input type="date" id="fecha_final" name="fecha_final" value="<?php echo htmlspecialchars($impuesto_data['fecha_final']); ?>">
                     </div>
 
                     <div class="form-group">

@@ -79,10 +79,13 @@ switch ($request_method) {
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
 
-        if (!empty($data->codigo) && !empty($data->fecha_inicial) && !empty($data->fecha_final) && isset($data->valor)) {
+        // La fecha final ya no es obligatoria
+        if (!empty($data->codigo) && !empty($data->fecha_inicial) && isset($data->valor)) {
             $estado = isset($data->estado) ? (bool)$data->estado : true;
+            // Convertir fecha final vacía a NULL
+            $fecha_final = !empty($data->fecha_final) ? $data->fecha_final : null;
 
-            if ($impuesto->create($data->codigo, $data->fecha_inicial, $data->fecha_final, $data->valor, $estado)) {
+            if ($impuesto->create($data->codigo, $data->fecha_inicial, $fecha_final, $data->valor, $estado)) {
                 http_response_code(201);
                 echo json_encode(["message" => "Impuesto creado con éxito."]);
             } else {
@@ -91,7 +94,7 @@ switch ($request_method) {
             }
         } else {
             http_response_code(400);
-            echo json_encode(["message" => "Datos incompletos."]);
+            echo json_encode(["message" => "Datos incompletos. Código, fecha inicial y valor son obligatorios."]);
         }
         break;
 
@@ -99,10 +102,13 @@ switch ($request_method) {
         $data = json_decode(file_get_contents("php://input"));
         $impuesto_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
 
-        if ($impuesto_id && !empty($data->codigo) && !empty($data->fecha_inicial) && !empty($data->fecha_final) && isset($data->valor)) {
+        // La fecha final ya no es obligatoria
+        if ($impuesto_id && !empty($data->codigo) && !empty($data->fecha_inicial) && isset($data->valor)) {
              $estado = isset($data->estado) ? (bool)$data->estado : true;
+             // Convertir fecha final vacía a NULL
+             $fecha_final = !empty($data->fecha_final) ? $data->fecha_final : null;
 
-            if ($impuesto->update($impuesto_id, $data->codigo, $data->fecha_inicial, $data->fecha_final, $data->valor, $estado)) {
+            if ($impuesto->update($impuesto_id, $data->codigo, $data->fecha_inicial, $fecha_final, $data->valor, $estado)) {
                 http_response_code(200);
                 echo json_encode(["message" => "Impuesto actualizado con éxito."]);
             } else {
