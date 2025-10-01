@@ -12,12 +12,10 @@ class ApiService {
   // La URL base ahora se gestiona en `config/api_config.dart`.
   static const String _baseUrl = baseUrl;
 
-  /**
-   * Intenta iniciar sesión en el sistema.
-   * @param username El nombre de usuario.
-   * @param password La contraseña del usuario.
-   * @return Un Map con los datos del usuario si el login es exitoso, o null si falla.
-   */
+  /// Intenta iniciar sesión en el sistema.
+  /// @param username El nombre de usuario.
+  /// @param password La contraseña del usuario.
+  /// @return Un Map con los datos del usuario si el login es exitoso, o null si falla.
   Future<Map<String, dynamic>?> login(String username, String password) async {
     final url = Uri.parse('$_baseUrl/login.php');
 
