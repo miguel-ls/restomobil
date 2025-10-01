@@ -41,50 +41,38 @@ switch ($request_method) {
                 echo json_encode(["message" => "Impuesto no encontrado."]);
             }
         }
-        // Si se solicita la lista de impuestos con filtros y paginación
+        // Si se solicita la lista de impuestos con filtros y paginación (versión corregida)
         else {
             // Parámetros de filtro y paginación
             $codigo = isset($_GET['codigo']) && $_GET['codigo'] !== '' ? $_GET['codigo'] : null;
-            $estado = isset($_GET['estado']) && $_GET['estado'] !== '' ? filter_var($_GET['estado'], FILTER_VALIDATE_BOOLEAN) : null;
+            $estado_param = isset($_GET['estado']) && $_GET['estado'] !== '' ? $_GET['estado'] : null;
+            $estado = is_null($estado_param) ? null : filter_var($estado_param, FILTER_VALIDATE_BOOLEAN);
+
             $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
             $limit = 10;
             $offset = ($page - 1) * $limit;
 
-            // Obtener registros y total
-            $stmt = $impuesto->readAll($codigo, $estado, $offset, $limit);
+            // Obtener registros y total. El modelo ahora maneja el cierre de cursores.
+            $records = $impuesto->readAll($codigo, $estado, $offset, $limit);
             $total_records = $impuesto->countAll($codigo, $estado);
 
-            $num = $stmt->rowCount();
+            // Procesar registros para asegurar que el estado sea booleano
+            $processed_records = array_map(function($row) {
+                $row['estado'] = (bool)$row['estado'];
+                return $row;
+            }, $records);
 
-            if ($num > 0) {
-                $impuestos_arr = [
-                    "records" => [],
-                    "pagination" => [
-                        "total_records" => (int)$total_records,
-                        "total_pages" => ceil($total_records / $limit),
-                        "current_page" => $page,
-                        "limit" => $limit
-                    ]
-                ];
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    // Convertir estado a booleano para consistencia en JSON
-                    $row['estado'] = (bool)$row['estado'];
-                    array_push($impuestos_arr["records"], $row);
-                }
-                http_response_code(200);
-                echo json_encode($impuestos_arr);
-            } else {
-                http_response_code(200);
-                echo json_encode([
-                    "records" => [],
-                    "pagination" => [
-                        "total_records" => 0,
-                        "total_pages" => 0,
-                        "current_page" => 1,
-                        "limit" => $limit
-                    ]
-                ]);
-            }
+            $response_data = [
+                "records" => $processed_records,
+                "pagination" => [
+                    "total_records" => (int)$total_records,
+                    "total_pages" => $total_records > 0 ? ceil($total_records / $limit) : 0,
+                    "current_page" => $page,
+                    "limit" => $limit
+                ]
+            ];
+            http_response_code(200);
+            echo json_encode($response_data);
         }
         break;
 

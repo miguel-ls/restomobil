@@ -9,20 +9,27 @@ class Impuesto {
     }
 
     /**
-     * Lee los impuestos con filtros y paginación.
+     * Lee los impuestos con filtros y paginación (versión corregida).
+     * Obtiene todos los registros en un array y cierra el cursor para evitar conflictos.
      */
     public function readAll($codigo, $estado, $offset, $limit) {
         $query = "CALL sp_leer_impuestos(:codigo, :estado, :offset, :limit)";
         $stmt = $this->conn->prepare($query);
 
-        // Bind de parámetros
         $stmt->bindParam(':codigo', $codigo, PDO::PARAM_STR);
         $stmt->bindParam(':estado', $estado, PDO::PARAM_BOOL);
         $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
         $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
 
         $stmt->execute();
-        return $stmt;
+
+        // Obtener todos los registros en un array
+        $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Cerrar el cursor para permitir la siguiente consulta
+        $stmt->closeCursor();
+
+        return $records;
     }
 
     /**
