@@ -125,11 +125,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const tr = document.createElement('tr');
             const estadoText = impuesto.estado ? 'Activo' : 'Inactivo';
             const estadoClass = impuesto.estado ? 'status-active' : 'status-inactive';
+            const fechaFinalDisplay = impuesto.fecha_final || ''; // Muestra una cadena vacía si es null
 
             tr.innerHTML = `
                 <td data-label="Código">${impuesto.codigo}</td>
                 <td data-label="Fecha Inicial">${impuesto.fecha_inicial}</td>
-                <td data-label="Fecha Final">${impuesto.fecha_final}</td>
+                <td data-label="Fecha Final">${fechaFinalDisplay}</td>
                 <td data-label="Valor (%)">${impuesto.valor}</td>
                 <td data-label="Estado"><span class="status ${estadoClass}">${estadoText}</span></td>
                 <td data-label="Acciones" class="actions-cell">
