@@ -145,10 +145,10 @@ $pagination = $ventas_data['pagination'] ?? null;
                                         </span>
                                     </td>
                                     <td data-label="Acciones" class="actions-cell">
-                                        <a href="venta_form.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-info" title="Ver Venta"><i class="bi bi-eye"></i></a>
-                                        <a href="venta_edit_form.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-edit" title="Editar Venta"><i class="bi bi-pencil"></i></a>
+                                        <a href="venta_form.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-success" title="Ver Venta"><i class="bi bi-eye"></i></a>
+                                        <a href="venta_edit_form.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-warning" title="Editar Venta"><i class="bi bi-pencil"></i></a>
                                         <?php if ($venta['estado'] === 'emitida'): ?>
-                                            <button type="button" class="btn btn-sm btn-warning btn-anular" data-id="<?php echo $venta['id']; ?>" title="Anular Venta"><i class="bi bi-slash-circle"></i></button>
+                                            <button type="button" class="btn btn-sm btn-secondary btn-anular" data-id="<?php echo $venta['id']; ?>" title="Anular Venta"><i class="bi bi-slash-circle"></i></button>
                                         <?php endif; ?>
                                         <button type="button" class="btn btn-sm btn-danger btn-eliminar" data-id="<?php echo $venta['id']; ?>" title="Eliminar Venta"><i class="bi bi-trash"></i></button>
                                     </td>
