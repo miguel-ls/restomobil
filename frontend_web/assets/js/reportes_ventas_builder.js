@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         const headerStyle = {
             font: { bold: true, color: { rgb: "FFFFFFFF" } },
-            fill: { fgColor: { rgb: "FF005A9E" } },
+            fill: { fgColor: { rgb: "FF004C99" } },
             alignment: { vertical: 'center', horizontal: 'center' },
             border: border
         };
