@@ -78,6 +78,7 @@ function handle_get($pdo) {
             http_response_code(404);
             echo json_encode(["message" => "Venta no encontrada."]);
         }
+        exit; // CORRECCIÓN: Asegura que el script termine aquí.
     } else {
         // --- Lógica de Paginación y Filtros para la lista de ventas ---
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -88,11 +89,27 @@ function handle_get($pdo) {
         $where_clauses = [];
         $params = [];
 
-        if (!empty($_GET['fecha_inicio'])) { $where_clauses[] = "v.fecha_emision >= :fecha_inicio"; $params[':fecha_inicio'] = $_GET['fecha_inicio']; }
-        if (!empty($_GET['fecha_fin'])) { $fecha_fin = date('Y-m-d', strtotime($_GET['fecha_fin'] . ' +1 day')); $where_clauses[] = "v.fecha_emision < :fecha_fin"; $params[':fecha_fin'] = $fecha_fin; }
-        if (!empty($_GET['search'])) { $where_clauses[] = "(c.nombres_apellidos LIKE :search OR v.numero_documento LIKE :search OR sd.serie LIKE :search)"; $params[':search'] = '%' . $_GET['search'] . '%'; }
-        if (!empty($_GET['estado']) && $_GET['estado'] !== 'Todos') { $where_clauses[] = "v.estado = :estado"; $params[':estado'] = $_GET['estado']; }
-        if (!empty($_GET['id_tipo_documento'])) { $where_clauses[] = "v.id_tipo_documento_venta = :id_tipo_documento"; $params[':id_tipo_documento'] = $_GET['id_tipo_documento']; }
+        if (!empty($_GET['fecha_inicio'])) {
+            $where_clauses[] = "v.fecha_emision >= :fecha_inicio";
+            $params[':fecha_inicio'] = $_GET['fecha_inicio'];
+        }
+        if (!empty($_GET['fecha_fin'])) {
+            $fecha_fin = date('Y-m-d', strtotime($_GET['fecha_fin'] . ' +1 day'));
+            $where_clauses[] = "v.fecha_emision < :fecha_fin";
+            $params[':fecha_fin'] = $fecha_fin;
+        }
+        if (!empty($_GET['search'])) {
+            $where_clauses[] = "(c.nombres_apellidos LIKE :search OR v.numero_documento LIKE :search OR sd.serie LIKE :search)";
+            $params[':search'] = '%' . $_GET['search'] . '%';
+        }
+        if (!empty($_GET['estado']) && $_GET['estado'] !== 'Todos') {
+            $where_clauses[] = "v.estado = :estado";
+            $params[':estado'] = $_GET['estado'];
+        }
+        if (!empty($_GET['id_tipo_documento'])) {
+            $where_clauses[] = "v.id_tipo_documento_venta = :id_tipo_documento";
+            $params[':id_tipo_documento'] = $_GET['id_tipo_documento'];
+        }
 
         $where_sql = !empty($where_clauses) ? " WHERE " . implode(' AND ', $where_clauses) : "";
 
@@ -104,7 +121,9 @@ function handle_get($pdo) {
 
         $query = " SELECT v.id, v.fecha_emision, c.nombres_apellidos AS nombre_cliente, tdv.nombre AS tipo_documento, sd.serie, v.numero_documento, v.total, v.estado " . $base_query . $where_sql . " ORDER BY v.fecha_emision DESC LIMIT :limit OFFSET :offset ";
         $stmt = $pdo->prepare($query);
-        foreach ($params as $key => &$val) { $stmt->bindParam($key, $val); }
+        foreach ($params as $key => &$val) {
+            $stmt->bindParam($key, $val);
+        }
         $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
@@ -124,9 +143,9 @@ function handle_get($pdo) {
 function handle_put($pdo) {
     $data = json_decode(file_get_contents("php://input"));
 
-    if (empty($data->id) || empty($data->fecha_emision) || empty($data->nombre_cliente)) {
+    if (empty($data->id) || empty($data->fecha_emision)) {
         http_response_code(400);
-        echo json_encode(["success" => false, "message" => "Datos incompletos."]);
+        echo json_encode(["success" => false, "message" => "ID de venta y fecha de emisión son requeridos."]);
         return;
     }
 
