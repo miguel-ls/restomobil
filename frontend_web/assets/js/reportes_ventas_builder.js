@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     generateReportBtn.addEventListener('click', () => {
-        const selectedColumns = Array.from(selectedColumnsEl.querySelectorAll('.list-item')).map(item => item.dataset.key);
+        const selectedColumns = Array.from(selectedColumnsEl.querySelectorAll('.list-group-item')).map(item => item.dataset.key);
         if (selectedColumns.length === 0) {
             showAlert('Por favor, seleccione al menos una columna.');
             return;
@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function () {
             showAlert('Por favor, ingrese un nombre para la plantilla.');
             return;
         }
-        const columns = Array.from(selectedColumnsEl.querySelectorAll('.list-item')).map(item => item.dataset.key);
+        const columns = Array.from(selectedColumnsEl.querySelectorAll('.list-group-item')).map(item => item.dataset.key);
         if (columns.length === 0) {
             showAlert('Seleccione al menos una columna para guardar en la plantilla.');
             return;
@@ -360,12 +360,12 @@ document.addEventListener('DOMContentLoaded', function () {
         fetchFromAPI(`get_template_details&id=${templateId}`)
             .then(result => {
                 // Reset current selection
-                moveItems(selectedColumnsEl, availableColumnsEl, selectedColumnsEl.querySelectorAll('.list-item'));
+                moveItems(selectedColumnsEl, availableColumnsEl, selectedColumnsEl.querySelectorAll('.list-group-item'));
 
                 // Load new columns
                 const columnsToSelect = result.columnas || [];
                 columnsToSelect.forEach(columnKey => {
-                    const columnElement = availableColumnsEl.querySelector(`.list-item[data-key="${columnKey}"]`);
+                    const columnElement = availableColumnsEl.querySelector(`.list-group-item[data-key="${columnKey}"]`);
                     if (columnElement) {
                         moveItems(availableColumnsEl, selectedColumnsEl, [columnElement]);
                     }
