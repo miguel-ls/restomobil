@@ -99,18 +99,18 @@ END$$
 DELIMITER ;
 
 -- Procedimiento para CONTAR el total de impuestos con filtros
+-- Procedimiento para CONTAR el total de impuestos con filtros (versión corregida)
 DROP PROCEDURE IF EXISTS `sp_contar_impuestos`;
 DELIMITER $$
 CREATE PROCEDURE `sp_contar_impuestos`(
     IN p_codigo CHAR(3),
-    IN p_estado BOOLEAN,
-    OUT p_total INT
+    IN p_estado BOOLEAN
 )
 BEGIN
-    SELECT COUNT(id) INTO p_total
+    SELECT COUNT(id) AS total
     FROM `impuestos`
     WHERE
-        (p_codigo IS NULL OR codigo = p_codigo) AND
+        (p_codigo IS NULL OR p_codigo = '' OR codigo = p_codigo) AND
         (p_estado IS NULL OR estado = p_estado);
 END$$
 DELIMITER ;

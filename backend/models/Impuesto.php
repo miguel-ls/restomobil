@@ -26,10 +26,10 @@ class Impuesto {
     }
 
     /**
-     * Cuenta el número total de impuestos con filtros.
+     * Cuenta el número total de impuestos con filtros (versión corregida).
      */
     public function countAll($codigo, $estado) {
-        $query = "CALL sp_contar_impuestos(:codigo, :estado, @p_total)";
+        $query = "CALL sp_contar_impuestos(:codigo, :estado)";
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(':codigo', $codigo, PDO::PARAM_STR);
@@ -37,10 +37,12 @@ class Impuesto {
 
         $stmt->execute();
 
-        // Recuperar el valor del parámetro de salida
-        $stmt_total = $this->conn->query("SELECT @p_total AS total");
-        $total_row = $stmt_total->fetch(PDO::FETCH_ASSOC);
-        return $total_row['total'];
+        // Recuperar el resultado como una consulta SELECT normal
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Liberar el cursor para la siguiente consulta
+        $stmt->closeCursor();
+
+        return $result['total'] ?? 0;
     }
 
     /**
