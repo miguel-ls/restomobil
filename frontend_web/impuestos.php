@@ -30,9 +30,9 @@ $codigos_impuestos = getImpuestoCodigos();
             </div>
 
             <!-- Filtros -->
-            <div class="filters-container">
-                <form id="filter-form">
-                    <div class="filter-group">
+            <div class="filter-container">
+                <form id="filter-form" class="filters">
+                    <div class="form-group">
                         <label for="codigo-filter">Código:</label>
                         <select id="codigo-filter" name="codigo">
                             <option value="">Todos</option>
@@ -43,7 +43,7 @@ $codigos_impuestos = getImpuestoCodigos();
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="filter-group">
+                    <div class="form-group">
                         <label for="estado-filter">Estado:</label>
                         <select id="estado-filter" name="estado">
                             <option value="">Todos</option>
@@ -51,9 +51,7 @@ $codigos_impuestos = getImpuestoCodigos();
                             <option value="0">Inactivo</option>
                         </select>
                     </div>
-                    <div class="filter-group">
-                        <button type="submit" class="btn">Filtrar</button>
-                    </div>
+                    <button type="submit" class="btn">Filtrar</button>
                 </form>
             </div>
 
@@ -64,7 +62,7 @@ $codigos_impuestos = getImpuestoCodigos();
                             <th>Código</th>
                             <th>Fecha Inicial</th>
                             <th>Fecha Final</th>
-                            <th>Valor</th>
+                            <th>Valor (%)</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -74,7 +72,7 @@ $codigos_impuestos = getImpuestoCodigos();
                     </tbody>
                 </table>
             </div>
-            <div class="pagination-container" id="pagination-container">
+            <div class="pagination" id="pagination-container">
                 <!-- La paginación se generará aquí -->
             </div>
         </div>
@@ -129,12 +127,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const estadoClass = impuesto.estado ? 'status-active' : 'status-inactive';
 
             tr.innerHTML = `
-                <td>${impuesto.codigo}</td>
-                <td>${impuesto.fecha_inicial}</td>
-                <td>${impuesto.fecha_final}</td>
-                <td>${impuesto.valor}</td>
-                <td><span class="status ${estadoClass}">${estadoText}</span></td>
-                <td class="actions-cell">
+                <td data-label="Código">${impuesto.codigo}</td>
+                <td data-label="Fecha Inicial">${impuesto.fecha_inicial}</td>
+                <td data-label="Fecha Final">${impuesto.fecha_final}</td>
+                <td data-label="Valor (%)">${impuesto.valor}</td>
+                <td data-label="Estado"><span class="status ${estadoClass}">${estadoText}</span></td>
+                <td data-label="Acciones" class="actions-cell">
                     <a href="impuesto_form.php?id=${impuesto.id}" class="btn btn-edit">Editar</a>
                     <a href="impuesto_delete_handler.php?id=${impuesto.id}" class="btn btn-delete" onclick="return confirm('¿Estás seguro de eliminar este impuesto?');">Eliminar</a>
                 </td>
