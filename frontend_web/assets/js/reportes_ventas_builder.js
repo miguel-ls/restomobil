@@ -173,24 +173,28 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // 1. Crear la hoja de cálculo a partir de los datos
         const ws = XLSX.utils.json_to_sheet(data);
-
-        // 2. Añadir filtros automáticos a la cabecera
         ws['!autofilter'] = { ref: ws['!ref'] };
-        // Congelar la primera fila
         ws['!view'] = { state: 'frozen', ySplit: 1 };
 
-        // 3. Definir estilos (colores azules, bordes, etc.)
-        const borderStyle = { style: 'thin', color: { rgb: "FF000000" } };
+        const border = {
+            top: { style: 'thin', color: { rgb: "FFD0D7E5" } },
+            bottom: { style: 'thin', color: { rgb: "FFD0D7E5" } },
+            left: { style: 'thin', color: { rgb: "FFD0D7E5" } },
+            right: { style: 'thin', color: { rgb: "FFD0D7E5" } }
+        };
         const headerStyle = {
             font: { bold: true, color: { rgb: "FFFFFFFF" } },
-            fill: { fgColor: { rgb: "FF4F81BD" } }, // Azul oscuro
-            border: { top: borderStyle, bottom: borderStyle, left: borderStyle, right: borderStyle }
+            fill: { fgColor: { rgb: "FF005A9E" } },
+            alignment: { vertical: 'center', horizontal: 'center' },
+            border: border
         };
-        const oddRowStyle = { fill: { fgColor: { rgb: "FFDCE6F1" } } }; // Azul claro
+        const baseCellStyle = { border: border };
+        const oddRowStyle = {
+            fill: { fgColor: { rgb: "FFEAF1F8" } },
+            border: border
+        };
 
-        // 4. Aplicar estilos y calcular el ancho de las columnas
         let colWidths = [];
         const range = XLSX.utils.decode_range(ws['!ref']);
         for (let C = range.s.c; C <= range.e.c; ++C) {
@@ -199,78 +203,55 @@ document.addEventListener('DOMContentLoaded', function () {
                 const cell_ref = XLSX.utils.encode_cell({ c: C, r: R });
                 if (!ws[cell_ref]) continue;
 
-                // Aplicar estilo a la cabecera
                 if (R === 0) {
                     ws[cell_ref].s = headerStyle;
-                }
-                // Aplicar estilo a las filas impares para un efecto de bandas
-                else if (R % 2 !== 0) {
-                     ws[cell_ref].s = oddRowStyle;
+                } else {
+                    ws[cell_ref].s = (R % 2 !== 0) ? oddRowStyle : baseCellStyle;
                 }
 
-                // Calcular el ancho máximo de la columna
                 const cellTextLength = ws[cell_ref].v ? String(ws[cell_ref].v).length : 0;
                 if (cellTextLength > maxWidth) {
                     maxWidth = cellTextLength;
                 }
             }
-            // Asegurarse de que el ancho de la cabecera también se considere
-            const headerCell = XLSX.utils.encode_cell({c: C, r: 0});
+            const headerCell = XLSX.utils.encode_cell({ c: C, r: 0 });
             const headerTextLength = ws[headerCell] ? String(ws[headerCell].v).length : 0;
             maxWidth = Math.max(maxWidth, headerTextLength);
-
-            colWidths[C] = { wch: maxWidth + 2 }; // Añadir un poco de padding
+            colWidths[C] = { wch: maxWidth + 2 };
         }
         ws['!cols'] = colWidths;
 
-        // 5. Crear el libro de trabajo y exportar el archivo
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Reporte");
         XLSX.writeFile(wb, "Reporte_Ventas.xlsx", { bookSST: true });
     }
 
     // --- Event Listeners ---
-    function sortAvailableList() {
-        const items = Array.from(availableColumnsEl.children);
-        items.sort((a, b) => a.textContent.localeCompare(b.textContent));
-        items.forEach(item => availableColumnsEl.appendChild(item));
-    }
-
     function moveItems(from, to, items) {
         items.forEach(item => {
+            // Usar la clase 'active' de Bootstrap para la selección
             item.classList.remove('active');
             to.appendChild(item);
         });
-        // Si los elementos se mueven de vuelta a la lista de disponibles, reordenarla.
-        if (to === availableColumnsEl) {
-            sortAvailableList();
-        }
     }
 
-    // Ocultar botones de movimiento individual ya que el clic directo los reemplaza
-    addColBtn.style.display = 'none';
-    removeColBtn.style.display = 'none';
+    // Actualizar selectores para usar la nueva clase de item y la clase 'active'
+    addColBtn.addEventListener('click', () => moveItems(availableColumnsEl, selectedColumnsEl, availableColumnsEl.querySelectorAll('.list-group-item.active')));
+    addAllColsBtn.addEventListener('click', () => moveItems(availableColumnsEl, selectedColumnsEl, availableColumnsEl.querySelectorAll('.list-group-item')));
+    removeColBtn.addEventListener('click', () => moveItems(selectedColumnsEl, availableColumnsEl, selectedColumnsEl.querySelectorAll('.list-group-item.active')));
+    removeAllColsBtn.addEventListener('click', () => moveItems(selectedColumnsEl, availableColumnsEl, selectedColumnsEl.querySelectorAll('.list-group-item')));
 
-    // Event listeners para los botones de "mover todo"
-    addAllColsBtn.addEventListener('click', () => moveItems(availableColumnsEl, selectedColumnsEl, Array.from(availableColumnsEl.children)));
-    removeAllColsBtn.addEventListener('click', () => moveItems(selectedColumnsEl, availableColumnsEl, Array.from(selectedColumnsEl.children)));
-
-    // --- One-Click Item Move ---
-    // Implementar la funcionalidad de mover con un solo clic
-    availableColumnsEl.addEventListener('click', e => {
+    // Event listener más robusto para la selección de items
+    document.getElementById('dual-list-container').addEventListener('click', e => {
+        // Usar .closest() para encontrar el elemento de la lista, sin importar si se hizo clic en el texto o en el div
         const item = e.target.closest('.list-group-item');
-        if (item) {
-            moveItems(availableColumnsEl, selectedColumnsEl, [item]);
+
+        // Asegurarse de que el item existe y pertenece a este contenedor
+        if (item && document.getElementById('dual-list-container').contains(item)) {
+            e.preventDefault();
+            item.classList.toggle('active');
         }
     });
-
-    selectedColumnsEl.addEventListener('click', e => {
-        const item = e.target.closest('.list-group-item');
-        if (item) {
-            moveItems(selectedColumnsEl, availableColumnsEl, [item]);
-        }
-    });
-
 
     addFilterBtn.addEventListener('click', addFilterRow);
 
@@ -279,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     generateReportBtn.addEventListener('click', () => {
-        const selectedColumns = Array.from(selectedColumnsEl.querySelectorAll('.list-group-item')).map(item => item.dataset.key);
+        const selectedColumns = Array.from(selectedColumnsEl.querySelectorAll('.list-item')).map(item => item.dataset.key);
         if (selectedColumns.length === 0) {
             showAlert('Por favor, seleccione al menos una columna.');
             return;
