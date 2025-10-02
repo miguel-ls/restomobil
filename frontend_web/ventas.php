@@ -10,7 +10,8 @@ include_once 'templates/header.php';
 include_once __DIR__ . '/config.php';
 
 // --- Funciones de API ---
-function fetchFromAPI($endpoint) {
+function fetchFromAPI($endpoint)
+{
     $api_url = API_BASE_URL . $endpoint;
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -109,9 +110,9 @@ $pagination = $ventas_data['pagination'] ?? null;
                             <option value="50" <?php if ($limit == 50) echo 'selected'; ?>>50 por página</option>
                         </select>
                         <?php if ($pagination && $pagination['total_records'] > 0): ?>
-                        <span class="pagination-summary">
-                            Mostrando <?php echo count($ventas); ?> de <?php echo $pagination['total_records']; ?> registros
-                        </span>
+                            <span class="pagination-summary">
+                                Mostrando <?php echo count($ventas); ?> de <?php echo $pagination['total_records']; ?> registros
+                            </span>
                         <?php endif; ?>
                     </div>
                 </form>
@@ -150,14 +151,14 @@ $pagination = $ventas_data['pagination'] ?? null;
                                             <?php echo htmlspecialchars(ucfirst($venta['estado'])); ?>
                                         </span>
                                     </td>
-<td data-label="Acciones" class="actions-cell d-flex justify-content-end">
-    <a href="venta_form.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-view-custom m-0" title="Ver Venta"><i class="bi bi-eye"></i></a>
-    <a href="venta_edit_form.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-edit-custom m-0" title="Editar Venta"><i class="bi bi-pencil"></i></a>
-    <?php if ($venta['estado'] === 'emitida'): ?>
-        <button type="button" class="btn btn-sm btn-annul-custom btn-anular m-0" data-id="<?php echo $venta['id']; ?>" title="Anular Venta"><i class="bi bi-slash-circle"></i></button>
-    <?php endif; ?>
-    <button type="button" class="btn btn-sm btn-delete-custom btn-eliminar m-0" data-id="<?php echo $venta['id']; ?>" title="Eliminar Venta"><i class="bi bi-trash"></i></button>
-</td>
+                                    <td data-label="Acciones" class="actions-cell d-flex justify-content-end">
+                                        <a href="venta_form.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-view-custom m-0" title="Ver Venta"><i class="bi bi-eye"></i></a>
+                                        <a href="venta_edit_form.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-edit-custom m-0" title="Editar Venta"><i class="bi bi-pencil"></i></a>
+                                        <?php if ($venta['estado'] === 'emitida'): ?>
+                                            <button type="button" class="btn btn-sm btn-annul-custom btn-anular m-0" data-id="<?php echo $venta['id']; ?>" title="Anular Venta"><i class="bi bi-slash-circle"></i></button>
+                                        <?php endif; ?>
+                                        <button type="button" class="btn btn-sm btn-delete-custom btn-eliminar m-0" data-id="<?php echo $venta['id']; ?>" title="Eliminar Venta"><i class="bi bi-trash"></i></button>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -171,36 +172,36 @@ $pagination = $ventas_data['pagination'] ?? null;
 
             <!-- Controles de Paginación Inferiores -->
             <?php if ($pagination && $pagination['total_pages'] > 1): ?>
-            <div class="pagination-controls-bottom">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination">
-                        <?php
-                        // Botón "Anterior"
-                        if ($pagination['current_page'] > 1) {
-                            $prev_page_params = http_build_query(array_merge($_GET, ['page' => $pagination['current_page'] - 1]));
-                            echo "<li class='page-item'><a class='page-link' href='?$prev_page_params'>Anterior</a></li>";
-                        } else {
-                            echo "<li class='page-item disabled'><span class='page-link'>Anterior</span></li>";
-                        }
+                <div class="pagination-controls-bottom">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <?php
+                            // Botón "Anterior"
+                            if ($pagination['current_page'] > 1) {
+                                $prev_page_params = http_build_query(array_merge($_GET, ['page' => $pagination['current_page'] - 1]));
+                                echo "<li class='page-item'><a class='page-link' href='?$prev_page_params'>Anterior</a></li>";
+                            } else {
+                                echo "<li class='page-item disabled'><span class='page-link'>Anterior</span></li>";
+                            }
 
-                        // Números de página
-                        for ($i = 1; $i <= $pagination['total_pages']; $i++) {
-                            $page_params = http_build_query(array_merge($_GET, ['page' => $i]));
-                            $active_class = ($i == $pagination['current_page']) ? 'active' : '';
-                            echo "<li class='page-item $active_class'><a class='page-link' href='?$page_params'>$i</a></li>";
-                        }
+                            // Números de página
+                            for ($i = 1; $i <= $pagination['total_pages']; $i++) {
+                                $page_params = http_build_query(array_merge($_GET, ['page' => $i]));
+                                $active_class = ($i == $pagination['current_page']) ? 'active' : '';
+                                echo "<li class='page-item $active_class'><a class='page-link' href='?$page_params'>$i</a></li>";
+                            }
 
-                        // Botón "Siguiente"
-                        if ($pagination['current_page'] < $pagination['total_pages']) {
-                            $next_page_params = http_build_query(array_merge($_GET, ['page' => $pagination['current_page'] + 1]));
-                            echo "<li class='page-item'><a class='page-link' href='?$next_page_params'>Siguiente</a></li>";
-                        } else {
-                            echo "<li class='page-item disabled'><span class='page-link'>Siguiente</span></li>";
-                        }
-                        ?>
-                    </ul>
-                </nav>
-            </div>
+                            // Botón "Siguiente"
+                            if ($pagination['current_page'] < $pagination['total_pages']) {
+                                $next_page_params = http_build_query(array_merge($_GET, ['page' => $pagination['current_page'] + 1]));
+                                echo "<li class='page-item'><a class='page-link' href='?$next_page_params'>Siguiente</a></li>";
+                            } else {
+                                echo "<li class='page-item disabled'><span class='page-link'>Siguiente</span></li>";
+                            }
+                            ?>
+                        </ul>
+                    </nav>
+                </div>
             <?php endif; ?>
 
         </div>
@@ -208,142 +209,173 @@ $pagination = $ventas_data['pagination'] ?? null;
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const apiBaseUrl = '<?php echo API_BASE_URL; ?>';
+    document.addEventListener('DOMContentLoaded', function() {
+        const apiBaseUrl = '<?php echo API_BASE_URL; ?>';
 
-    // Lógica para anular venta
-    document.querySelectorAll('.btn-anular').forEach(button => {
-        button.addEventListener('click', function() {
-            const ventaId = this.dataset.id;
-            if (confirm('¿Está seguro de que desea anular esta venta?')) {
-                fetch(`${apiBaseUrl}anular_venta.php`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ id_venta: ventaId })
-                })
-                .then(response => response.json().then(data => ({ status: response.status, body: data })))
-                .then(result => {
-                    if (result.status === 200) {
-                        alert(result.body.message);
-                        window.location.reload();
-                    } else {
-                        throw new Error(result.body.message || 'Error desconocido');
-                    }
-                })
-                .catch(error => alert('Error al anular la venta: ' + error.message));
-            }
+        // Lógica para anular venta
+        document.querySelectorAll('.btn-anular').forEach(button => {
+            button.addEventListener('click', function() {
+                const ventaId = this.dataset.id;
+                if (confirm('¿Está seguro de que desea anular esta venta?')) {
+                    fetch(`${apiBaseUrl}anular_venta.php`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                id_venta: ventaId
+                            })
+                        })
+                        .then(response => response.json().then(data => ({
+                            status: response.status,
+                            body: data
+                        })))
+                        .then(result => {
+                            if (result.status === 200) {
+                                alert(result.body.message);
+                                window.location.reload();
+                            } else {
+                                throw new Error(result.body.message || 'Error desconocido');
+                            }
+                        })
+                        .catch(error => alert('Error al anular la venta: ' + error.message));
+                }
+            });
+        });
+
+        // Lógica para eliminar venta
+        document.querySelectorAll('.btn-eliminar').forEach(button => {
+            button.addEventListener('click', function() {
+                const ventaId = this.dataset.id;
+                if (confirm('¿Está seguro de que desea ELIMINAR esta venta? Esta acción es irreversible.')) {
+                    fetch(`${apiBaseUrl}eliminar_venta.php`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                id_venta: ventaId
+                            })
+                        })
+                        .then(response => response.json().then(data => ({
+                            status: response.status,
+                            body: data
+                        })))
+                        .then(result => {
+                            if (result.status === 200) {
+                                alert(result.body.message);
+                                this.closest('tr').remove();
+                            } else {
+                                throw new Error(result.body.message || 'Error desconocido');
+                            }
+                        })
+                        .catch(error => alert('Error al eliminar la venta: ' + error.message));
+                }
+            });
         });
     });
-
-    // Lógica para eliminar venta
-    document.querySelectorAll('.btn-eliminar').forEach(button => {
-        button.addEventListener('click', function() {
-            const ventaId = this.dataset.id;
-            if (confirm('¿Está seguro de que desea ELIMINAR esta venta? Esta acción es irreversible.')) {
-                fetch(`${apiBaseUrl}eliminar_venta.php`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ id_venta: ventaId })
-                })
-                .then(response => response.json().then(data => ({ status: response.status, body: data })))
-                .then(result => {
-                    if (result.status === 200) {
-                        alert(result.body.message);
-                        this.closest('tr').remove();
-                    } else {
-                        throw new Error(result.body.message || 'Error desconocido');
-                    }
-                })
-                .catch(error => alert('Error al eliminar la venta: ' + error.message));
-            }
-        });
-    });
-});
 </script>
 
 <style>
-.filter-container .filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-    padding-bottom: 10px;
-}
-.filter-container .filters select,
-.filter-container .filters input {
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    flex-grow: 1;
-    flex-basis: 150px;
-}
-#search { flex-grow: 2; }
-.filter-container .filters button,
-.filter-container .filters a.btn {
-    padding: 8px 15px;
-    flex-grow: 0;
-}
-.pagination-controls-top {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 20px;
-    padding-bottom: 20px;
-}
-.pagination-controls-top select {
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-.pagination-summary {
-    font-size: 0.9em;
-    color: #555;
-}
-.pagination-controls-bottom {
-    display: flex;
-    justify-content: center;
-    padding-top: 20px;
-}
-.pagination {
-    display: flex;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    border-radius: 5px;
-    overflow: hidden;
-}
-.page-item .page-link {
-    padding: 10px 15px;
-    display: block;
-    color: #007bff;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    text-decoration: none;
-}
-.page-item:first-child .page-link {
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-}
-.page-item:last-child .page-link {
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-}
-.page-item.active .page-link {
-    z-index: 1;
-    color: #fff;
-    background-color: #007bff;
-    border-color: #007bff;
-}
-.page-item.disabled .page-link {
-    color: #6c757d;
-    pointer-events: none;
-    background-color: #fff;
-    border-color: #ddd;
-}
-.page-item:not(:first-child) .page-link {
-    margin-left: -1px;
-}
-.page-item .page-link:hover {
-    background-color: #e9ecef;
-}
+    .filter-container .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        padding-bottom: 10px;
+    }
+
+    .filter-container .filters select,
+    .filter-container .filters input {
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        flex-grow: 1;
+        flex-basis: 150px;
+    }
+
+    #search {
+        flex-grow: 2;
+    }
+
+    .filter-container .filters button,
+    .filter-container .filters a.btn {
+        padding: 8px 15px;
+        flex-grow: 0;
+    }
+
+    .pagination-controls-top {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 20px;
+        padding-bottom: 20px;
+    }
+
+    .pagination-controls-top select {
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    .pagination-summary {
+        font-size: 0.9em;
+        color: #555;
+    }
+
+    .pagination-controls-bottom {
+        display: flex;
+        justify-content: center;
+        padding-top: 20px;
+    }
+
+    .pagination {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .page-item .page-link {
+        padding: 10px 15px;
+        display: block;
+        color: #007bff;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        text-decoration: none;
+    }
+
+    .page-item:first-child .page-link {
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+
+    .page-item:last-child .page-link {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+
+    .page-item.active .page-link {
+        z-index: 1;
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .page-item.disabled .page-link {
+        color: #6c757d;
+        pointer-events: none;
+        background-color: #fff;
+        border-color: #ddd;
+    }
+
+    .page-item:not(:first-child) .page-link {
+        margin-left: -1px;
+    }
+
+    .page-item .page-link:hover {
+        background-color: #e9ecef;
+    }
 </style>
