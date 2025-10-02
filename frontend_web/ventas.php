@@ -154,6 +154,8 @@ $pagination = $ventas_data['pagination'] ?? null;
                                     <td data-label="Acciones" class="actions-cell d-flex justify-content-end">
                                         <a href="venta_form.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-view-custom m-0" title="Ver Venta"><i class="bi bi-eye"></i></a>
                                         <a href="venta_edit_form.php?id=<?php echo $venta['id']; ?>" class="btn btn-sm btn-edit-custom m-0" title="Editar Venta"><i class="bi bi-pencil"></i></a>
+                                    </td>
+                                    <td data-label="Acciones" class="actions-cell d-flex justify-content-end">
                                         <?php if ($venta['estado'] === 'emitida'): ?>
                                             <button type="button" class="btn btn-sm btn-annul-custom btn-anular m-0" data-id="<?php echo $venta['id']; ?>" title="Anular Venta"><i class="bi bi-slash-circle"></i></button>
                                         <?php endif; ?>
