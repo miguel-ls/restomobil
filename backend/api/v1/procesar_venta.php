@@ -25,8 +25,14 @@ if (
     exit;
 }
 
-$database = new Database();
-$db = $database->getConnection();
+try {
+    $database = new Database();
+    $db = $database->getConnection();
+} catch (PDOException $e) {
+    http_response_code(503); // Service Unavailable
+    echo json_encode(["message" => "No se puede conectar a la base de datos: " . $e->getMessage()]);
+    exit();
+}
 $venta = new Venta($db);
 
 session_start();
