@@ -103,8 +103,8 @@ if (isset($_GET['id'])) {
                                         <tr>
                                             <td><?php echo htmlspecialchars($item['nombre_producto']); ?></td>
                                             <td><?php echo htmlspecialchars($item['cantidad']); ?></td>
-                                            <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['precio_unitario'], 2)); ?></td>
-                                            <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['subtotal'], 2)); ?></td>
+                                            <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(sprintf('%.2f', $item['precio_unitario'])); ?></td>
+                                            <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(sprintf('%.2f', $item['subtotal'])); ?></td>
                                         </tr>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
@@ -112,7 +112,7 @@ if (isset($_GET['id'])) {
                                 <tfoot>
                                     <tr>
                                         <th colspan="3" style="text-align: right;">Total:</th>
-                                        <th><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta_data['total'], 2)); ?></th>
+                                        <th><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(sprintf('%.2f', $venta_data['total'])); ?></th>
                                     </tr>
                                 </tfoot>
                             </table>
