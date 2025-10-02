@@ -383,3 +383,36 @@ table th { background-color: var(--light-bg); font-weight: 600; }
     from { opacity: 0; }
     to { opacity: 1; }
 }
+
+/* Estilos personalizados para botones de acción en la tabla de ventas */
+.actions-cell .btn.btn-view-custom {
+    background-color: #17a2b8; /* Turquesa */
+    color: #ffffff;
+}
+.actions-cell .btn.btn-view-custom:hover {
+    background-color: #138496;
+}
+
+.actions-cell .btn.btn-edit-custom {
+    background-color: #ffc107; /* Amarillo */
+    color: #212529;
+}
+.actions-cell .btn.btn-edit-custom:hover {
+    background-color: #e0a800;
+}
+
+.actions-cell .btn.btn-annul-custom {
+    background-color: #6f42c1; /* Morado */
+    color: #ffffff;
+}
+.actions-cell .btn.btn-annul-custom:hover {
+    background-color: #5a32a3;
+}
+
+.actions-cell .btn.btn-delete-custom {
+    background-color: #dc3545; /* Rojo */
+    color: #ffffff;
+}
+.actions-cell .btn.btn-delete-custom:hover {
+    background-color: #c82333;
+}
