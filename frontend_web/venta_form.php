@@ -9,12 +9,15 @@ $page_title = 'Detalle de Venta';
 include_once 'templates/header.php';
 include_once __DIR__ . '/config.php';
 
-function fetchFromAPI($endpoint) {
+function fetchFromAPI($endpoint)
+{
     $api_url = API_BASE_URL . $endpoint;
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $response = curl_exec($ch);
-    if (curl_errno($ch)) { return ['error' => 'Error de comunicación con la API.']; }
+    if (curl_errno($ch)) {
+        return ['error' => 'Error de comunicación con la API.'];
+    }
     curl_close($ch);
     return json_decode($response, true);
 }
@@ -112,27 +115,37 @@ $is_anulada = ($venta_data && $venta_data['estado'] === 'anulada');
                                     <thead>
                                         <tr>
                                             <th>Producto</th>
-                                            <th>Cantidad</th>
-                                            <th>Precio Unit.</th>
-                                            <th>Subtotal</th>
+                                            <th style="text-align: right;">Cantidad</th>
+                                            <th style="text-align: right;">Precio Unit.</th>
+                                            <th style="text-align: right;">Subtotal</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php if (!empty($venta_data['items'])): ?>
                                             <?php foreach ($venta_data['items'] as $item): ?>
-                                            <tr>
-                                                <td><?php echo htmlspecialchars($item['nombre_producto']); ?></td>
-                                                <td><?php echo htmlspecialchars($item['cantidad']); ?></td>
-                                                <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['precio_unitario'], 2)); ?></td>
-                                                <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['subtotal'], 2)); ?></td>
-                                            </tr>
+                                                <tr>
+                                                    <td><?php echo htmlspecialchars($item['nombre_producto']); ?></td>
+                                                    <td  style="text-align: right;"><?php echo htmlspecialchars($item['cantidad']); ?></td>
+                                                    <td style="text-align: right;"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['precio_unitario'], 2)); ?></td>
+                                                    <td style="text-align: right;"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['subtotal'], 2)); ?></td>
+                                                </tr>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     </tbody>
                                     <tfoot>
                                         <tr>
+                                            <th colspan="3" style="text-align: right;">Sub Total:</th>
+                                            <th style="text-align: right;"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta_data['base'], 2)); ?></th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="3" style="text-align: right;">
+                                                IGV (<?php echo htmlspecialchars(number_format($venta_data['porcentaje'], 0)); ?>%):
+                                            </th>
+                                            <th style="text-align: right;"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta_data['impuesto'], 2)); ?></th>
+                                        </tr>
+                                        <tr>
                                             <th colspan="3" style="text-align: right;">Total:</th>
-                                            <th><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta_data['total'], 2)); ?></th>
+                                            <th style="text-align: right;"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta_data['total'], 2)); ?></th>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -152,11 +165,25 @@ $is_anulada = ($venta_data && $venta_data['estado'] === 'anulada');
 </div>
 
 <style>
-.form-group-row { display: flex; gap: 20px; }
-.form-group { flex-grow: 1; }
-.card.mt-4 { margin-top: 1.5rem; }
-.form-actions.mt-4 { margin-top: 1.5rem; }
-input[readonly] { background-color: #e9ecef; opacity: 1; }
+    .form-group-row {
+        display: flex;
+        gap: 20px;
+    }
+
+    .form-group {
+        flex-grow: 1;
+    }
+
+    .card.mt-4 {
+        margin-top: 1.5rem;
+    }
+
+    .form-actions.mt-4 {
+        margin-top: 1.5rem;
+    }
+
+    input[readonly] {
+        background-color: #e9ecef;
+        opacity: 1;
+    }
 </style>
-
-

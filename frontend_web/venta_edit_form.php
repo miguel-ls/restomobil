@@ -106,28 +106,38 @@ if (isset($_GET['id'])) {
                                 <thead>
                                     <tr>
                                         <th>Producto</th>
-                                        <th>Cantidad</th>
-                                        <th>Precio Unit.</th>
-                                        <th>Subtotal</th>
+                                            <th style="text-align: right;">Cantidad</th>
+                                            <th style="text-align: right;">Precio Unit.</th>
+                                            <th style="text-align: right;">Subtotal</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php if (!empty($venta_data['items'])): ?>
                                         <?php foreach ($venta_data['items'] as $item): ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($item['nombre_producto']); ?></td>
-                                            <td><?php echo htmlspecialchars($item['cantidad']); ?></td>
-                                            <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(sprintf('%.2f', $item['precio_unitario'])); ?></td>
-                                            <td><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(sprintf('%.2f', $item['subtotal'])); ?></td>
-                                        </tr>
+                                                   <tr>
+                                                    <td><?php echo htmlspecialchars($item['nombre_producto']); ?></td>
+                                                    <td  style="text-align: right;"><?php echo htmlspecialchars($item['cantidad']); ?></td>
+                                                    <td style="text-align: right;"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['precio_unitario'], 2)); ?></td>
+                                                    <td style="text-align: right;"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['subtotal'], 2)); ?></td>
+                                                </tr>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
                                 </tbody>
                                 <tfoot>
-                                    <tr>
-                                        <th colspan="3" style="text-align: right;">Total:</th>
-                                        <th><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(sprintf('%.2f', $venta_data['total'])); ?></th>
-                                    </tr>
+                                        <tr>
+                                            <th colspan="3" style="text-align: right;">Sub Total:</th>
+                                            <th style="text-align: right;"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta_data['base'], 2)); ?></th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="3" style="text-align: right;">
+                                                IGV (<?php echo htmlspecialchars(number_format($venta_data['porcentaje'], 0)); ?>%):
+                                            </th>
+                                            <th style="text-align: right;"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta_data['impuesto'], 2)); ?></th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="3" style="text-align: right;">Total:</th>
+                                            <th style="text-align: right;"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta_data['total'], 2)); ?></th>
+                                        </tr>
                                 </tfoot>
                             </table>
                         </div>
