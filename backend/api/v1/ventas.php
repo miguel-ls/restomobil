@@ -13,19 +13,19 @@ include_once __DIR__ . '/../../config/database.php';
 include_once __DIR__ . '/../../models/Venta.php';
 
 try {
-    $database = new Database();
-    $db = $database->getConnection();
+    $db = new PDO(DB_DSN, DB_USER, DB_PASS);
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     http_response_code(503); // Service Unavailable
     echo json_encode(["message" => "No se puede conectar a la base de datos: " . $e->getMessage()]);
     exit();
 }
+
 $venta = new Venta($db);
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
-        // --- Lógica de Paginación y Filtros para la lista de ventas ---
         $filtros = [
             'fecha_inicio' => $_GET['fecha_inicio'] ?? null,
             'fecha_fin' => $_GET['fecha_fin'] ?? null,

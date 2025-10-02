@@ -26,8 +26,8 @@ if (
 }
 
 try {
-    $database = new Database();
-    $db = $database->getConnection();
+    $db = new PDO(DB_DSN, DB_USER, DB_PASS);
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     http_response_code(503); // Service Unavailable
     echo json_encode(["message" => "No se puede conectar a la base de datos: " . $e->getMessage()]);

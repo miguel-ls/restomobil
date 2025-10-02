@@ -34,9 +34,9 @@ BEGIN
     WHERE
         (p_fecha_inicio IS NULL OR v.fecha_emision >= p_fecha_inicio) AND
         (p_fecha_fin IS NULL OR v.fecha_emision <= p_fecha_fin) AND
-        (p_estado IS NULL OR p_estado = 'Todos' OR v.estado = p_estado) AND
+        (p_estado IS NULL OR p_estado = 'Todos' OR v.estado COLLATE utf8mb4_unicode_ci = p_estado) AND
         (p_id_tipo_documento IS NULL OR v.id_tipo_documento_venta = p_id_tipo_documento) AND
-        (p_search IS NULL OR c.nombres_apellidos LIKE CONCAT('%', p_search, '%') OR v.numero_documento LIKE CONCAT('%', p_search, '%'))
+        (p_search IS NULL OR c.nombres_apellidos COLLATE utf8mb4_unicode_ci LIKE CONCAT('%', p_search, '%') OR v.numero_documento COLLATE utf8mb4_unicode_ci LIKE CONCAT('%', p_search, '%'))
     ORDER BY v.fecha_emision DESC
     LIMIT v_offset, p_limit;
 END$$
@@ -57,9 +57,9 @@ BEGIN
     WHERE
         (p_fecha_inicio IS NULL OR v.fecha_emision >= p_fecha_inicio) AND
         (p_fecha_fin IS NULL OR v.fecha_emision <= p_fecha_fin) AND
-        (p_estado IS NULL OR p_estado = 'Todos' OR v.estado = p_estado) AND
+        (p_estado IS NULL OR p_estado = 'Todos' OR v.estado COLLATE utf8mb4_unicode_ci = p_estado) AND
         (p_id_tipo_documento IS NULL OR v.id_tipo_documento_venta = p_id_tipo_documento) AND
-        (p_search IS NULL OR c.nombres_apellidos LIKE CONCAT('%', p_search, '%') OR v.numero_documento LIKE CONCAT('%', p_search, '%'));
+        (p_search IS NULL OR c.nombres_apellidos COLLATE utf8mb4_unicode_ci LIKE CONCAT('%', p_search, '%') OR v.numero_documento COLLATE utf8mb4_unicode_ci LIKE CONCAT('%', p_search, '%'));
 END$$
 
 DELIMITER ;
