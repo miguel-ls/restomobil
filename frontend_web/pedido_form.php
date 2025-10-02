@@ -548,15 +548,19 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = true;
             submitButton.textContent = 'Procesando...';
 
-            const formData = new FormData();
-            formData.append('id_pedido', initialOrderData.id);
-            formData.append('id_serie_documento', serieSelect.value);
-            formData.append('id_tipo_documento_venta', document.getElementById('id_tipo_documento_venta').value);
+            const payload = {
+                id_pedido: initialOrderData.id,
+                id_serie_documento: serieSelect.value,
+                id_tipo_documento_venta: document.getElementById('id_tipo_documento_venta').value
+            };
 
             try {
                 const response = await fetch(`${apiBaseUrl}procesar_venta.php`, {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
                 });
                 const result = await response.json();
                 if (!response.ok) throw new Error(result.message || 'Error desconocido en el servidor.');
