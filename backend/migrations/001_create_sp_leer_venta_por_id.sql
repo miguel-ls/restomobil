@@ -9,11 +9,17 @@ BEGIN
         v.id,
         v.fecha_emision,
         v.total,
+        v.estado,
+        v.numero_documento,
         c.nombres_apellidos AS nombre_cliente,
         c.numero_documento AS ruc_cliente,
-        c.direccion AS direccion_cliente
+        c.direccion AS direccion_cliente,
+        tdv.nombre AS tipo_documento,
+        sd.serie
     FROM ventas v
     LEFT JOIN clientes c ON v.id_cliente = c.id
+    LEFT JOIN tipo_documento_venta tdv ON v.id_tipo_documento_venta = tdv.id
+    LEFT JOIN series_documentos sd ON v.id_serie_documento = sd.id
     WHERE v.id = p_id_venta;
 
     -- Segundo, obtener los detalles de la venta (items)

@@ -35,10 +35,11 @@ if (empty($data->username) || empty($data->password)) {
 $data->username = trim($data->username);
 $data->password = trim($data->password);
 
-$user = new User();
+try {
+    $user = new User();
 
-// Buscar usuario por nombre de usuario
-if ($user->findByUsername($data->username)) {
+    // Buscar usuario por nombre de usuario
+    if ($user->findByUsername($data->username)) {
     // Verificar la contraseña
     if ($user->verifyPassword($data->password)) {
 
@@ -66,5 +67,9 @@ if ($user->findByUsername($data->username)) {
     // Usuario no encontrado
     http_response_code(404); // Not Found
     echo json_encode(array("message" => "Usuario no encontrado."));
+}
+} catch (PDOException $e) {
+    http_response_code(503); // Service Unavailable
+    echo json_encode(["message" => "Error de conexión a la base de datos: " . $e->getMessage()]);
 }
 ?>

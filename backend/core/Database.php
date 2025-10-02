@@ -31,8 +31,8 @@ class Database {
                 global $pdo_options;
                 self::$pdo = new PDO(DB_DSN, DB_USER, DB_PASS, $pdo_options);
             } catch (PDOException $e) {
-                // En un entorno de producción, sería mejor loguear este error que mostrarlo.
-                die("Error de conexión a la base de datos: " . $e->getMessage());
+                // Lanzar la excepción para que pueda ser manejada por el código que llama.
+                throw $e;
             }
         }
         return self::$pdo;
