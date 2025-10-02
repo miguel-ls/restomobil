@@ -218,7 +218,7 @@ if ($is_pago_view) {
                                             <option value="">--</option>
                                         </select>
                                     </div>
-                                    <div class="form-group" style="flex-grow: 1;">
+                                    <div class="form-group" style="flex-grow: 1; display: none;">
                                         <label for="numero_documento">Número</label>
                                         <input type="text" id="numero_documento" name="numero_documento" readonly>
                                     </div>
