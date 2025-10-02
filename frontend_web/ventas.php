@@ -126,10 +126,10 @@ $pagination = $ventas_data['pagination'] ?? null;
                             <th>Fecha Emisión</th>
                             <th>Cliente</th>
                             <th>Documento</th>
-                            <th>Total</th>
-                            <th>% Imp.</th>
+                            <th>Imp.</th>
                             <th>Base</th>
                             <th>Impuesto</th>
+                            <th>Total</th>                            
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -139,13 +139,13 @@ $pagination = $ventas_data['pagination'] ?? null;
                             <?php foreach ($ventas as $venta): ?>
                                 <tr>
                                     <td data-label="ID"><?php echo htmlspecialchars($venta['id']); ?></td>
-                                    <td data-label="Fecha Emisión"><?php echo htmlspecialchars(date("d/m/Y H:i", strtotime($venta['fecha_emision']))); ?></td>
+                                    <td data-label="Fecha Emisión"><?php echo htmlspecialchars(date("d/m/Y", strtotime($venta['fecha_emision']))); ?></td>
                                     <td data-label="Cliente"><?php echo htmlspecialchars($venta['nombre_cliente'] ?? 'Varios'); ?></td>
-                                    <td data-label="Documento"><?php echo htmlspecialchars($venta['tipo_documento'] . ' ' . $venta['serie'] . '-' . $venta['numero_documento']); ?></td>
-                                    <td data-label="Total"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta['total'], 2)); ?></td>
-                                    <td data-label="% Imp."><?php echo htmlspecialchars(number_format($venta['porcentaje'] ?? 0, 2)); ?>%</td>
+                                    <td data-label="Documento"><?php echo htmlspecialchars($venta['descripcion'] . ' ' . $venta['serie'] . '-' . $venta['numero_documento']); ?></td>
+                                    <td data-label="% Imp."><?php echo htmlspecialchars(number_format($venta['porcentaje'] ?? 0, 0)); ?>%</td>
                                     <td data-label="Base"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta['base'] ?? 0, 2)); ?></td>
                                     <td data-label="Impuesto"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta['impuesto'] ?? 0, 2)); ?></td>
+                                    <td data-label="Total"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta['total'], 2)); ?></td>                                    
                                     <td data-label="Estado">
                                         <span class="status status-<?php echo htmlspecialchars($venta['estado']); ?>">
                                             <?php echo htmlspecialchars(ucfirst($venta['estado'])); ?>
