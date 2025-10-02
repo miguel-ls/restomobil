@@ -126,6 +126,9 @@ $pagination = $ventas_data['pagination'] ?? null;
                             <th>Cliente</th>
                             <th>Documento</th>
                             <th>Total</th>
+                            <th>% Imp.</th>
+                            <th>Base</th>
+                            <th>Impuesto</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -139,6 +142,9 @@ $pagination = $ventas_data['pagination'] ?? null;
                                     <td data-label="Cliente"><?php echo htmlspecialchars($venta['nombre_cliente'] ?? 'Varios'); ?></td>
                                     <td data-label="Documento"><?php echo htmlspecialchars($venta['tipo_documento'] . ' ' . $venta['serie'] . '-' . $venta['numero_documento']); ?></td>
                                     <td data-label="Total"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta['total'], 2)); ?></td>
+                                    <td data-label="% Imp."><?php echo htmlspecialchars(number_format($venta['porcentaje'] ?? 0, 2)); ?>%</td>
+                                    <td data-label="Base"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta['base'] ?? 0, 2)); ?></td>
+                                    <td data-label="Impuesto"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($venta['impuesto'] ?? 0, 2)); ?></td>
                                     <td data-label="Estado">
                                         <span class="status status-<?php echo htmlspecialchars($venta['estado']); ?>">
                                             <?php echo htmlspecialchars(ucfirst($venta['estado'])); ?>
@@ -156,7 +162,7 @@ $pagination = $ventas_data['pagination'] ?? null;
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7" class="text-center"><?php echo $ventas_data['message'] ?? 'No se encontraron ventas.'; ?></td>
+                                <td colspan="10" class="text-center"><?php echo $ventas_data['message'] ?? 'No se encontraron ventas.'; ?></td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
