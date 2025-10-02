@@ -53,6 +53,20 @@ if (isset($_GET['id'])) {
                     <div class="card-body">
                         <div class="form-group-row">
                             <div class="form-group">
+                                <label for="tipo_comprobante">Tipo de Comprobante</label>
+                                <input type="text" id="tipo_comprobante" class="form-control" value="<?php echo htmlspecialchars($venta_data['tipo_documento'] ?? ''); ?>" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="serie">Serie</label>
+                                <input type="text" id="serie" class="form-control" value="<?php echo htmlspecialchars($venta_data['serie'] ?? ''); ?>" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="numero_documento">Número</label>
+                                <input type="text" id="numero_documento" class="form-control" value="<?php echo htmlspecialchars($venta_data['numero_documento'] ?? ''); ?>" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group-row mt-3">
+                            <div class="form-group">
                                 <label for="fecha_emision">Fecha de Emisión</label>
                                 <input type="datetime-local" id="fecha_emision" name="fecha_emision" class="form-control" value="<?php echo htmlspecialchars(date('Y-m-d\TH:i:s', strtotime($venta_data['fecha_emision']))); ?>">
                             </div>

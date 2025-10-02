@@ -1,0 +1,13 @@
+[Thu Oct  2 19:43:15 2025] PHP 8.3.6 Development Server (http://0.0.0.0:8001) started
+[Thu Oct  2 19:43:18 2025] 127.0.0.1:34192 Accepted
+[Thu Oct  2 19:43:18 2025] 127.0.0.1:34192 [200]: POST /api/v1/login.php
+[Thu Oct  2 19:43:18 2025] 127.0.0.1:34192 Closing
+[Thu Oct  2 19:43:18 2025] 127.0.0.1:34204 Accepted
+[Thu Oct  2 19:43:18 2025] 127.0.0.1:34204 [200]: GET /api/v1/tipos_documentos.php
+[Thu Oct  2 19:43:18 2025] 127.0.0.1:34204 Closing
+[Thu Oct  2 19:43:18 2025] 127.0.0.1:34208 Accepted
+[Thu Oct  2 19:43:18 2025] 127.0.0.1:34208 [200]: GET /api/v1/ventas.php?page=1&limit=10&fecha_inicio=2025-10-01&fecha_fin=2025-10-31
+[Thu Oct  2 19:43:18 2025] 127.0.0.1:34208 Closing
+[Thu Oct  2 19:43:18 2025] 127.0.0.1:34214 Accepted
+[Thu Oct  2 19:43:18 2025] 127.0.0.1:34214 [200]: GET /api/v1/ventas.php?id=1
+[Thu Oct  2 19:43:18 2025] 127.0.0.1:34214 Closing
