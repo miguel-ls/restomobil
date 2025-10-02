@@ -28,7 +28,7 @@ CREATE TABLE reservas ( id INT AUTO_INCREMENT PRIMARY KEY, id_mesa INT, nombre_c
 -- Datos Iniciales
 -- -----------------------------------------------------
 INSERT INTO roles (nombre_rol) VALUES ('Administrador'), ('Cajero'), ('Mozo');
-INSERT INTO usuarios (username, nombre_completo, email, password_hash, id_rol) VALUES ('admin', 'Administrador del Sistema', 'admin@example.com', '$2y$10$T8Yj8A.A.JpZ.e.zY.e.IuG.t.t.t.t.t.t.t.t.t.t', 1);
+INSERT INTO usuarios (username, nombre_completo, email, password_hash, id_rol) VALUES ('admin', 'Administrador del Sistema', 'admin@example.com', '$2y$10$1GMmW3jA/iGvlCxLYsqUHu75Nbpmi7pkwQHSaTOslPimuNB/Eaxqa', 1);
 
 -- -----------------------------------------------------
 -- Procedimientos Almacenados

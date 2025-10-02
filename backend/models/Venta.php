@@ -113,5 +113,37 @@ class Venta {
             return false;
         }
     }
+
+    // Leer una sola venta por ID
+    public function leerUno($id) {
+        $query = "CALL sp_leer_venta_por_id(:id)";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+        try {
+            $stmt->execute();
+
+            // Obtener la fila de la venta principal
+            $venta_data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$venta_data) {
+                return null;
+            }
+
+            // Mover al siguiente conjunto de resultados (los items)
+            $stmt->nextRowset();
+
+            // Obtener todos los items de la venta
+            $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $venta_data['items'] = $items;
+
+            $stmt->closeCursor();
+            return $venta_data;
+
+        } catch (PDOException $e) {
+            error_log("Error al ejecutar sp_leer_venta_por_id: " . $e->getMessage());
+            return null;
+        }
+    }
 }
 ?>
