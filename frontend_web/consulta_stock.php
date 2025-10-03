@@ -4,21 +4,17 @@ if (!isset($_SESSION['user_id'])) {
     header('Location: index.php');
     exit;
 }
+$page_title = 'Consulta de Stock';
 require_once 'templates/header.php';
 ?>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-2 p-0">
-            <?php require_once 'templates/sidebar.php'; ?>
+<div class="dashboard-container">
+    <?php require_once 'templates/sidebar.php'; ?>
+
+    <main class="main-content">
+        <div class="container">
+            <h1>Consulta de Stock</h1>
+            <p>Página en construcción.</p>
         </div>
-        <div class="col-10">
-            <main class="main-content">
-                <div class="header">
-                    <h1>Consulta de Stock</h1>
-                </div>
-                <p>Página en construcción.</p>
-            </main>
-        </div>
-    </div>
+    </main>
 </div>
