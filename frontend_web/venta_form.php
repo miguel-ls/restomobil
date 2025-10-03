@@ -55,26 +55,21 @@ $is_anulada = ($venta_data && $venta_data['estado'] === 'anulada');
                     <div class="card">
                         <div class="card-header">
 
-<div class="form-group-row" style="display: flex; justify-content: center; text-align: center;">
-    <div class="form-group" style="flex-grow: 1; max-width: 400px;">
-        <img id="logo-preview" 
-             src="<?php echo htmlspecialchars($venta_data['logo_url']); ?>" 
-             alt="Logo Preview" 
-             style="max-width: 150px; max-height: 150px; display:block; margin:0 auto 5px auto;">
-        
-        <p style="margin:0;"><?php echo htmlspecialchars($venta_data['nombre_largo'] ?? ''); ?></p>
-        <p style="margin:0;">Dirección: <?php echo htmlspecialchars($venta_data['direccion'] ?? ''); ?></p>
-        <p style="margin:0;">Telf.: <?php echo htmlspecialchars($venta_data['telefonos'] ?? ''); ?></p>
-        <p style="margin:0;">Web: <?php echo htmlspecialchars($venta_data['web'] ?? ''); ?></p>
-        <p style="margin:0;">Mail: <?php echo htmlspecialchars($venta_data['email'] ?? ''); ?></p>
-    </div>
-</div>
+                            <div class="form-group-row" style="display: flex; justify-content: center; text-align: center;">
+                                <div class="form-group" style="flex-grow: 1; max-width: 400px;">
+                                    <img id="logo-preview"
+                                        src="<?php echo htmlspecialchars($venta_data['logo_url']); ?>"
+                                        alt="Logo Preview"
+                                        style="max-width: 150px; max-height: 150px; display:block; margin:0 auto 5px auto;">
 
-                            <?php if ($is_editing && isset($venta_data['estado'])): ?>
-                                <span class="status status-<?php echo htmlspecialchars($venta_data['estado']); ?>">
-                                    <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $venta_data['estado']))); ?>
-                                </span>
-                            <?php endif; ?>
+                                    <p style="margin:0;"><?php echo htmlspecialchars($venta_data['nombre_largo'] ?? ''); ?></p>
+                                    <p style="margin:0;">Dirección: <?php echo htmlspecialchars($venta_data['direccion'] ?? ''); ?></p>
+                                    <p style="margin:0;">Telf: <?php echo htmlspecialchars($venta_data['telefonos'] ?? ''); ?></p>
+                                    <p style="margin:0;">Web: <?php echo htmlspecialchars($venta_data['web'] ?? ''); ?></p>
+                                    <p style="margin:0;">Mail: <?php echo htmlspecialchars($venta_data['email'] ?? ''); ?></p>
+                                </div>
+                            </div>
+
                         </div>
                         <div class="card-body">
                             <div class="form-group-row">
@@ -100,8 +95,9 @@ $is_anulada = ($venta_data && $venta_data['estado'] === 'anulada');
                                             <table class="table">
                                                 <thead>
                                                     <tr>
-                                                        <th>Producto</th>
-                                                        <th style="text-align: right;">Cantidad</th>
+                                                    <th style="text-align: left;">Cant.</th>    
+                                                    <th style="text-align: left;">Producto</th>
+                                                        
                                                         <th style="text-align: right;">P.Unit.</th>
                                                         <th style="text-align: right;">Subtotal</th>
                                                     </tr>
@@ -110,10 +106,11 @@ $is_anulada = ($venta_data && $venta_data['estado'] === 'anulada');
                                                     <?php if (!empty($venta_data['items'])): ?>
                                                         <?php foreach ($venta_data['items'] as $item): ?>
                                                             <tr>
-                                                                <td><?php echo htmlspecialchars($item['nombre_producto']); ?></td>
-                                                                <td style="text-align: right;"><?php echo htmlspecialchars($item['cantidad']); ?></td>
-                                                                <td style="text-align: right;"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['precio_unitario'], 2)); ?></td>
-                                                                <td style="text-align: right;"><?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($item['subtotal'], 2)); ?></td>
+                                                                <td style="text-align: left;"><?php echo htmlspecialchars($item['cantidad']); ?></td>
+                                                                <td style="text-align: left;"><?php echo htmlspecialchars($item['nombre_producto']); ?></td>
+
+                                                                <td style="text-align: right;"><?php echo htmlspecialchars(number_format($item['precio_unitario'], 2)); ?></td>
+                                                                <td style="text-align: right;"><?php echo htmlspecialchars(number_format($item['subtotal'], 2)); ?></td>
                                                             </tr>
                                                         <?php endforeach; ?>
                                                     <?php endif; ?>
