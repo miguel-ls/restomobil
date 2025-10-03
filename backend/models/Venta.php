@@ -124,11 +124,11 @@ class Venta {
             $stmt->execute();
 
             // Obtener la fila de la venta principal
-            $venta_data = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$venta_data) {
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if (empty($result)) {
                 return null;
             }
+            $venta_data = $result[0];
 
             // Mover al siguiente conjunto de resultados (los items)
             $stmt->nextRowset();

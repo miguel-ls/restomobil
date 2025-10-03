@@ -8,6 +8,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $page_title = 'Detalle de Venta';
 include_once 'templates/header.php';
 include_once __DIR__ . '/config.php';
+include_once __DIR__ . '/lib/phpqrcode.php';
 
 function fetchFromAPI($endpoint)
 {
@@ -132,6 +133,32 @@ $is_anulada = ($venta_data && $venta_data['estado'] === 'anulada');
                                                     </tr>
                                                 </tfoot>
                                             </table>
+                                            <?php if ($venta_data): ?>
+                                                <?php
+                                                // Datos para el código QR
+                                                $qr_data = implode('|', [
+                                                    $venta_data['ruc_empresa'] ?? '',
+                                                    $venta_data['tipo_documento'] ?? '',
+                                                    $venta_data['serie'] ?? '',
+                                                    $venta_data['numero_documento'] ?? '',
+                                                    number_format($venta_data['impuesto'] ?? 0, 2, '.', ''),
+                                                    number_format($venta_data['total'] ?? 0, 2, '.', ''),
+                                                    $venta_data['fecha_emision'] ?? ''
+                                                ]);
+
+                                                // Generar el QR en formato PNG y obtener la salida en buffer
+                                                ob_start();
+                                                QRcode::png($qr_data, null, QR_ECLEVEL_L, 4);
+                                                $qr_image_data = ob_get_contents();
+                                                ob_end_clean();
+
+                                                // Convertir a base64 para embeber en el HTML
+                                                $qr_image_base64 = base64_encode($qr_image_data);
+                                                ?>
+                                                <div class="qr-container" style="text-align: center; margin-top: 20px;">
+                                                    <img src="data:image/png;base64,<?php echo $qr_image_base64; ?>" alt="Código QR">
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
 
