@@ -96,9 +96,9 @@ $is_anulada = ($venta_data && $venta_data['estado'] === 'anulada');
                                             <table class="table">
                                                 <thead>
                                                     <tr>
-                                                    <th style="text-align: left;">Cant.</th>    
-                                                    <th style="text-align: left;">Producto</th>
-                                                        
+                                                        <th style="text-align: left;">Cant.</th>
+                                                        <th style="text-align: left;">Producto</th>
+
                                                         <th style="text-align: right;">P.Unit.</th>
                                                         <th style="text-align: right;">Subtotal</th>
                                                     </tr>
@@ -137,10 +137,15 @@ $is_anulada = ($venta_data && $venta_data['estado'] === 'anulada');
                                                 <?php
                                                 // Datos para el código QR
                                                 $qr_data = implode('|', [
-                                                    $venta_data['ruc_empresa'] ?? '',
+                                                    //$venta_data['ruc_empresa'] ?? '',
                                                     $venta_data['tipo_documento'] ?? '',
                                                     $venta_data['serie'] ?? '',
                                                     $venta_data['numero_documento'] ?? '',
+
+                                                    $venta_data['nombre_cliente'] ?? '',
+                                                    $venta_data['ruc_cliente'] ?? '',
+                                                    $venta_data['direccion_cliente'] ?? '',
+                                                    number_format($venta_data['base'] ?? 0, 2, '.', ''),
                                                     number_format($venta_data['impuesto'] ?? 0, 2, '.', ''),
                                                     number_format($venta_data['total'] ?? 0, 2, '.', ''),
                                                     $venta_data['fecha_emision'] ?? ''
