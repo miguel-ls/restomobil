@@ -5,7 +5,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
-$page_title = 'Gestión de Mesas';
+$page_title = 'Gestión de Punto de Venta';
 include_once 'templates/header.php';
 
 function getTables() {
@@ -35,10 +35,10 @@ $tables_data = getTables();
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Número de Mesa</th>
+                            <th>Punto de Venta</th>
                             <th>Capacidad</th>
                             <th>Estado</th>
-                            <th>Tipo de Mesa</th>
+                            <th>Tipo</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>

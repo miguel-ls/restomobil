@@ -162,8 +162,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span class="status ${statusClass}">${statusText.charAt(0).toUpperCase() + statusText.slice(1)}</span>
                 </div>
                 <div class="card-body">
-                    <p><strong>Mesa:</strong> ${order.numero_mesa || 'N/A'}</p>
-                    <p><strong>Mozo:</strong> ${order.nombre_mozo || 'N/A'}</p>
+                    <p><strong><?php echo PUNTO_VENTA; ?>:</strong> ${order.numero_mesa || 'N/A'}</p>
+                    <p><strong><?php echo VENDEDOR; ?>:</strong> ${order.nombre_mozo || 'N/A'}</p>
                     <p><strong>Fecha:</strong> ${formatCustomDateTime(order.fecha_creacion)}</p>
                     <p class="total"><strong>Total:</strong> <?php echo CURRENCY_SYMBOL; ?>${parseFloat(order.total).toFixed(2)}</p>
                 </div>

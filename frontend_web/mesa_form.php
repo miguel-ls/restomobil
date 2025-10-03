@@ -12,7 +12,7 @@ $is_editing = false;
 if (isset($_GET['id'])) {
     $is_editing = true;
     $table_id = intval($_GET['id']);
-    $page_title = 'Editar Mesa';
+    $page_title = 'Editar Punto de Venta';
 
     // Incluir configuración de la API
     require_once 'config.php';
@@ -39,7 +39,7 @@ $estados = ['disponible', 'ocupada', 'reservada', 'mantenimiento'];
                 <form action="mesa_handler.php" method="POST">
                     <input type="hidden" name="id" value="<?php echo htmlspecialchars($table_data['id']); ?>">
                     <div class="form-group">
-                        <label for="numero_mesa">Número de Mesa</label>
+                        <label for="numero_mesa">Punto de Venta</label>
                         <input type="text" id="numero_mesa" name="numero_mesa" value="<?php echo htmlspecialchars($table_data['numero_mesa']); ?>" required>
                     </div>
                     <div class="form-group">
@@ -57,9 +57,9 @@ $estados = ['disponible', 'ocupada', 'reservada', 'mantenimiento'];
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="es_libre">
-                            <input type="checkbox" id="es_libre" name="es_libre" value="1" <?php echo ($table_data['es_libre'] ?? true) ? 'checked' : ''; ?>>
-                            Mesa de Servicio Libre
+                        <label for="es_libre" class="d-inline-flex align-items-center">
+                            Descripción de Producto Editable
+                            <input type="checkbox" id="es_libre" name="es_libre" value="1" <?php echo ($table_data['es_libre'] ?? true) ? 'checked' : ''; ?> style="margin-left:5px;">
                         </label>
                     </div>
                     <div class="form-actions">
@@ -70,4 +70,3 @@ $estados = ['disponible', 'ocupada', 'reservada', 'mantenimiento'];
         </div>
     </main>
 </div>
-
