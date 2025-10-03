@@ -39,6 +39,22 @@
             </ul>
         </li>
 
+        <!-- Menu Logistica -->
+        <li class="has-submenu">
+            <a href="#" class="menu-toggle"><i class="bi bi-truck icon"></i> <span class="text">Logística</span><i class="bi bi-chevron-down arrow"></i></a>
+            <ul class="submenu">
+                <li><a href="tipo_movimiento.php"><span class="text">Tipo de Movimiento</span></a></li>
+                <li><a href="proveedores.php"><span class="text">Proveedores</span></a></li>
+                <li><a href="compras.php"><span class="text">Compras</span></a></li>
+                <li><a href="entradas.php"><span class="text">Entradas</span></a></li>
+                <li><a href="salidas.php"><span class="text">Salidas</span></a></li>
+                <li><a href="guias_remision.php"><span class="text">Guías de Remisión</span></a></li>
+                <li><a href="inventario.php"><span class="text">Inventario</span></a></li>
+                <li><a href="consulta_stock.php"><span class="text">Consulta de Stock</span></a></li>
+                <li><a href="reporte_kardex.php"><span class="text">Reporte de Kardex</span></a></li>
+            </ul>
+        </li>
+
         <!-- Menu Reportes -->
         <li class="has-submenu">
             <a href="#" class="menu-toggle"><i class="bi bi-graph-up icon"></i> <span class="text">Reportes</span><i class="bi bi-chevron-down arrow"></i></a>
