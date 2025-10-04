@@ -24,6 +24,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($
     // Ejecutar la petición y obtener la respuesta
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    // Verificar si hubo un error en cURL
+    if (curl_errno($ch)) {
+        $error_message = 'cURL error: ' . curl_error($ch);
+        curl_close($ch);
+        header("Location: index.php?error=" . urlencode($error_message));
+        exit();
+    }
+
     curl_close($ch);
 
     // Decodificar la respuesta JSON
