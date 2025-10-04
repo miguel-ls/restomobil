@@ -10,6 +10,9 @@
         <div class="modal-body">
             <p id="alertModalMessage"></p>
         </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="closeAlertModal()">OK</button>
+        </div>
     </div>
 </div>
 
