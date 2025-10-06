@@ -110,4 +110,3 @@ $pagination = $data['pagination'] ?? null;
     </main>
 </div>
 
-<?php include_once 'templates/footer.php'; ?>
