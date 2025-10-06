@@ -109,4 +109,3 @@ $pagination = $data['pagination'] ?? null;
         </div>
     </main>
 </div>
-

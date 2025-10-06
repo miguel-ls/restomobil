@@ -46,20 +46,20 @@ class Movimiento {
     }
 
     public function create($data) {
-        $stmt = $this->conn->prepare("CALL sp_create_movimiento(:p_anio, :p_periodo, :p_tipo_movimiento, :p_codigo_movimiento, :p_fecha_movimiento, :p_tipo_documento, :p_serie_documento, :p_numero_documento, :p_tipo_entidad, :p_id_entidad, :p_detalle)");
+        $stmt = $this->conn->prepare("CALL sp_create_movimiento(:p_anio, :p_periodo, :p_codigo_movimiento, :p_fecha_movimiento, :p_id_tipo_documento_venta, :p_serie_documento, :p_numero_documento, :p_tipo_entidad, :p_id_cliente, :p_id_proveedor, :p_detalle)");
 
         $detalleJson = json_encode($data['detalle']);
 
         $stmt->bindParam(':p_anio', $data['anio']);
         $stmt->bindParam(':p_periodo', $data['periodo']);
-        $stmt->bindParam(':p_tipo_movimiento', $data['tipo_movimiento']);
         $stmt->bindParam(':p_codigo_movimiento', $data['codigo_movimiento']);
         $stmt->bindParam(':p_fecha_movimiento', $data['fecha_movimiento']);
-        $stmt->bindParam(':p_tipo_documento', $data['tipo_documento']);
+        $stmt->bindParam(':p_id_tipo_documento_venta', $data['id_tipo_documento_venta']);
         $stmt->bindParam(':p_serie_documento', $data['serie_documento']);
         $stmt->bindParam(':p_numero_documento', $data['numero_documento']);
         $stmt->bindParam(':p_tipo_entidad', $data['tipo_entidad']);
-        $stmt->bindParam(':p_id_entidad', $data['id_entidad']);
+        $stmt->bindParam(':p_id_cliente', $data['id_cliente']);
+        $stmt->bindParam(':p_id_proveedor', $data['id_proveedor']);
         $stmt->bindParam(':p_detalle', $detalleJson);
 
         $stmt->execute();
@@ -69,21 +69,21 @@ class Movimiento {
     }
 
     public function update($id, $data) {
-        $stmt = $this->conn->prepare("CALL sp_update_movimiento(:p_id_movimiento, :p_anio, :p_periodo, :p_tipo_movimiento, :p_codigo_movimiento, :p_fecha_movimiento, :p_tipo_documento, :p_serie_documento, :p_numero_documento, :p_tipo_entidad, :p_id_entidad, :p_estado, :p_detalle)");
+        $stmt = $this->conn->prepare("CALL sp_update_movimiento(:p_id_movimiento, :p_anio, :p_periodo, :p_codigo_movimiento, :p_fecha_movimiento, :p_id_tipo_documento_venta, :p_serie_documento, :p_numero_documento, :p_tipo_entidad, :p_id_cliente, :p_id_proveedor, :p_estado, :p_detalle)");
 
         $detalleJson = json_encode($data['detalle']);
 
         $stmt->bindParam(':p_id_movimiento', $id);
         $stmt->bindParam(':p_anio', $data['anio']);
         $stmt->bindParam(':p_periodo', $data['periodo']);
-        $stmt->bindParam(':p_tipo_movimiento', $data['tipo_movimiento']);
         $stmt->bindParam(':p_codigo_movimiento', $data['codigo_movimiento']);
         $stmt->bindParam(':p_fecha_movimiento', $data['fecha_movimiento']);
-        $stmt->bindParam(':p_tipo_documento', $data['tipo_documento']);
+        $stmt->bindParam(':p_id_tipo_documento_venta', $data['id_tipo_documento_venta']);
         $stmt->bindParam(':p_serie_documento', $data['serie_documento']);
         $stmt->bindParam(':p_numero_documento', $data['numero_documento']);
         $stmt->bindParam(':p_tipo_entidad', $data['tipo_entidad']);
-        $stmt->bindParam(':p_id_entidad', $data['id_entidad']);
+        $stmt->bindParam(':p_id_cliente', $data['id_cliente']);
+        $stmt->bindParam(':p_id_proveedor', $data['id_proveedor']);
         $stmt->bindParam(':p_estado', $data['estado']);
         $stmt->bindParam(':p_detalle', $detalleJson);
 

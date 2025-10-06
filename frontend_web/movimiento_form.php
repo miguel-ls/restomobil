@@ -144,15 +144,13 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         if (records) {
             records.forEach(item => {
-                if (item.estado === 'activado' || item.estado === '1' || item.estado === 1) {
-                    const option = document.createElement('option');
-                    option.value = item[valueField];
-                    option.textContent = item[textField];
-                    if (item[valueField] == selectedValue) {
-                        option.selected = true;
-                    }
-                    select.appendChild(option);
+                const option = document.createElement('option');
+                option.value = item[valueField];
+                option.textContent = item[textField];
+                if (item[valueField] == selectedValue) {
+                    option.selected = true;
                 }
+                select.appendChild(option);
             });
         }
     }
@@ -190,11 +188,16 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     document.getElementById('tipo_entidad').addEventListener('change', (e) => {
         const tipo = e.target.value;
-        const selectedId = (initialData && tipo === initialData.tipo_entidad) ? (initialData.id_cliente || initialData.id_proveedor) : null;
+        let selectedId = null;
+        // Corregido: Solo intentar obtener el ID si estamos en modo edición
+        if (initialData && tipo === initialData.tipo_entidad) {
+            selectedId = initialData.id_cliente || initialData.id_proveedor;
+        }
+
         if(tipo === 'C') {
-            loadDropdown('#id_entidad', `${API_URL}clientes.php?estado=Activado`, 'id', 'nombres_apellidos', selectedId);
+            loadDropdown('#id_entidad', `${API_URL}clientes.php`, 'id', 'nombres_apellidos', selectedId);
         } else if (tipo === 'P') {
-            loadDropdown('#id_entidad', `${API_URL}proveedores.php?estado=Activado`, 'id', 'nombres_apellidos', selectedId);
+            loadDropdown('#id_entidad', `${API_URL}proveedores.php`, 'id', 'nombres_apellidos', selectedId);
         } else {
             document.getElementById('id_entidad').innerHTML = '<option value="">Seleccione...</option>';
         }
@@ -242,6 +245,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     if (initialData) {
         await filterTiposMovimiento(initialData.tipo_movimiento, initialData.codigo_movimiento);
+        // Disparar el evento de cambio para cargar los clientes/proveedores en modo edición
         document.getElementById('tipo_entidad').dispatchEvent(new Event('change'));
     }
 
