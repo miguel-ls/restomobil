@@ -16,6 +16,7 @@
             <ul class="submenu">
                 <li><a href="empresas.php"><span class="text">Empresa</span></a></li>
                 <li><a href="clientes.php"><span class="text">Clientes</span></a></li>
+                <li><a href="proveedores.php"><span class="text">Proveedores</span></a></li>                
                 <li><a href="productos.php"><span class="text">Productos</span></a></li>
                 <li><a href="categorias.php"><span class="text">Categorías</span></a></li>
                 <li><a href="mesas.php"><span class="text">Punto de Venta</span></a></li>
@@ -44,7 +45,6 @@
             <a href="#" class="menu-toggle"><i class="bi bi-truck icon"></i> <span class="text">Logística</span><i class="bi bi-chevron-down arrow"></i></a>
             <ul class="submenu">
                 <li><a href="tipo_movimiento.php"><span class="text">Tipo de Movimiento</span></a></li>
-                <li><a href="proveedores.php"><span class="text">Proveedores</span></a></li>
                 <li><a href="compras.php"><span class="text">Compras</span></a></li>
                 <li><a href="entradas.php"><span class="text">Entradas</span></a></li>
                 <li><a href="salidas.php"><span class="text">Salidas</span></a></li>
