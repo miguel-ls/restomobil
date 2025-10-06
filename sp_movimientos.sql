@@ -17,17 +17,17 @@ BEGIN
             m.anio,
             m.periodo,
             m.fecha_movimiento,
-            tm.nombre as nombre_movimiento,
+            tm.descripcion as nombre_movimiento,
             m.tipo_documento,
             m.serie_documento,
             m.numero_documento,
             m.estado
         FROM movimientos m
-        JOIN tipos_movimiento tm ON m.codigo_movimiento = tm.id
+        JOIN tipo_movimiento tm ON m.codigo_movimiento = tm.id
         WHERE (
             m.serie_documento LIKE ''%', p_filter, '%'' COLLATE utf8mb4_unicode_ci OR
             m.numero_documento LIKE ''%', p_filter, '%'' COLLATE utf8mb4_unicode_ci OR
-            tm.nombre LIKE ''%', p_filter, '%'' COLLATE utf8mb4_unicode_ci
+            tm.descripcion LIKE ''%', p_filter, '%'' COLLATE utf8mb4_unicode_ci
         )
         ORDER BY m.fecha_movimiento DESC, m.id DESC
         LIMIT ', p_limit, ' OFFSET ', p_offset, ';
@@ -47,11 +47,11 @@ CREATE PROCEDURE `sp_count_movimientos`(
 BEGIN
     SELECT COUNT(m.id) as total
     FROM movimientos m
-    JOIN tipos_movimiento tm ON m.codigo_movimiento = tm.id
+    JOIN tipo_movimiento tm ON m.codigo_movimiento = tm.id
     WHERE (
         m.serie_documento LIKE CONCAT('%', p_filter, '%') COLLATE utf8mb4_unicode_ci OR
         m.numero_documento LIKE CONCAT('%', p_filter, '%') COLLATE utf8mb4_unicode_ci OR
-        tm.nombre LIKE CONCAT('%', p_filter, '%') COLLATE utf8mb4_unicode_ci
+        tm.descripcion LIKE CONCAT('%', p_filter, '%') COLLATE utf8mb4_unicode_ci
     );
 END$$
 DELIMITER ;
@@ -66,9 +66,9 @@ BEGIN
     -- Obtener cabecera
     SELECT
         m.*,
-        tm.nombre as nombre_movimiento
+        tm.descripcion as nombre_movimiento
     FROM movimientos m
-    JOIN tipos_movimiento tm ON m.codigo_movimiento = tm.id
+    JOIN tipo_movimiento tm ON m.codigo_movimiento = tm.id
     WHERE m.id = p_id;
 
     -- Obtener detalle
@@ -88,18 +88,18 @@ DELIMITER $$
 CREATE PROCEDURE `sp_create_movimiento`(
     IN p_anio CHAR(4),
     IN p_periodo CHAR(2),
-    IN p_tipo_movimiento ENUM('E', 'S'),
     IN p_codigo_movimiento INT,
     IN p_fecha_movimiento DATE,
     IN p_tipo_documento VARCHAR(50),
     IN p_serie_documento VARCHAR(10),
     IN p_numero_documento VARCHAR(20),
     IN p_tipo_entidad ENUM('C', 'P'),
-    IN p_id_entidad BIGINT,
+    IN p_id_entidad INT,
     IN p_detalle JSON
 )
 BEGIN
     DECLARE v_id_movimiento BIGINT;
+    DECLARE v_tipo_movimiento_char CHAR(1);
     DECLARE v_index INT DEFAULT 0;
     DECLARE v_item_count INT;
     DECLARE v_item INT;
@@ -109,12 +109,15 @@ BEGIN
     DECLARE v_codigo_unidad_medida VARCHAR(3);
     DECLARE v_costo_unitario DECIMAL(14,5);
 
+    -- Obtener el tipo ('E' o 'S') desde la tabla tipo_movimiento
+    SELECT tipo INTO v_tipo_movimiento_char FROM tipo_movimiento WHERE id = p_codigo_movimiento;
+
     -- Iniciar transacción
     START TRANSACTION;
 
     -- Insertar cabecera
     INSERT INTO movimientos (anio, periodo, tipo_movimiento, codigo_movimiento, fecha_movimiento, tipo_documento, serie_documento, numero_documento, tipo_entidad, id_entidad, estado)
-    VALUES (p_anio, p_periodo, p_tipo_movimiento, p_codigo_movimiento, p_fecha_movimiento, p_tipo_documento, p_serie_documento, p_numero_documento, p_tipo_entidad, p_id_entidad, 'Activado');
+    VALUES (p_anio, p_periodo, v_tipo_movimiento_char, p_codigo_movimiento, p_fecha_movimiento, p_tipo_documento, p_serie_documento, p_numero_documento, p_tipo_entidad, p_id_entidad, 'Activado');
 
     SET v_id_movimiento = LAST_INSERT_ID();
     SET v_item_count = JSON_LENGTH(p_detalle);
@@ -148,18 +151,18 @@ CREATE PROCEDURE `sp_update_movimiento`(
     IN p_id_movimiento BIGINT,
     IN p_anio CHAR(4),
     IN p_periodo CHAR(2),
-    IN p_tipo_movimiento ENUM('E', 'S'),
     IN p_codigo_movimiento INT,
     IN p_fecha_movimiento DATE,
     IN p_tipo_documento VARCHAR(50),
     IN p_serie_documento VARCHAR(10),
     IN p_numero_documento VARCHAR(20),
     IN p_tipo_entidad ENUM('C', 'P'),
-    IN p_id_entidad BIGINT,
+    IN p_id_entidad INT,
     IN p_estado ENUM('Activado', 'Desactivado'),
     IN p_detalle JSON
 )
 BEGIN
+    DECLARE v_tipo_movimiento_char CHAR(1);
     DECLARE v_index INT DEFAULT 0;
     DECLARE v_item_count INT;
     DECLARE v_item INT;
@@ -169,6 +172,9 @@ BEGIN
     DECLARE v_codigo_unidad_medida VARCHAR(3);
     DECLARE v_costo_unitario DECIMAL(14,5);
 
+    -- Obtener el tipo ('E' o 'S') desde la tabla tipo_movimiento
+    SELECT tipo INTO v_tipo_movimiento_char FROM tipo_movimiento WHERE id = p_codigo_movimiento;
+
     -- Iniciar transacción
     START TRANSACTION;
 
@@ -176,7 +182,7 @@ BEGIN
     UPDATE movimientos SET
         anio = p_anio,
         periodo = p_periodo,
-        tipo_movimiento = p_tipo_movimiento,
+        tipo_movimiento = v_tipo_movimiento_char,
         codigo_movimiento = p_codigo_movimiento,
         fecha_movimiento = p_fecha_movimiento,
         tipo_documento = p_tipo_documento,
