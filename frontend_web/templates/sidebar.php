@@ -24,6 +24,7 @@
                 <li><a href="series_documentos.php"><span class="text">Series Documentos</span></a></li>
                 <li><a href="tipo_documento_identidad.php"><span class="text">Tipo de Documento Identidad</span></a></li>
                 <li><a href="impuestos.php"><span class="text">Impuestos</span></a></li>
+                <li><a href="unidades_medida.php"><span class="text">Unidades de medida</span></a></li>
             </ul>
         </li>
 
