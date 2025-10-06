@@ -8,11 +8,11 @@
         <button id="sidebar-toggle" title="Contraer menú" class="desktop-toggle"><i class="bi bi-list"></i></button>
     </div>
     <ul>
-        <li><a href="dashboard.php"><i class="bi bi-house-door-fill icon"></i> <span class="text">Inicio</span></a></li>
+        <li><a href="dashboard.php"><i class="bi bi-house-door icon"></i> <span class="text">Inicio</span></a></li>
 
         <!-- Menu Maestros -->
         <li class="has-submenu">
-            <a href="#" class="menu-toggle"><i class="bi bi-folder-fill icon"></i> <span class="text">Maestros</span><i class="bi bi-chevron-down arrow"></i></a>
+            <a href="#" class="menu-toggle"><i class="bi bi-folder icon"></i> <span class="text">Maestros</span><i class="bi bi-chevron-down arrow"></i></a>
             <ul class="submenu">
                 <li><a href="empresas.php"><span class="text">Empresa</span></a></li>
                 <li><a href="clientes.php"><span class="text">Clientes</span></a></li>
@@ -27,16 +27,16 @@
             </ul>
         </li>
 
-        <!-- Menu Operaciones -->
+        <!-- Menu Ventas -->
         <li class="has-submenu">
-            <a href="#" class="menu-toggle"><i class="bi bi-gear-fill icon"></i> <span class="text">Operaciones</span><i class="bi bi-chevron-down arrow"></i></a>
+            <a href="#" class="menu-toggle"><i class="bi bi-bag-check icon"></i> <span class="text">Ventas</span><i class="bi bi-chevron-down arrow"></i></a>
             <ul class="submenu">
                 <li><a href="caja.php"><span class="text">Caja</span></a></li>
                 <li><a href="movim_caja.php"><span class="text">Movim. de Caja</span></a></li>
                 <li><a href="apertura_cierre.php"><span class="text">Apertura / Cierre</span></a></li>
                 <li><a href="pedidos.php"><span class="text">Pedidos</span></a></li>
                 <li><a href="reservas.php"><span class="text">Reservas</span></a></li>
-                <li><a href="ventas.php"><span class="text">Ventas</span></a></li>
+                <li><a href="ventas.php"><span class="text">Comp. Ventas</span></a></li>
             </ul>
         </li>
 
@@ -45,9 +45,9 @@
             <a href="#" class="menu-toggle"><i class="bi bi-truck icon"></i> <span class="text">Logística</span><i class="bi bi-chevron-down arrow"></i></a>
             <ul class="submenu">
                 <li><a href="tipo_movimiento.php"><span class="text">Tipo de Movimiento</span></a></li>
-                <li><a href="compras.php"><span class="text">Compras</span></a></li>
                 <li><a href="entradas.php"><span class="text">Entradas</span></a></li>
                 <li><a href="salidas.php"><span class="text">Salidas</span></a></li>
+                <li><a href="compras.php"><span class="text">Compras</span></a></li>                
                 <li><a href="guias_remision.php"><span class="text">Guías de Remisión</span></a></li>
                 <li><a href="inventario.php"><span class="text">Inventario</span></a></li>
                 <li><a href="consulta_stock.php"><span class="text">Consulta de Stock</span></a></li>
@@ -64,7 +64,7 @@
         </li>
 
         <?php if (isset($_SESSION['user_rol']) && $_SESSION['user_rol'] == 'Administrador'): ?>
-            <li><a href="usuarios.php"><i class="bi bi-people-fill icon"></i> <span class="text">Usuarios</span></a></li>
+            <li><a href="usuarios.php"><i class="bi bi-people icon"></i> <span class="text">Usuarios</span></a></li>
         <?php endif; ?>
     </ul>
     <div class="sidebar-footer">
