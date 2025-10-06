@@ -1,20 +1,4 @@
--- Tabla de Tipos de Movimiento
-CREATE TABLE IF NOT EXISTS `tipos_movimiento` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `nombre` VARCHAR(100) NOT NULL,
-  `tipo` ENUM('E', 'S') NOT NULL COMMENT 'E: Entrada, S: Salida',
-  `descripcion` TEXT,
-  `estado` ENUM('Activado', 'Desactivado') NOT NULL DEFAULT 'Activado'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Datos iniciales para Tipos de Movimiento
-INSERT IGNORE INTO `tipos_movimiento` (`id`, `nombre`, `tipo`, `descripcion`) VALUES
-(1, 'Compra Nacional', 'E', 'Ingreso de mercadería por compra a proveedor nacional.'),
-(2, 'Venta Nacional', 'S', 'Salida de mercadería por venta a cliente nacional.'),
-(3, 'Ajuste por Inventario (Entrada)', 'E', 'Ajuste de inventario que resulta en un aumento de stock.'),
-(4, 'Ajuste por Inventario (Salida)', 'S', 'Ajuste de inventario que resulta en una disminución de stock.');
-
--- Tabla de Cabecera de Movimientos
+-- Tabla de Cabecera de Movimientos (Estructura Corregida Definitiva)
 CREATE TABLE IF NOT EXISTS `movimientos` (
   `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
   `anio` CHAR(4) NOT NULL,
@@ -22,15 +6,19 @@ CREATE TABLE IF NOT EXISTS `movimientos` (
   `tipo_movimiento` ENUM('E', 'S') NOT NULL COMMENT 'E: Entrada, S: Salida',
   `codigo_movimiento` INT NOT NULL,
   `fecha_movimiento` DATE NOT NULL,
-  `tipo_documento` VARCHAR(50),
-  `serie_documento` VARCHAR(10),
-  `numero_documento` VARCHAR(20),
-  `tipo_entidad` ENUM('C', 'P') COMMENT 'C: Cliente, P: Proveedor',
-  `id_entidad` BIGINT,
+  `id_tipo_documento_venta` INT NULL,
+  `serie_documento` VARCHAR(10) NULL,
+  `numero_documento` VARCHAR(20) NULL,
+  `tipo_entidad` ENUM('C', 'P') NULL COMMENT 'C: Cliente, P: Proveedor',
+  `id_cliente` INT NULL,
+  `id_proveedor` INT NULL,
   `estado` ENUM('Activado', 'Desactivado') NOT NULL DEFAULT 'Activado',
   `fecha_creacion` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `fecha_modificacion` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (`codigo_movimiento`) REFERENCES `tipos_movimiento`(`id`)
+  FOREIGN KEY (`codigo_movimiento`) REFERENCES `tipo_movimiento`(`id`),
+  FOREIGN KEY (`id_tipo_documento_venta`) REFERENCES `tipo_documento_venta`(`id`),
+  FOREIGN KEY (`id_cliente`) REFERENCES `clientes`(`id`) ON DELETE SET NULL,
+  FOREIGN KEY (`id_proveedor`) REFERENCES `proveedores`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabla de Detalle de Movimientos
