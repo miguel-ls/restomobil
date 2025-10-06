@@ -16,10 +16,10 @@ switch ($request_method) {
             $proveedor_data = $proveedor->readOne($proveedor_id);
             if ($proveedor_data) {
                 http_response_code(200);
-                echo json_encode($proveedor_data);
+                echo json_encode($proveedor_data, JSON_INVALID_UTF8_SUBSTITUTE);
             } else {
                 http_response_code(404);
-                echo json_encode(["message" => "Proveedor no encontrado."]);
+                echo json_encode(["message" => "Proveedor no encontrado."], JSON_INVALID_UTF8_SUBSTITUTE);
             }
         } else {
             $stmt = $proveedor->readAll();
@@ -30,10 +30,10 @@ switch ($request_method) {
                     array_push($proveedores_arr["records"], $row);
                 }
                 http_response_code(200);
-                echo json_encode($proveedores_arr);
+                echo json_encode($proveedores_arr, JSON_INVALID_UTF8_SUBSTITUTE);
             } else {
                 http_response_code(200);
-                echo json_encode(["records" => []]);
+                echo json_encode(["records" => []], JSON_INVALID_UTF8_SUBSTITUTE);
             }
         }
         break;
@@ -41,7 +41,7 @@ switch ($request_method) {
         $data = json_decode(file_get_contents("php://input"));
         if (empty($data->id_tipo_documento_identidad) || empty($data->numero_documento) || empty($data->nombres_apellidos)) {
             http_response_code(400);
-            echo json_encode(["message" => "Datos incompletos."]);
+            echo json_encode(["message" => "Datos incompletos."], JSON_INVALID_UTF8_SUBSTITUTE);
             break;
         }
 
@@ -59,18 +59,18 @@ switch ($request_method) {
             if ($stmt) {
                 $new_proveedor = $stmt->fetch(PDO::FETCH_ASSOC);
                 http_response_code(201);
-                echo json_encode(["message" => "Proveedor creado.", "id" => $new_proveedor['id']]);
+                echo json_encode(["message" => "Proveedor creado.", "id" => $new_proveedor['id']], JSON_INVALID_UTF8_SUBSTITUTE);
             } else {
                 http_response_code(503);
-                echo json_encode(["message" => "No se pudo crear el proveedor."]);
+                echo json_encode(["message" => "No se pudo crear el proveedor."], JSON_INVALID_UTF8_SUBSTITUTE);
             }
         } catch (PDOException $e) {
             if ($e->getCode() == '23000') { // Integrity constraint violation
                 http_response_code(409); // Conflict
-                echo json_encode(["message" => "Ya existe un proveedor con el tipo y número de documento especificado."]);
+                echo json_encode(["message" => "Ya existe un proveedor con el tipo y número de documento especificado."], JSON_INVALID_UTF8_SUBSTITUTE);
             } else {
                 http_response_code(503);
-                echo json_encode(["message" => "Error en la base de datos.", "error" => $e->getMessage()]);
+                echo json_encode(["message" => "Error en la base de datos.", "error" => $e->getMessage()], JSON_INVALID_UTF8_SUBSTITUTE);
             }
         }
         break;
@@ -92,14 +92,14 @@ switch ($request_method) {
                 $estado
             )) {
                 http_response_code(200);
-                echo json_encode(["message" => "Proveedor actualizado."]);
+                echo json_encode(["message" => "Proveedor actualizado."], JSON_INVALID_UTF8_SUBSTITUTE);
             } else {
                 http_response_code(503);
-                echo json_encode(["message" => "No se pudo actualizar el proveedor."]);
+                echo json_encode(["message" => "No se pudo actualizar el proveedor."], JSON_INVALID_UTF8_SUBSTITUTE);
             }
         } else {
             http_response_code(400);
-            echo json_encode(["message" => "Datos incompletos."]);
+            echo json_encode(["message" => "Datos incompletos."], JSON_INVALID_UTF8_SUBSTITUTE);
         }
         break;
     case 'DELETE':
@@ -107,19 +107,19 @@ switch ($request_method) {
         if ($proveedor_id) {
             if ($proveedor->delete($proveedor_id)) {
                 http_response_code(200);
-                echo json_encode(["message" => "Proveedor eliminado (desactivado)."]);
+                echo json_encode(["message" => "Proveedor eliminado (desactivado)."], JSON_INVALID_UTF8_SUBSTITUTE);
             } else {
                 http_response_code(503);
-                echo json_encode(["message" => "No se pudo eliminar el proveedor."]);
+                echo json_encode(["message" => "No se pudo eliminar el proveedor."], JSON_INVALID_UTF8_SUBSTITUTE);
             }
         } else {
             http_response_code(400);
-            echo json_encode(["message" => "ID no proporcionado."]);
+            echo json_encode(["message" => "ID no proporcionado."], JSON_INVALID_UTF8_SUBSTITUTE);
         }
         break;
     default:
         http_response_code(405);
-        echo json_encode(["message" => "Método no permitido."]);
+        echo json_encode(["message" => "Método no permitido."], JSON_INVALID_UTF8_SUBSTITUTE);
         break;
 }
 ?>
