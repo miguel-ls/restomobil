@@ -2,8 +2,8 @@
 // Configuración de la conexión a la base de datos
 
 define('DB_HOST', '127.0.0.1'); // O la IP de tu servidor de BD
-define('DB_USER', 'miguel');      // Usuario de la BD
-define('DB_PASS', 'Miguel123!');  // Contraseña de la BD
+define('DB_USER', 'root');      // Usuario de la BD
+define('DB_PASS', '');  // Contraseña de la BD
 define('DB_NAME', 'restaurante_db');
 
 // Opcional: configurar el DSN (Data Source Name) para PDO
