@@ -15,14 +15,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $data = [
         'fecha_movimiento' => $_POST['fecha_movimiento'],
         'codigo_movimiento' => intval($_POST['codigo_movimiento']),
-        'estado' => $_POST['estado'],
-        'tipo_documento' => $_POST['tipo_documento'] ?? null,
+        'id_tipo_documento_venta' => !empty($_POST['id_tipo_documento_venta']) ? intval($_POST['id_tipo_documento_venta']) : null,
         'serie_documento' => $_POST['serie_documento'] ?? null,
         'numero_documento' => $_POST['numero_documento'] ?? null,
         'tipo_entidad' => $_POST['tipo_entidad'] ?? null,
-        'id_entidad' => !empty($_POST['id_entidad']) ? intval($_POST['id_entidad']) : null,
+        'id_cliente' => null,
+        'id_proveedor' => null,
+        'estado' => $_POST['estado'],
         'detalle' => []
     ];
+
+    // Asignar el id de la entidad a la columna correcta
+    if ($data['tipo_entidad'] === 'C' && !empty($_POST['id_entidad'])) {
+        $data['id_cliente'] = intval($_POST['id_entidad']);
+    } elseif ($data['tipo_entidad'] === 'P' && !empty($_POST['id_entidad'])) {
+        $data['id_proveedor'] = intval($_POST['id_entidad']);
+    }
 
     // --- Estructurar datos del detalle ---
     if (isset($_POST['detalle']) && is_array($_POST['detalle'])) {
@@ -34,21 +42,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     'cantidad' => floatval($item['cantidad']),
                     'costo_unitario' => floatval($item['costo_unitario']),
                     'descripcion' => $item['descripcion'] ?? '',
-                    'codigo_unidad_medida' => 'NIU' // Simplificación, debería venir del producto
+                    'codigo_unidad_medida' => 'NIU' // Simplificación
                 ];
             }
         }
     }
 
-    // Determinar año, periodo y tipo de movimiento
+    // Determinar año y periodo
     $fecha = new DateTime($data['fecha_movimiento']);
     $data['anio'] = $fecha->format('Y');
     $data['periodo'] = $fecha->format('m');
-
-    // Para obtener el tipo (E/S), necesitamos consultarlo.
-    // Una forma simple es pasarlo desde el formulario, pero para mantenerlo seguro, lo ideal es consultarlo en el backend.
-    // Por ahora, el backend lo deduce desde el `codigo_movimiento`.
-    // El modelo de la API ya lo hace, así que no es necesario enviarlo desde aquí.
 
     // --- Configurar y ejecutar cURL ---
     $ch = curl_init();
