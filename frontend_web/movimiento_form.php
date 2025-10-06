@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         if(tipo === 'C') {
             loadDropdown('#id_entidad', `${API_URL}clientes.php?estado=Activado`, 'id', 'nombres_apellidos', selectedId);
         } else if (tipo === 'P') {
-            loadDropdown('#id_entidad', `${API_URL}proveedores.php?estado=Activado`, 'id', 'nombre', selectedId);
+            loadDropdown('#id_entidad', `${API_URL}proveedores.php?estado=Activado`, 'id', 'nombres_apellidos', selectedId);
         } else {
             document.getElementById('id_entidad').innerHTML = '<option value="">Seleccione...</option>';
         }
@@ -254,5 +254,3 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 });
 </script>
-
-<?php include_once 'templates/footer.php'; ?>
