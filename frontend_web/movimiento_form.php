@@ -144,7 +144,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         if (records) {
             records.forEach(item => {
-                if (item.estado === 'activado' || item.estado === '1' || item.estado === 1) {
+                // Corregido: Hacer la comparación del estado insensible a mayúsculas y minúsculas
+                if (String(item.estado).toLowerCase() === 'activado' || String(item.estado) === '1') {
                     const option = document.createElement('option');
                     option.value = item[valueField];
                     option.textContent = item[textField];
