@@ -96,12 +96,29 @@ $pagination = $data['pagination'] ?? null;
                                     <td data-label="ID"><?php echo htmlspecialchars($mov['id']); ?></td>
                                     <td data-label="Fecha"><?php echo htmlspecialchars($mov['fecha_movimiento']); ?></td>
                                     <td data-label="Almacen"><?php echo htmlspecialchars($mov['nombre_almacen']); ?></td>
-                                    <td data-label="Tipo"><?php echo htmlspecialchars($mov['tipo_movimiento']); ?></td>
+
+                                    
+
+                                    <td>
+                                        <span class="status <?php echo $mov['tipo_movimiento'] === 'E' ? 'status-active' : 'status-inactive'; ?>">
+                                            <?php echo htmlspecialchars(ucfirst($mov['tipo_movimiento'])); ?>
+                                        </span>
+                                    </td>
+
+                                    
+
                                     <td data-label="Cód. Movimiento"><?php echo htmlspecialchars($mov['nombre_movimiento']); ?></td>
                                     <td data-label="Documento"><?php echo htmlspecialchars(($mov['tipo_documento_nombre'] ?? '') . ' ' . ($mov['serie_documento'] ?? '') . '-' . ($mov['numero_documento'] ?? '')); ?></td>
                                     <td data-label="Tipo Entidad"><?php echo htmlspecialchars($mov['tipo_entidad']); ?></td>
                                     <td data-label="Cliente/Proveedor"><?php echo htmlspecialchars($mov['entidad_nombre'] ?? 'N/A'); ?></td>
-                                    <td data-label="Estado"><span class="status status-<?php echo strtolower(htmlspecialchars($mov['estado'])); ?>"><?php echo htmlspecialchars($mov['estado']); ?></span></td>
+                                    
+                                    <td>
+                                        <span class="status <?php echo $mov['estado'] === 'Activado' ? 'status-active' : 'status-inactive'; ?>">
+                                            <?php echo htmlspecialchars(ucfirst($mov['estado'])); ?>
+                                        </span>
+                                    </td>
+                                    
+                                    
                                     <td data-label="Acciones" class="actions-cell">
                                         <a href="movimiento_form.php?id=<?php echo $mov['id']; ?>" class="btn btn-edit">Editar</a>
                                         <a href="movimiento_delete_handler.php?id=<?php echo $mov['id']; ?>" class="btn btn-delete" onclick="return confirm('¿Está seguro de que desea anular este movimiento? Esta acción no se puede deshacer.');">Anular</a>
