@@ -22,7 +22,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         'id_cliente' => null,
         'id_proveedor' => null,
         'estado' => $_POST['estado'],
-        'detalle' => []
+        'detalle' => [],
+        'id_almacen' =>  $_POST['id_almacen'] ?? null,
     ];
 
     // Asignar el id de la entidad a la columna correcta

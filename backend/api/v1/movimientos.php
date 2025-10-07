@@ -12,6 +12,18 @@ try {
 
     switch ($request_method) {
         case 'GET':
+            if (!empty($_GET["id"])) {
+                $id = intval($_GET["id"]);
+                $resultado = $movimiento->getById($id);
+                if ($resultado) {
+                    http_response_code(200);
+                    echo json_encode($resultado);
+                } else {
+                    http_response_code(404);
+                    echo json_encode(array("message" => "Movimiento no encontrado."));
+                }
+            } else {
+
             // Lógica para obtener movimientos (ya implementada)
             $filter = $_GET['filter'] ?? '';
             $tipo_movimiento = $_GET['tipo_movimiento'] ?? null;
@@ -19,9 +31,10 @@ try {
             $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
             $limit = 10;
             $offset = ($page - 1) * $limit;
+            $id_almacen = $_GET['id_almacen'] ?? null;
 
-            $movimientos = $movimiento->getAll($filter, $tipo_movimiento, $tipo_entidad, $limit, $offset);
-            $total_records = $movimiento->count($filter, $tipo_movimiento, $tipo_entidad);
+            $movimientos = $movimiento->getAll($filter, $tipo_movimiento, $tipo_entidad, $limit, $offset, $id_almacen);
+            $total_records = $movimiento->count($filter, $tipo_movimiento, $tipo_entidad, $id_almacen);
 
             $response = [
                 "records" => $movimientos,
@@ -34,6 +47,7 @@ try {
 
             http_response_code(200);
             echo json_encode($response, JSON_INVALID_UTF8_SUBSTITUTE);
+        }
             break;
 
         case 'POST':
@@ -56,7 +70,40 @@ try {
             }
             break;
 
-        // Aquí se podrían añadir los casos para PUT y DELETE en el futuro
+        case 'PUT':
+            $data = json_decode(file_get_contents("php://input"), true);
+
+            if (!empty($_GET["id"]) && !empty($data)) {
+                $id = intval($_GET["id"]);
+                if ($movimiento->update($id, $data)) {
+                    http_response_code(200);
+                    echo json_encode(array("message" => "Movimiento actualizado."));
+                } else {
+                    http_response_code(503);
+                    echo json_encode(array("message" => "No se pudo actualizar el movimiento."));
+                }
+            } else {
+                http_response_code(400);
+                echo json_encode(array("message" => "Datos incompletos o ID no proporcionado."));
+            }
+            break;
+
+        case 'DELETE':
+            if (!empty($_GET["id"])) {
+                $id = intval($_GET["id"]);
+                if ($movimiento->delete($id)) {
+                    http_response_code(200);
+                    echo json_encode(array("message" => "Movimiento anulado."));
+                } else {
+                    http_response_code(503);
+                    echo json_encode(array("message" => "No se pudo anular el movimiento."));
+                }
+            } else {
+                http_response_code(400);
+                echo json_encode(array("message" => "No se proporcionó un ID."));
+            }
+            break;
+
 
         default:
             http_response_code(405);

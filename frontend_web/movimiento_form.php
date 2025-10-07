@@ -12,6 +12,16 @@ $movimiento_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $movimiento_data = null;
 $page_title = $movimiento_id ? 'Editar Movimiento' : 'Nuevo Movimiento';
 
+function getAPIdata($endpoint) {
+    $api_url = API_BASE_URL . $endpoint;
+    $ch = curl_init($api_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    $data = json_decode($response, true);
+    return isset($data['records']) ? $data['records'] : $data;
+}
+
 if ($movimiento_id) {
     // Cargar datos del movimiento para editar
     $api_url = API_BASE_URL . "movimientos.php?id=" . $movimiento_id;
@@ -20,6 +30,8 @@ if ($movimiento_id) {
         $movimiento_data = json_decode($response, true);
     }
 }
+
+$categories = getAPIdata('almacenes.php');
 
 ?>
 <div class="dashboard-container">
@@ -40,6 +52,22 @@ if ($movimiento_id) {
                         <label for="fecha_movimiento">Fecha Movimiento</label>
                         <input type="date" id="fecha_movimiento" name="fecha_movimiento" value="<?php echo htmlspecialchars($movimiento_data['fecha_movimiento'] ?? date('Y-m-d')); ?>" required>
                     </div>
+
+                    <div class="form-group">
+                        <label for="id_almacen">Almacen</label>
+                        <select id="id_almacen" name="id_almacen" required>
+                            <option value="">Seleccione un almacen</option>
+                            <?php if (!empty($categories)): ?>
+                                <?php foreach ($categories as $category): ?>
+                                    <option value="<?php echo $category['id']; ?>" <?php echo (isset($product_data['id_almacen']) && $product_data['id_almacen'] == $category['id']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($category['nombre']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+                    
+                    
                     <div class="form-group">
                         <label for="tipo_operacion">Tipo de Movimiento (E/S)</label>
                         <select id="tipo_operacion" name="tipo_operacion" required>
@@ -243,7 +271,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
 
     // --- INICIALIZACIÓN ---
+    // await loadDropdown('#id_almacen', `${API_URL}almacenes.php`, 'id', 'nombre', initialData?.id_almacen);
+
     await loadDropdown('#id_tipo_documento_venta', `${API_URL}tipos_documentos.php`, 'id', 'nombre', initialData?.id_tipo_documento_venta);
+
+    
 
     if (initialData) {
         await filterTiposMovimiento(initialData.tipo_movimiento, initialData.codigo_movimiento);
@@ -257,5 +289,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     } else if (!initialData) {
         addDetalleRow();
     }
+
+    
+    
+
+
+    
+    
 });
 </script>
