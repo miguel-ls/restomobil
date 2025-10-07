@@ -8,16 +8,26 @@ $page_title = 'Gestión de Movimientos';
 include_once 'templates/header.php';
 include_once __DIR__ . '/config.php';
 
-// Obtener filtro y paginación de la URL
-$filter = isset($_GET['filter']) ? $_GET['filter'] : '';
+// Obtener filtros de la URL
+$filter = $_GET['filter'] ?? '';
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+$tipo_movimiento_filter = $_GET['tipo_movimiento'] ?? '';
+$tipo_entidad_filter = $_GET['tipo_entidad'] ?? '';
+
+// Construir el array de parámetros para la API
+$api_params = [
+    'page' => $page,
+    'filter' => $filter,
+    'tipo_movimiento' => $tipo_movimiento_filter,
+    'tipo_entidad' => $tipo_entidad_filter,
+];
 
 // Construir la URL de la API
-$api_url = API_BASE_URL . 'movimientos.php?' . http_build_query(['page' => $page, 'filter' => $filter]);
+$api_url = API_BASE_URL . 'movimientos.php?' . http_build_query(array_filter($api_params));
 
 // Realizar la petición a la API
-$response = file_get_contents($api_url);
-$data = json_decode($response, true);
+$response = @file_get_contents($api_url);
+$data = $response ? json_decode($response, true) : null;
 $movimientos = $data['records'] ?? [];
 $pagination = $data['pagination'] ?? null;
 ?>
@@ -39,12 +49,25 @@ $pagination = $data['pagination'] ?? null;
             if (isset($_GET['error'])) {
                 echo '<p class="error-message">' . htmlspecialchars(urldecode($_GET['error'])) . '</p>';
             }
+            if (!$response) {
+                 echo '<p class="error-message">Error: No se pudo conectar a la API para cargar los movimientos.</p>';
+            }
             ?>
 
             <div class="filter-container">
                 <form method="GET" action="movimientos.php">
                     <div class="filters">
-                        <input type="text" id="filter-input" name="filter" placeholder="Buscar por tipo, serie o número..." value="<?php echo htmlspecialchars($filter); ?>">
+                        <input type="text" name="filter" placeholder="Buscar por serie, número, etc." value="<?php echo htmlspecialchars($filter); ?>">
+                        <select name="tipo_movimiento">
+                            <option value="">Tipo (E/S)</option>
+                            <option value="E" <?php echo ($tipo_movimiento_filter == 'E') ? 'selected' : ''; ?>>Entrada</option>
+                            <option value="S" <?php echo ($tipo_movimiento_filter == 'S') ? 'selected' : ''; ?>>Salida</option>
+                        </select>
+                        <select name="tipo_entidad">
+                            <option value="">Tipo Entidad</option>
+                            <option value="C" <?php echo ($tipo_entidad_filter == 'C') ? 'selected' : ''; ?>>Cliente</option>
+                            <option value="P" <?php echo ($tipo_entidad_filter == 'P') ? 'selected' : ''; ?>>Proveedor</option>
+                        </select>
                         <button type="submit" class="btn">Filtrar</button>
                     </div>
                 </form>
@@ -56,20 +79,26 @@ $pagination = $data['pagination'] ?? null;
                         <tr>
                             <th>ID</th>
                             <th>Fecha</th>
-                            <th>Tipo Mov.</th>
+                            <th>Tipo</th>
+                            <th>Cód. Movimiento</th>
                             <th>Documento</th>
+                            <th>Tipo Entidad</th>
+                            <th>Cliente/Proveedor</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="movimientos-tbody">
+                    <tbody>
                         <?php if (!empty($movimientos)): ?>
                             <?php foreach ($movimientos as $mov): ?>
                                 <tr>
                                     <td data-label="ID"><?php echo htmlspecialchars($mov['id']); ?></td>
                                     <td data-label="Fecha"><?php echo htmlspecialchars($mov['fecha_movimiento']); ?></td>
-                                    <td data-label="Tipo Mov."><?php echo htmlspecialchars($mov['nombre_movimiento']); ?></td>
-                                    <td data-label="Documento"><?php echo htmlspecialchars(($mov['tipo_documento'] ?? '') . ' ' . ($mov['serie_documento'] ?? '') . '-' . ($mov['numero_documento'] ?? '')); ?></td>
+                                    <td data-label="Tipo"><?php echo htmlspecialchars($mov['tipo_movimiento']); ?></td>
+                                    <td data-label="Cód. Movimiento"><?php echo htmlspecialchars($mov['nombre_movimiento']); ?></td>
+                                    <td data-label="Documento"><?php echo htmlspecialchars(($mov['tipo_documento_nombre'] ?? '') . ' ' . ($mov['serie_documento'] ?? '') . '-' . ($mov['numero_documento'] ?? '')); ?></td>
+                                    <td data-label="Tipo Entidad"><?php echo htmlspecialchars($mov['tipo_entidad']); ?></td>
+                                    <td data-label="Cliente/Proveedor"><?php echo htmlspecialchars($mov['entidad_nombre'] ?? 'N/A'); ?></td>
                                     <td data-label="Estado"><span class="status status-<?php echo strtolower(htmlspecialchars($mov['estado'])); ?>"><?php echo htmlspecialchars($mov['estado']); ?></span></td>
                                     <td data-label="Acciones" class="actions-cell">
                                         <a href="movimiento_form.php?id=<?php echo $mov['id']; ?>" class="btn btn-edit">Editar</a>
@@ -79,7 +108,7 @@ $pagination = $data['pagination'] ?? null;
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6">No se encontraron movimientos.</td>
+                                <td colspan="9">No se encontraron movimientos.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -89,7 +118,7 @@ $pagination = $data['pagination'] ?? null;
             <?php if ($pagination && $pagination['total_pages'] > 1): ?>
                 <div class="pagination">
                     <?php
-                    $queryParams = ['filter' => $filter];
+                    $queryParams = $_GET;
                     if ($pagination['page'] > 1) {
                         $queryParams['page'] = $pagination['page'] - 1;
                         echo '<a href="?' . http_build_query($queryParams) . '">&laquo; Anterior</a>';

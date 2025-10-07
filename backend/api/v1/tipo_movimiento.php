@@ -35,8 +35,8 @@ switch ($request_method) {
                 http_response_code(200);
                 echo json_encode($records);
             } else {
-                http_response_code(200); // Devolver un array vacío es un éxito
-                echo json_encode([]);
+                http_response_code(404);
+                echo json_encode(["message" => "No se encontraron tipos de movimiento."]);
             }
         }
         break;
