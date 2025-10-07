@@ -45,7 +45,6 @@
         <li class="has-submenu">
             <a href="#" class="menu-toggle"><i class="bi bi-truck icon"></i> <span class="text">Logística</span><i class="bi bi-chevron-down arrow"></i></a>
             <ul class="submenu">
-                <li><a href="almacenes.php"><span class="text">Almacenes</span></a></li>
                 <li><a href="tipo_movimiento.php"><span class="text">Tipo de Movimiento</span></a></li>
                 <li><a href="movimientos.php"><span class="text">Movimientos</span></a></li>
                 <li><a href="compras.php"><span class="text">Compras</span></a></li>                

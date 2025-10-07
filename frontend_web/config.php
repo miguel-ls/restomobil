@@ -13,4 +13,3 @@ define('VENDEDOR', 'Vendedor');
 
 // Define la URL base para la API. Asegúrate de que termine con una barra inclinada (/).
 define('API_BASE_URL', 'http://localhost:8081/api/v1/');
-    

@@ -8,22 +8,30 @@ class Movimiento {
         $this->conn = Database::getInstance();
     }
 
-    public function getAll($filter, $tipo_movimiento, $tipo_entidad, $limit, $offset) {
-        $stmt = $this->conn->prepare("CALL sp_read_movimientos(:p_filter, :p_tipo_movimiento, :p_tipo_entidad, :p_limit, :p_offset)");
+    public function getAll($filter, $tipo_movimiento, $tipo_entidad, $id_almacen, $anio, $mes, $limit, $offset) {
+        $stmt = $this->conn->prepare("CALL sp_read_movimientos(:p_filter, :p_tipo_movimiento, :p_tipo_entidad, :p_id_almacen, :p_anio, :p_mes, :p_limit, :p_offset)");
         $stmt->bindParam(':p_filter', $filter, PDO::PARAM_STR);
         $stmt->bindParam(':p_tipo_movimiento', $tipo_movimiento, PDO::PARAM_STR);
         $stmt->bindParam(':p_tipo_entidad', $tipo_entidad, PDO::PARAM_STR);
+        $stmt->bindParam(':p_id_almacen', $id_almacen, PDO::PARAM_INT);
+        $stmt->bindParam(':p_anio', $anio, PDO::PARAM_STR);
+        $stmt->bindParam(':p_mes', $mes, PDO::PARAM_STR);
         $stmt->bindParam(':p_limit', $limit, PDO::PARAM_INT);
         $stmt->bindParam(':p_offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        return $results;
     }
 
-    public function count($filter, $tipo_movimiento, $tipo_entidad) {
-        $stmt = $this->conn->prepare("CALL sp_count_movimientos(:p_filter, :p_tipo_movimiento, :p_tipo_entidad)");
+    public function count($filter, $tipo_movimiento, $tipo_entidad, $id_almacen, $anio, $mes) {
+        $stmt = $this->conn->prepare("CALL sp_count_movimientos(:p_filter, :p_tipo_movimiento, :p_tipo_entidad, :p_id_almacen, :p_anio, :p_mes)");
         $stmt->bindParam(':p_filter', $filter, PDO::PARAM_STR);
         $stmt->bindParam(':p_tipo_movimiento', $tipo_movimiento, PDO::PARAM_STR);
         $stmt->bindParam(':p_tipo_entidad', $tipo_entidad, PDO::PARAM_STR);
+        $stmt->bindParam(':p_id_almacen', $id_almacen, PDO::PARAM_INT);
+        $stmt->bindParam(':p_anio', $anio, PDO::PARAM_STR);
+        $stmt->bindParam(':p_mes', $mes, PDO::PARAM_STR);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         $stmt->closeCursor();
@@ -50,10 +58,11 @@ class Movimiento {
     }
 
     public function create($data) {
-        $stmt = $this->conn->prepare("CALL sp_create_movimiento(:p_anio, :p_periodo, :p_codigo_movimiento, :p_fecha_movimiento, :p_id_tipo_documento_venta, :p_serie_documento, :p_numero_documento, :p_tipo_entidad, :p_id_cliente, :p_id_proveedor, :p_detalle)");
+        $stmt = $this->conn->prepare("CALL sp_create_movimiento(:p_id_almacen, :p_anio, :p_periodo, :p_codigo_movimiento, :p_fecha_movimiento, :p_id_tipo_documento_venta, :p_serie_documento, :p_numero_documento, :p_tipo_entidad, :p_id_cliente, :p_id_proveedor, :p_detalle)");
 
         $detalleJson = json_encode($data['detalle']);
 
+        $stmt->bindParam(':p_id_almacen', $data['id_almacen']);
         $stmt->bindParam(':p_anio', $data['anio']);
         $stmt->bindParam(':p_periodo', $data['periodo']);
         $stmt->bindParam(':p_codigo_movimiento', $data['codigo_movimiento']);
@@ -73,11 +82,12 @@ class Movimiento {
     }
 
     public function update($id, $data) {
-        $stmt = $this->conn->prepare("CALL sp_update_movimiento(:p_id_movimiento, :p_anio, :p_periodo, :p_codigo_movimiento, :p_fecha_movimiento, :p_id_tipo_documento_venta, :p_serie_documento, :p_numero_documento, :p_tipo_entidad, :p_id_cliente, :p_id_proveedor, :p_estado, :p_detalle)");
+        $stmt = $this->conn->prepare("CALL sp_update_movimiento(:p_id_movimiento, :p_id_almacen, :p_anio, :p_periodo, :p_codigo_movimiento, :p_fecha_movimiento, :p_id_tipo_documento_venta, :p_serie_documento, :p_numero_documento, :p_tipo_entidad, :p_id_cliente, :p_id_proveedor, :p_estado, :p_detalle)");
 
         $detalleJson = json_encode($data['detalle']);
 
         $stmt->bindParam(':p_id_movimiento', $id);
+        $stmt->bindParam(':p_id_almacen', $data['id_almacen']);
         $stmt->bindParam(':p_anio', $data['anio']);
         $stmt->bindParam(':p_periodo', $data['periodo']);
         $stmt->bindParam(':p_codigo_movimiento', $data['codigo_movimiento']);

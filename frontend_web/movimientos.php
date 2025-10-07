@@ -8,11 +8,28 @@ $page_title = 'Gestión de Movimientos';
 include_once 'templates/header.php';
 include_once __DIR__ . '/config.php';
 
+// Función para obtener los almacenes activos
+function getAlmacenes() {
+    $api_url = API_BASE_URL . 'almacenes.php?action=getAllActive';
+    $response = @file_get_contents($api_url);
+    if ($response) {
+        $data = json_decode($response, true);
+        return $data['records'] ?? [];
+    }
+    return [];
+}
+
+$almacenes = getAlmacenes();
+
 // Obtener filtros de la URL
 $filter = $_GET['filter'] ?? '';
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $tipo_movimiento_filter = $_GET['tipo_movimiento'] ?? '';
 $tipo_entidad_filter = $_GET['tipo_entidad'] ?? '';
+$id_almacen_filter = $_GET['id_almacen'] ?? '';
+$anio_filter = $_GET['anio'] ?? '';
+$mes_filter = $_GET['mes'] ?? '';
+
 
 // Construir el array de parámetros para la API
 $api_params = [
@@ -20,6 +37,9 @@ $api_params = [
     'filter' => $filter,
     'tipo_movimiento' => $tipo_movimiento_filter,
     'tipo_entidad' => $tipo_entidad_filter,
+    'id_almacen' => $id_almacen_filter,
+    'anio' => $anio_filter,
+    'mes' => $mes_filter,
 ];
 
 // Construir la URL de la API
@@ -58,6 +78,32 @@ $pagination = $data['pagination'] ?? null;
                 <form method="GET" action="movimientos.php">
                     <div class="filters">
                         <input type="text" name="filter" placeholder="Buscar por serie, número, etc." value="<?php echo htmlspecialchars($filter); ?>">
+
+                        <select name="id_almacen">
+                            <option value="">Todos los Almacenes</option>
+                            <?php foreach ($almacenes as $almacen): ?>
+                                <option value="<?php echo $almacen['id']; ?>" <?php echo ($id_almacen_filter == $almacen['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($almacen['nombre']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+
+                        <select name="anio">
+                            <option value="">Año</option>
+                            <?php for ($i = date('Y'); $i >= 2020; $i--): ?>
+                                <option value="<?php echo $i; ?>" <?php echo ($anio_filter == $i) ? 'selected' : ''; ?>><?php echo $i; ?></option>
+                            <?php endfor; ?>
+                        </select>
+
+                        <select name="mes">
+                            <option value="">Mes</option>
+                            <?php for ($i = 1; $i <= 12; $i++): ?>
+                                <option value="<?php echo str_pad($i, 2, '0', STR_PAD_LEFT); ?>" <?php echo ($mes_filter == str_pad($i, 2, '0', STR_PAD_LEFT)) ? 'selected' : ''; ?>>
+                                    <?php echo DateTime::createFromFormat('!m', $i)->format('F'); ?>
+                                </option>
+                            <?php endfor; ?>
+                        </select>
+
                         <select name="tipo_movimiento">
                             <option value="">Tipo (E/S)</option>
                             <option value="E" <?php echo ($tipo_movimiento_filter == 'E') ? 'selected' : ''; ?>>Entrada</option>
@@ -77,7 +123,7 @@ $pagination = $data['pagination'] ?? null;
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>Almacén</th>
                             <th>Fecha</th>
                             <th>Tipo</th>
                             <th>Cód. Movimiento</th>
@@ -92,7 +138,7 @@ $pagination = $data['pagination'] ?? null;
                         <?php if (!empty($movimientos)): ?>
                             <?php foreach ($movimientos as $mov): ?>
                                 <tr>
-                                    <td data-label="ID"><?php echo htmlspecialchars($mov['id']); ?></td>
+                                    <td data-label="Almacén"><?php echo htmlspecialchars($mov['almacen_nombre'] ?? 'N/A'); ?></td>
                                     <td data-label="Fecha"><?php echo htmlspecialchars($mov['fecha_movimiento']); ?></td>
                                     <td data-label="Tipo"><?php echo htmlspecialchars($mov['tipo_movimiento']); ?></td>
                                     <td data-label="Cód. Movimiento"><?php echo htmlspecialchars($mov['nombre_movimiento']); ?></td>
@@ -115,7 +161,7 @@ $pagination = $data['pagination'] ?? null;
                 </table>
             </div>
 
-            <?php if ($pagination && $pagination['total_pages'] > 1): ?>
+            <?php if ($pagination && isset($pagination['total_pages']) && $pagination['total_pages'] > 1): ?>
                 <div class="pagination">
                     <?php
                     $queryParams = $_GET;
