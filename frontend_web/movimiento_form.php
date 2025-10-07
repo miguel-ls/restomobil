@@ -191,7 +191,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('tipo_entidad').addEventListener('change', (e) => {
         const tipo = e.target.value;
         let selectedId = null;
-        // Corregido: Solo intentar obtener el ID si estamos en modo edición
         if (initialData && tipo === initialData.tipo_entidad) {
             selectedId = initialData.id_cliente || initialData.id_proveedor;
         }
@@ -247,7 +246,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     if (initialData) {
         await filterTiposMovimiento(initialData.tipo_movimiento, initialData.codigo_movimiento);
-        // Disparar el evento de cambio para cargar los clientes/proveedores en modo edición
         document.getElementById('tipo_entidad').dispatchEvent(new Event('change'));
     }
 
