@@ -33,7 +33,7 @@ class Movimiento {
     }
 
     public function getById($id) {
-        $stmt = $this->conn->prepare("CALL sp_get_movimiento_by_id(:p_id)");
+        $stmt = $this->conn->prepare("CALL  (:p_id)");
         $stmt->bindParam(':p_id', $id, PDO::PARAM_INT);
         $stmt->execute();
 

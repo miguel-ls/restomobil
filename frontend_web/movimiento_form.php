@@ -55,17 +55,23 @@ $categories = getAPIdata('almacenes.php');
 
                     <div class="form-group">
                         <label for="id_almacen">Almacen</label>
+
                         <select id="id_almacen" name="id_almacen" required>
                             <option value="">Seleccione un almacen</option>
                             <?php if (!empty($categories)): ?>
                                 <?php foreach ($categories as $category): ?>
-                                    <option value="<?php echo $category['id']; ?>" <?php echo (isset($product_data['id_almacen']) && $product_data['id_almacen'] == $category['id']) ? 'selected' : ''; ?>>
+                                    <option value="<?php echo $category['id']; ?>" <?php echo (isset($movimiento_data['id_almacen']) && $movimiento_data['id_almacen'] == $category['id']) ? 'selected' : ''; ?>>
                                         <?php echo htmlspecialchars($category['nombre']); ?>
                                     </option>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </select>
+
+
+                        
                     </div>
+                    
+
                     
                     
                     <div class="form-group">

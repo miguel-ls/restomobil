@@ -79,6 +79,7 @@ $pagination = $data['pagination'] ?? null;
                         <tr>
                             <th>ID</th>
                             <th>Fecha</th>
+                            <th>Almacen</th>
                             <th>Tipo</th>
                             <th>Cód. Movimiento</th>
                             <th>Documento</th>
@@ -94,6 +95,7 @@ $pagination = $data['pagination'] ?? null;
                                 <tr>
                                     <td data-label="ID"><?php echo htmlspecialchars($mov['id']); ?></td>
                                     <td data-label="Fecha"><?php echo htmlspecialchars($mov['fecha_movimiento']); ?></td>
+                                    <td data-label="Almacen"><?php echo htmlspecialchars($mov['nombre_almacen']); ?></td>
                                     <td data-label="Tipo"><?php echo htmlspecialchars($mov['tipo_movimiento']); ?></td>
                                     <td data-label="Cód. Movimiento"><?php echo htmlspecialchars($mov['nombre_movimiento']); ?></td>
                                     <td data-label="Documento"><?php echo htmlspecialchars(($mov['tipo_documento_nombre'] ?? '') . ' ' . ($mov['serie_documento'] ?? '') . '-' . ($mov['numero_documento'] ?? '')); ?></td>
