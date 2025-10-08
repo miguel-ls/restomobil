@@ -20,6 +20,8 @@ switch ($request_method) {
             $product_id = intval($_GET["id"]);
             $product_data = $product->readOne($product_id);
             if ($product_data) {
+                // Convertir el valor de controlar_stock a booleano para consistencia en JSON
+                $product_data['controlar_stock'] = (bool)$product_data['controlar_stock'];
                 http_response_code(200);
                 echo json_encode($product_data);
             } else {
@@ -35,6 +37,9 @@ switch ($request_method) {
             if (!empty($_GET['precio'])) $filters['precio'] = $_GET['precio'];
             if (!empty($_GET['categoria_nombre'])) $filters['categoria_nombre'] = $_GET['categoria_nombre'];
             if (!empty($_GET['estado'])) $filters['estado'] = $_GET['estado'];
+            if (isset($_GET['controlar_stock']) && $_GET['controlar_stock'] !== '') {
+                 $filters['controlar_stock'] = $_GET['controlar_stock'];
+            }
 
             handleGetAllProducts($product, $filters);
         }
@@ -43,7 +48,10 @@ switch ($request_method) {
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
         if (!empty($data->nombre) && isset($data->precio) && !empty($data->estado)) {
-            $stmt = $product->create($data->nombre, $data->descripcion, $data->precio, $data->id_categoria, $data->estado);
+            // Asignar controlar_stock, por defecto es false si no se envía
+            $controlar_stock = isset($data->controlar_stock) ? (bool)$data->controlar_stock : false;
+
+            $stmt = $product->create($data->nombre, $data->descripcion, $data->precio, $data->id_categoria, $data->estado, $controlar_stock);
             if ($stmt) {
                 $new_product = $stmt->fetch(PDO::FETCH_ASSOC);
                 http_response_code(201); // Created
@@ -61,7 +69,10 @@ switch ($request_method) {
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"));
         if (!empty($data->id) && !empty($data->nombre) && isset($data->precio) && !empty($data->estado)) {
-            if ($product->update($data->id, $data->nombre, $data->descripcion, $data->precio, $data->id_categoria, $data->estado)) {
+            // Asignar controlar_stock, por defecto es false si no se envía
+            $controlar_stock = isset($data->controlar_stock) ? (bool)$data->controlar_stock : false;
+
+            if ($product->update($data->id, $data->nombre, $data->descripcion, $data->precio, $data->id_categoria, $data->estado, $controlar_stock)) {
                 http_response_code(200);
                 echo json_encode(array("message" => "Producto actualizado."));
             } else {
@@ -113,9 +124,10 @@ function handleGetAllProducts($product, $filters = []) {
     $num = count($records);
 
     if ($num > 0) {
-        // Asegurarse de que la descripción se decodifique correctamente
+        // Asegurarse de que la descripción se decodifique y controlar_stock sea booleano
         $decoded_records = array_map(function($row) {
             $row['descripcion'] = html_entity_decode($row['descripcion']);
+            $row['controlar_stock'] = (bool)$row['controlar_stock'];
             return $row;
         }, $records);
 

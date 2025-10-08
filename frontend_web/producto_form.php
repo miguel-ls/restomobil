@@ -70,6 +70,10 @@ $categories = getAPIdata('categorias.php');
                         </select>
                     </div>
                     <div class="form-group">
+                        <label for="controlar_stock">Controlar Stock</label>
+                        <input type="checkbox" id="controlar_stock" name="controlar_stock" value="1" <?php echo (isset($product_data['controlar_stock']) && $product_data['controlar_stock']) ? 'checked' : ''; ?>>
+                    </div>
+                    <div class="form-group">
                         <label for="estado">Estado</label>
                         <select id="estado" name="estado" required>
                             <option value="activo" <?php echo (isset($product_data['estado']) && $product_data['estado'] == 'activo') ? 'selected' : ''; ?>>Activo</option>

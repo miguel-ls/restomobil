@@ -15,7 +15,7 @@ class Product {
      * @return PDOStatement
      */
     public function readAll($filters = [], $page = 1, $page_size = 12) {
-        $query = "CALL sp_getAllProducts(:id, :nombre, :descripcion, :precio, :categoria_nombre, :estado, :page_number, :page_size)";
+        $query = "CALL sp_getAllProducts(:id, :nombre, :descripcion, :precio, :categoria_nombre, :estado, :controlar_stock, :page_number, :page_size)";
         $stmt = $this->conn->prepare($query);
 
         // Asignar valores de los filtros, usando null si no están definidos
@@ -25,6 +25,7 @@ class Product {
         $precio = $filters['precio'] ?? null;
         $categoria_nombre = $filters['categoria_nombre'] ?? null;
         $estado = $filters['estado'] ?? null;
+        $controlar_stock = isset($filters['controlar_stock']) && $filters['controlar_stock'] !== '' ? filter_var($filters['controlar_stock'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) : null;
 
         // Enlazar parámetros
         $stmt->bindValue(':id', $id, $id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
@@ -33,6 +34,7 @@ class Product {
         $stmt->bindValue(':precio', $precio, $precio === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
         $stmt->bindValue(':categoria_nombre', $categoria_nombre, $categoria_nombre === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
         $stmt->bindValue(':estado', $estado, $estado === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+        $stmt->bindValue(':controlar_stock', $controlar_stock, $controlar_stock === null ? PDO::PARAM_NULL : PDO::PARAM_BOOL);
         $stmt->bindValue(':page_number', $page, PDO::PARAM_INT);
         $stmt->bindValue(':page_size', $page_size, PDO::PARAM_INT);
 
@@ -41,7 +43,7 @@ class Product {
     }
 
     public function countAll($filters = []) {
-        $query = "CALL sp_countAllProducts(:id, :nombre, :descripcion, :precio, :categoria_nombre, :estado)";
+        $query = "CALL sp_countAllProducts(:id, :nombre, :descripcion, :precio, :categoria_nombre, :estado, :controlar_stock)";
         $stmt = $this->conn->prepare($query);
 
         // Asignar valores de los filtros, usando null si no están definidos
@@ -51,6 +53,7 @@ class Product {
         $precio = $filters['precio'] ?? null;
         $categoria_nombre = $filters['categoria_nombre'] ?? null;
         $estado = $filters['estado'] ?? null;
+        $controlar_stock = isset($filters['controlar_stock']) && $filters['controlar_stock'] !== '' ? filter_var($filters['controlar_stock'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) : null;
 
         // Enlazar parámetros
         $stmt->bindValue(':id', $id, $id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
@@ -59,6 +62,7 @@ class Product {
         $stmt->bindValue(':precio', $precio, $precio === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
         $stmt->bindValue(':categoria_nombre', $categoria_nombre, $categoria_nombre === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
         $stmt->bindValue(':estado', $estado, $estado === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+        $stmt->bindValue(':controlar_stock', $controlar_stock, $controlar_stock === null ? PDO::PARAM_NULL : PDO::PARAM_BOOL);
 
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -69,8 +73,8 @@ class Product {
      * Crea un nuevo producto.
      * @return PDOStatement|false
      */
-    public function create($nombre, $descripcion, $precio, $id_categoria, $estado) {
-        $query = "CALL sp_createProduct(:nombre, :descripcion, :precio, :id_categoria, :estado)";
+    public function create($nombre, $descripcion, $precio, $id_categoria, $estado, $controlar_stock) {
+        $query = "CALL sp_createProduct(:nombre, :descripcion, :precio, :id_categoria, :estado, :controlar_stock)";
         $stmt = $this->conn->prepare($query);
 
         // Limpiar datos
@@ -79,6 +83,7 @@ class Product {
         $precio = htmlspecialchars(strip_tags($precio));
         $id_categoria = htmlspecialchars(strip_tags($id_categoria));
         $estado = htmlspecialchars(strip_tags($estado));
+        $controlar_stock = (bool)$controlar_stock;
 
         // Enlazar parámetros
         $stmt->bindParam(':nombre', $nombre);
@@ -86,6 +91,7 @@ class Product {
         $stmt->bindParam(':precio', $precio);
         $stmt->bindParam(':id_categoria', $id_categoria);
         $stmt->bindParam(':estado', $estado);
+        $stmt->bindParam(':controlar_stock', $controlar_stock, PDO::PARAM_BOOL);
 
         if ($stmt->execute()) {
             return $stmt;
@@ -109,8 +115,8 @@ class Product {
      * Actualiza un producto existente.
      * @return bool
      */
-    public function update($id, $nombre, $descripcion, $precio, $id_categoria, $estado) {
-        $query = "CALL sp_updateProduct(:id, :nombre, :descripcion, :precio, :id_categoria, :estado)";
+    public function update($id, $nombre, $descripcion, $precio, $id_categoria, $estado, $controlar_stock) {
+        $query = "CALL sp_updateProduct(:id, :nombre, :descripcion, :precio, :id_categoria, :estado, :controlar_stock)";
         $stmt = $this->conn->prepare($query);
 
         // Limpiar datos
@@ -120,6 +126,7 @@ class Product {
         $precio = htmlspecialchars(strip_tags($precio));
         $id_categoria = htmlspecialchars(strip_tags($id_categoria));
         $estado = htmlspecialchars(strip_tags($estado));
+        $controlar_stock = (bool)$controlar_stock;
 
         // Enlazar parámetros
         $stmt->bindParam(':id', $id);
@@ -128,6 +135,7 @@ class Product {
         $stmt->bindParam(':precio', $precio);
         $stmt->bindParam(':id_categoria', $id_categoria);
         $stmt->bindParam(':estado', $estado);
+        $stmt->bindParam(':controlar_stock', $controlar_stock, PDO::PARAM_BOOL);
 
         if ($stmt->execute()) {
             return true;
