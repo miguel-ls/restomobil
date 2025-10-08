@@ -507,14 +507,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error(result.message || 'Error desconocido del servidor.');
                 }
 
-                showAlert('Éxito', 'El estado del pedido se ha actualizado correctamente.', () => {
-                    const volverLink = document.getElementById('volver-link');
-                    if (volverLink) {
-                        window.location.href = volverLink.href;
-                    } else {
-                        window.location.reload(); // Fallback por si no se encuentra el enlace
-                    }
-                });
+                // Redireccionar inmediatamente después del éxito
+                const volverLink = document.getElementById('volver-link');
+                const redirectUrl = volverLink ? volverLink.href : 'pedidos.php';
+
+                // Añadimos un mensaje de éxito a la URL de redirección
+                const finalUrl = new URL(redirectUrl, window.location.origin);
+                finalUrl.searchParams.set('success', 'El estado del pedido se ha actualizado correctamente.');
+
+                window.location.href = finalUrl.href;
 
             } catch (error) {
                 console.error('Error al actualizar el estado:', error);
