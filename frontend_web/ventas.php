@@ -140,7 +140,7 @@ $pagination = $ventas_data['pagination'] ?? null;
                             <?php foreach ($ventas as $venta): ?>
                                 <tr>
                                     <td data-label="ID"><?php echo htmlspecialchars($venta['id']); ?></td>
-                                    <td data-label="Pedido"><?php echo htmlspecialchars($venta['id_pedido'] ?? 'N/A'); ?></td>
+                                    <td data-label="Pedido">PD-<?php echo htmlspecialchars($venta['id_pedido'] ?? 'N/A'); ?></td>
                                     <td data-label="Fecha Emisión"><?php echo htmlspecialchars(date("d/m/Y", strtotime($venta['fecha_emision']))); ?></td>
                                     <td data-label="Cliente"><?php echo htmlspecialchars($venta['nombre_cliente'] ?? 'Varios'); ?></td>
                                     <td data-label="Documento"><?php echo htmlspecialchars($venta['descripcion'] . ' ' . $venta['serie'] . '-' . $venta['numero_documento']); ?></td>
