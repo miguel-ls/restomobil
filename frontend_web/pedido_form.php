@@ -397,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (!isEditing && mesas.length === 0 && !isPagoView) {
-        showAlert('No hay mesas disponibles', 'Todas las mesas están ocupadas. Por favor, libere una mesa antes de crear un nuevo pedido.');
+        showAlert('No hay mesas disponibles', 'Todas las puntos de ventas están ocupadas. Por favor, libere un punto de venta antes de crear un nuevo pedido.');
         const formContainer = document.getElementById('order-form-container');
         if (formContainer) {
             formContainer.style.opacity = '0.5';

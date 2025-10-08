@@ -61,11 +61,14 @@ include_once 'templates/header.php';
                     </div>
 
                     <div class="form-group">
-                        <label for="predeterminado">
-                            <input type="checkbox" id="predeterminado" name="predeterminado" value="1" <?php echo (isset($almacen_data['predeterminado']) && $almacen_data['predeterminado'] == 1) ? 'checked' : ''; ?>>
+                        <label for="predeterminado" class="d-inline-flex align-items-center">
+                            
                             Almacén Predeterminado
+                            <input type="checkbox" id="predeterminado" name="predeterminado" value="1" <?php echo (isset($almacen_data['predeterminado']) && $almacen_data['predeterminado'] == 1) ? 'checked' : ''; ?>>
                         </label>
                     </div>
+
+
 
                     <div class="form-actions">
                         <button type="submit" class="btn"><?php echo $is_editing ? 'Actualizar Almacén' : 'Grabar Almacén'; ?></button>
