@@ -32,9 +32,11 @@ try {
             $limit = 10;
             $offset = ($page - 1) * $limit;
             $id_almacen = $_GET['id_almacen'] ?? null;
+            $anio = $_GET['anio'] ?? null;
+            $mes = $_GET['mes'] ?? null;
 
-            $movimientos = $movimiento->getAll($filter, $tipo_movimiento, $tipo_entidad, $limit, $offset, $id_almacen);
-            $total_records = $movimiento->count($filter, $tipo_movimiento, $tipo_entidad, $id_almacen);
+            $movimientos = $movimiento->getAll($filter, $tipo_movimiento, $tipo_entidad, $limit, $offset, $id_almacen, $anio, $mes);
+            $total_records = $movimiento->count($filter, $tipo_movimiento, $tipo_entidad, $id_almacen, $anio, $mes);
 
             $response = [
                 "records" => $movimientos,

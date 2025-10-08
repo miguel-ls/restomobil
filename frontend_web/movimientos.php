@@ -13,6 +13,8 @@ $filter = $_GET['filter'] ?? '';
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $tipo_movimiento_filter = $_GET['tipo_movimiento'] ?? '';
 $tipo_entidad_filter = $_GET['tipo_entidad'] ?? '';
+$anio_filter = $_GET['anio'] ?? '';
+$mes_filter = $_GET['mes'] ?? '';
 
 // Construir el array de parámetros para la API
 $api_params = [
@@ -20,16 +22,36 @@ $api_params = [
     'filter' => $filter,
     'tipo_movimiento' => $tipo_movimiento_filter,
     'tipo_entidad' => $tipo_entidad_filter,
+    'anio' => $anio_filter,
+    'mes' => $mes_filter,
 ];
 
 // Construir la URL de la API
 $api_url = API_BASE_URL . 'movimientos.php?' . http_build_query(array_filter($api_params));
 
-// Realizar la petición a la API
-$response = @file_get_contents($api_url);
-$data = $response ? json_decode($response, true) : null;
-$movimientos = $data['records'] ?? [];
-$pagination = $data['pagination'] ?? null;
+// Realizar la petición a la API con cURL
+$ch = curl_init($api_url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curl_error = curl_error($ch);
+curl_close($ch);
+
+$data = null;
+$movimientos = [];
+$pagination = null;
+$api_error_message = '';
+
+if ($http_code == 200) {
+    $data = json_decode($response, true);
+    $movimientos = $data['records'] ?? [];
+    $pagination = $data['pagination'] ?? null;
+} else {
+    $api_error_message = "Error: No se pudo conectar a la API para cargar los movimientos (Código: {$http_code})";
+    if (!empty($curl_error)) {
+        $api_error_message .= " - " . $curl_error;
+    }
+}
 ?>
 
 <div class="dashboard-container">
@@ -49,14 +71,38 @@ $pagination = $data['pagination'] ?? null;
             if (isset($_GET['error'])) {
                 echo '<p class="error-message">' . htmlspecialchars(urldecode($_GET['error'])) . '</p>';
             }
-            if (!$response) {
-                 echo '<p class="error-message">Error: No se pudo conectar a la API para cargar los movimientos.</p>';
+            if (!empty($api_error_message)) {
+                echo '<p class="error-message">' . htmlspecialchars($api_error_message) . '</p>';
             }
             ?>
 
             <div class="filter-container">
                 <form method="GET" action="movimientos.php">
                     <div class="filters">
+                        <select name="anio">
+                            <option value="">Año</option>
+                            <?php
+                            $current_year = date('Y');
+                            for ($i = $current_year; $i >= 2020; $i--) {
+                                $selected = ($anio_filter == $i) ? 'selected' : '';
+                                echo "<option value='{$i}' {$selected}>{$i}</option>";
+                            }
+                            ?>
+                        </select>
+                        <select name="mes">
+                            <option value="">Mes</option>
+                            <?php
+                            $meses = [
+                                '01' => 'Enero', '02' => 'Febrero', '03' => 'Marzo', '04' => 'Abril',
+                                '05' => 'Mayo', '06' => 'Junio', '07' => 'Julio', '08' => 'Agosto',
+                                '09' => 'Septiembre', '10' => 'Octubre', '11' => 'Noviembre', '12' => 'Diciembre'
+                            ];
+                            foreach ($meses as $num => $nombre) {
+                                $selected = ($mes_filter == $num) ? 'selected' : '';
+                                echo "<option value='{$num}' {$selected}>{$nombre}</option>";
+                            }
+                            ?>
+                        </select>
                         <input type="text" name="filter" placeholder="Buscar por serie, número, etc." value="<?php echo htmlspecialchars($filter); ?>">
                         <select name="tipo_movimiento">
                             <option value="">Tipo (E/S)</option>
