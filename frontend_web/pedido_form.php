@@ -470,9 +470,52 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.querySelectorAll('.status-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            estadoInput.value = this.dataset.status;
-            orderForm.requestSubmit();
+        button.addEventListener('click', async function(e) {
+            e.preventDefault(); // Prevenir cualquier comportamiento por defecto
+
+            const newStatus = this.dataset.status;
+            const orderId = isEditing ? initialOrderData.id : null;
+
+            if (!orderId) {
+                showAlert('Error', 'No se encontró el ID del pedido para actualizar.');
+                return;
+            }
+
+            // Deshabilitar botones para evitar clics múltiples
+            const originalTexts = {};
+            document.querySelectorAll('.status-btn').forEach(btn => {
+                originalTexts[btn.dataset.status] = btn.textContent;
+                btn.disabled = true;
+            });
+            this.textContent = 'Actualizando...';
+
+            try {
+                const response = await fetch(`${apiBaseUrl}pedidos.php?id=${orderId}&action=update_status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ estado: newStatus })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Error desconocido del servidor.');
+                }
+
+                showAlert('Éxito', 'El estado del pedido se ha actualizado correctamente.', () => {
+                    window.location.reload();
+                });
+
+            } catch (error) {
+                console.error('Error al actualizar el estado:', error);
+                showAlert('Error', `No se pudo actualizar el estado: ${error.message}`);
+
+                // Rehabilitar botones en caso de error
+                document.querySelectorAll('.status-btn').forEach(btn => {
+                    btn.disabled = false;
+                    btn.textContent = originalTexts[btn.dataset.status];
+                });
+            }
         });
     });
 

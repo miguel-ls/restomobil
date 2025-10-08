@@ -133,5 +133,18 @@ class AperturaCierre {
         }
         return false;
     }
+
+    public function verificarAperturaActiva($fecha) {
+        // Este procedimiento almacenado debe ser creado.
+        // Devuelve 1 si hay una apertura y ningún cierre para la fecha, 0 en caso contrario.
+        $query = "CALL sp_verificarAperturaActiva(:fecha)";
+        $stmt = $this->conn->prepare($query);
+        $fecha_formateada = date('Y-m-d', strtotime($fecha));
+        $stmt->bindParam(':fecha', $fecha_formateada);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        return !empty($result) && (bool)$result['activa'];
+    }
 }
 ?>
