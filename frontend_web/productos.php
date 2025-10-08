@@ -43,6 +43,9 @@ if (!empty($_GET['categoria_nombre'])) {
 if (!empty($_GET['estado'])) {
     $filters['estado'] = $_GET['estado'];
 }
+if (isset($_GET['controlar_stock']) && $_GET['controlar_stock'] !== '') {
+    $filters['controlar_stock'] = $_GET['controlar_stock'];
+}
 if (!empty($_GET['page'])) {
     $filters['page'] = $_GET['page'];
 }
@@ -101,6 +104,11 @@ $categories = getCategories();
                             <option value="activo" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'activo') ? 'selected' : ''; ?>>Activo</option>
                             <option value="inactivo" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'inactivo') ? 'selected' : ''; ?>>Inactivo</option>
                         </select>
+                        <select name="controlar_stock">
+                            <option value="">Controlar Stock</option>
+                            <option value="1" <?php echo (isset($_GET['controlar_stock']) && $_GET['controlar_stock'] == '1') ? 'selected' : ''; ?>>Sí</option>
+                            <option value="0" <?php echo (isset($_GET['controlar_stock']) && $_GET['controlar_stock'] === '0') ? 'selected' : ''; ?>>No</option>
+                        </select>
                         <button type="submit" class="btn">Filtrar</button>
                     </div>
                 </form>
@@ -115,6 +123,7 @@ $categories = getCategories();
                             <th>Precio</th>
                             <th>Categoría</th>
                             <th>Estado</th>
+                            <th>Controlar Stock</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -132,6 +141,11 @@ $categories = getCategories();
                                             <?php echo htmlspecialchars($product['estado']); ?>
                                         </span>
                                     </td>
+                                    <td data-label="Controlar Stock">
+                                        <span class="status status-<?php echo $product['controlar_stock'] ? 'active' : 'inactive'; ?>">
+                                            <?php echo $product['controlar_stock'] ? 'Sí' : 'No'; ?>
+                                        </span>
+                                    </td>
                                     <td data-label="Acciones" class="actions-cell">
                                         <a href="producto_form.php?id=<?php echo $product['id']; ?>" class="btn btn-edit">Editar</a>
                                         <a href="producto_delete_handler.php?id=<?php echo $product['id']; ?>" class="btn btn-delete" onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?');">Eliminar</a>
@@ -140,7 +154,7 @@ $categories = getCategories();
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7">No se encontraron productos. La base de datos podría estar vacía o no hay productos que coincidan con los filtros.</td>
+                                <td colspan="8">No se encontraron productos. La base de datos podría estar vacía o no hay productos que coincidan con los filtros.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -176,4 +190,3 @@ $categories = getCategories();
         </div>
     </main>
 </div>
-
