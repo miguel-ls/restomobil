@@ -64,7 +64,7 @@ $orders_data = getOrders('abierto');
                                 <p class="total"><strong>Total:</strong> <?php echo CURRENCY_SYMBOL; ?><?php echo htmlspecialchars(number_format($order['total'], 2)); ?></p>
                             </div>
                             <div class="card-footer">
-                                <a href="pedido_form.php?id=<?php echo $order['id']; ?>" class="btn-card btn-edit">Editar</a>
+                                <a href="pedido_form.php?id=<?php echo $order['id']; ?>&from=pedidos" class="btn-card btn-edit">Editar</a>
                             </div>
                         </div>
                     <?php endforeach; ?>
