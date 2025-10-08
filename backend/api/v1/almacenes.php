@@ -47,6 +47,7 @@ switch ($request_method) {
 
             $processed_records = array_map(function($row) {
                 $row['estado'] = (bool)$row['estado'];
+                $row['predeterminado'] = (bool)$row['predeterminado'];
                 return $row;
             }, $records);
 
@@ -68,7 +69,8 @@ switch ($request_method) {
         $data = json_decode(file_get_contents("php://input"));
 
         if (!empty($data->nombre)) {
-            $new_id = $almacen->create($data->nombre);
+            $predeterminado = isset($data->predeterminado) ? (bool)$data->predeterminado : false;
+            $new_id = $almacen->create($data->nombre, $predeterminado);
             if ($new_id) {
                 http_response_code(201);
                 echo json_encode(["message" => "Almacén creado con éxito.", "id" => $new_id]);
@@ -86,9 +88,10 @@ switch ($request_method) {
         $data = json_decode(file_get_contents("php://input"));
         $almacen_id = !empty($_GET['id']) ? intval($_GET['id']) : null;
 
-        if ($almacen_id && !empty($data->nombre) && isset($data->estado)) {
+        if ($almacen_id && !empty($data->nombre) && isset($data->estado) && isset($data->predeterminado)) {
             $estado = (bool)$data->estado;
-            if ($almacen->update($almacen_id, $data->nombre, $estado)) {
+            $predeterminado = (bool)$data->predeterminado;
+            if ($almacen->update($almacen_id, $data->nombre, $estado, $predeterminado)) {
                 http_response_code(200);
                 echo json_encode(["message" => "Almacén actualizado con éxito."]);
             } else {
@@ -97,7 +100,7 @@ switch ($request_method) {
             }
         } else {
             http_response_code(400);
-            echo json_encode(["message" => "Datos incompletos para actualizar. Se requiere ID, nombre y estado."]);
+            echo json_encode(["message" => "Datos incompletos para actualizar. Se requiere ID, nombre, estado y predeterminado."]);
         }
         break;
 

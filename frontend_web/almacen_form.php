@@ -11,7 +11,8 @@ $page_title = 'Crear Almacén';
 $almacen_data = [
     'id' => '',
     'nombre' => '',
-    'estado' => 1 // Por defecto, Activo
+    'estado' => 1, // Por defecto, Activo
+    'predeterminado' => 0
 ];
 $is_editing = false;
 
@@ -57,6 +58,13 @@ include_once 'templates/header.php';
                             <option value="1" <?php echo (isset($almacen_data['estado']) && $almacen_data['estado'] == 1) ? 'selected' : ''; ?>>Activo</option>
                             <option value="0" <?php echo (isset($almacen_data['estado']) && $almacen_data['estado'] == 0) ? 'selected' : ''; ?>>Inactivo</option>
                         </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="predeterminado">
+                            <input type="checkbox" id="predeterminado" name="predeterminado" value="1" <?php echo (isset($almacen_data['predeterminado']) && $almacen_data['predeterminado'] == 1) ? 'checked' : ''; ?>>
+                            Almacén Predeterminado
+                        </label>
                     </div>
 
                     <div class="form-actions">

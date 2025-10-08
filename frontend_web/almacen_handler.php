@@ -15,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = [
         'nombre' => $_POST['nombre'],
         'estado' => isset($_POST['estado']) ? (int)$_POST['estado'] : 0,
+        'predeterminado' => isset($_POST['predeterminado']) ? 1 : 0,
     ];
 
     $ch = curl_init();
