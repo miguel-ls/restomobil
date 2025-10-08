@@ -24,6 +24,19 @@ BEGIN
 END //
 DELIMITER ;
 
+-- 3. Procedimiento para verificar si un pedido ya tiene una venta generada.
+DROP PROCEDURE IF EXISTS sp_verificarVentaPorPedido;
+DELIMITER //
+CREATE PROCEDURE sp_verificarVentaPorPedido(
+    IN p_id_pedido INT
+)
+BEGIN
+    SELECT COUNT(id) AS venta_existente
+    FROM ventas
+    WHERE id_pedido = p_id_pedido;
+END //
+DELIMITER ;
+
 
 -- 2. Procedimiento para verificar si hay una caja abierta para una fecha específica.
 -- Este SP es crucial para el endpoint de "procesar_venta.php".
