@@ -44,6 +44,7 @@ include_once 'config.php'; // Para API_BASE_URL
                     <thead>
                         <tr>
                             <th>Nombre</th>
+                            <th>Predeterminado</th>
                             <th>Estado</th>
                             <th>Fecha de Creación</th>
                             <th>Fecha de Eliminación</th>
@@ -100,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderTable(almacenes) {
         tbody.innerHTML = '';
         if (almacenes.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5">No se encontraron almacenes.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6">No se encontraron almacenes.</td></tr>';
             return;
         }
 
@@ -110,9 +111,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const estadoClass = almacen.estado ? 'status-active' : 'status-inactive';
             const fechaCreacion = new Date(almacen.fecha_creacion).toLocaleDateString();
             const fechaEliminacion = almacen.fecha_eliminacion ? new Date(almacen.fecha_eliminacion).toLocaleDateString() : '';
+            const predeterminadoChecked = almacen.predeterminado ? 'checked' : '';
 
             tr.innerHTML = `
                 <td data-label="Nombre">${almacen.nombre}</td>
+                <td data-label="Predeterminado"><input type="checkbox" ${predeterminadoChecked} disabled></td>
                 <td data-label="Estado"><span class="status ${estadoClass}">${estadoText}</span></td>
                 <td data-label="Fecha de Creación">${fechaCreacion}</td>
                 <td data-label="Fecha de Eliminación">${fechaEliminacion}</td>

@@ -63,10 +63,11 @@ class Almacen {
     /**
      * Crea un nuevo almacén y devuelve su ID.
      */
-    public function create($nombre) {
-        $query = "CALL sp_crear_almacen(:nombre)";
+    public function create($nombre, $predeterminado) {
+        $query = "CALL sp_crear_almacen(:nombre, :predeterminado)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':nombre', $nombre, PDO::PARAM_STR);
+        $stmt->bindParam(':predeterminado', $predeterminado, PDO::PARAM_BOOL);
 
         if ($stmt->execute()) {
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -79,13 +80,14 @@ class Almacen {
     /**
      * Actualiza un almacén existente.
      */
-    public function update($id, $nombre, $estado) {
-        $query = "CALL sp_actualizar_almacen(:id, :nombre, :estado)";
+    public function update($id, $nombre, $estado, $predeterminado) {
+        $query = "CALL sp_actualizar_almacen(:id, :nombre, :estado, :predeterminado)";
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->bindParam(':nombre', $nombre, PDO::PARAM_STR);
         $stmt->bindParam(':estado', $estado, PDO::PARAM_BOOL);
+        $stmt->bindParam(':predeterminado', $predeterminado, PDO::PARAM_BOOL);
 
         return $stmt->execute();
     }
