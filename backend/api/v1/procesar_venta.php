@@ -6,6 +6,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 include_once __DIR__ . '/../../config/database.php';
 include_once __DIR__ . '/../../models/Venta.php';
+include_once __DIR__ . '/../../models/AperturaCierre.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -34,6 +35,7 @@ try {
     exit();
 }
 $venta = new Venta($db);
+$apertura_cierre = new AperturaCierre(); // No necesita $db porque usa el Singleton
 
 session_start();
 $id_usuario_cajero = $_SESSION['user_id'] ?? 0; // Asumimos que el ID del usuario está en la sesión
@@ -44,6 +46,14 @@ if (empty($id_usuario_cajero)) {
 }
 
 try {
+    // Validación de apertura de caja
+    $fecha_actual = date('Y-m-d');
+    if (!$apertura_cierre->verificarAperturaActiva($fecha_actual)) {
+        http_response_code(403); // Forbidden
+        echo json_encode(["message" => "Operación no permitida. No hay una caja abierta para la fecha actual."]);
+        exit;
+    }
+
     // CORRECCIÓN: Obtener el id_cliente desde el pedido original en la base de datos.
     $stmt = $db->prepare("SELECT id_cliente FROM pedidos WHERE id = :id_pedido");
     $stmt->bindParam(':id_pedido', $data->id_pedido, PDO::PARAM_INT);
