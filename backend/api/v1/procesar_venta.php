@@ -46,6 +46,13 @@ if (empty($id_usuario_cajero)) {
 }
 
 try {
+    // Primero, verificar si ya existe una venta para este pedido
+    if ($venta->ventaExistePorPedido($data->id_pedido)) {
+        http_response_code(409); // Conflict
+        echo json_encode(["message" => "Este pedido ya tiene una venta generada. No se puede procesar nuevamente."]);
+        exit;
+    }
+
     // Validación de apertura de caja
     $fecha_actual = date('Y-m-d');
     if (!$apertura_cierre->verificarAperturaActiva($fecha_actual)) {

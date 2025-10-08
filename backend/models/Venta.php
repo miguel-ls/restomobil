@@ -145,5 +145,15 @@ class Venta {
             return null;
         }
     }
+
+    public function ventaExistePorPedido($id_pedido) {
+        $query = "CALL sp_verificarVentaPorPedido(:id_pedido)";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->bindParam(':id_pedido', $id_pedido, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        return ($result['venta_existente'] > 0);
+    }
 }
 ?>
