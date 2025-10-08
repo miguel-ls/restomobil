@@ -78,6 +78,11 @@ if ($is_pago_view) {
     $form_action .= "?view=caja_create";
 }
 
+// Determinar la URL de retorno
+$from_page = $_GET['from'] ?? 'pedidos'; // 'pedidos' por defecto
+$return_url = ($from_page === 'caja' || $is_caja_create_view || $is_pago_view) ? 'caja.php' : 'pedidos.php';
+$return_page_name = ($from_page === 'caja' || $is_caja_create_view || $is_pago_view) ? 'Caja' : 'Lista';
+
 ?>
 
 <div class="dashboard-container">
@@ -148,8 +153,8 @@ if ($is_pago_view) {
                                     }
                                 ?>
                             </button>
-                            <a id="volver-link" href="<?php echo ($is_pago_view || $is_caja_create_view) ? 'caja.php' : 'pedidos.php'; ?>" class="btn btn-secondary">
-                                Volver a <?php echo ($is_pago_view || $is_caja_create_view) ? 'Caja' : 'Lista'; ?>
+                            <a id="volver-link" href="<?php echo $return_url; ?>" class="btn btn-secondary">
+                                Volver a <?php echo $return_page_name; ?>
                             </a>
                         </div>
 

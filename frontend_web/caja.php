@@ -148,12 +148,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const statusText = (order.estado || 'desconocido').replace('_', ' ');
 
             let footerButtons = '';
-            if (order.estado === 'completado') {
-                footerButtons = `<a href="pedido_form.php?id=${order.id}&view=pago" class="btn-card btn-edit">Pagar</a>`;
+            if (order.estado === 'abierto') {
+                footerButtons = `<a href="pedido_form.php?id=${order.id}&from=caja" class="btn-card btn-edit">Ver/Editar</a>`;
+            } else if (order.estado === 'completado') {
+                footerButtons = `<a href="pedido_form.php?id=${order.id}&view=pago&from=caja" class="btn-card btn-edit">Pagar</a>`;
             } else if (order.estado === 'cancelado') {
-                footerButtons = `<a href="pedido_form.php?id=${order.id}&view=pago" class="btn-card btn-edit" style="background-color: green; color: white;">Editar</a>`;
+                // Un pedido cancelado probablemente no debería ser editable, pero mantenemos la lógica existente y añadimos el 'from'
+                footerButtons = `<a href="pedido_form.php?id=${order.id}&from=caja" class="btn-card btn-edit" style="background-color: green; color: white;">Editar</a>`;
             } else if (order.estado === 'pagado') {
-                 footerButtons = `<a href="pedido_form.php?id=${order.id}&view=pago" class="btn-card btn-view">Ver Detalle</a>`;
+                 footerButtons = `<a href="pedido_form.php?id=${order.id}&view=pago&from=caja" class="btn-card btn-view">Ver Detalle</a>`;
             }
 
             card.innerHTML = `
