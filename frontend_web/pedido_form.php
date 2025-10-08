@@ -148,7 +148,7 @@ if ($is_pago_view) {
                                     }
                                 ?>
                             </button>
-                            <a href="<?php echo ($is_pago_view || $is_caja_create_view) ? 'caja.php' : 'pedidos.php'; ?>" class="btn btn-secondary">
+                            <a id="volver-link" href="<?php echo ($is_pago_view || $is_caja_create_view) ? 'caja.php' : 'pedidos.php'; ?>" class="btn btn-secondary">
                                 Volver a <?php echo ($is_pago_view || $is_caja_create_view) ? 'Caja' : 'Lista'; ?>
                             </a>
                         </div>
@@ -503,7 +503,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 showAlert('Éxito', 'El estado del pedido se ha actualizado correctamente.', () => {
-                    window.location.reload();
+                    const volverLink = document.getElementById('volver-link');
+                    if (volverLink) {
+                        window.location.href = volverLink.href;
+                    } else {
+                        window.location.reload(); // Fallback por si no se encuentra el enlace
+                    }
                 });
 
             } catch (error) {
