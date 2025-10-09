@@ -22,6 +22,7 @@ $id_usuario_mozo = $_POST['id_usuario_mozo'] ?? null;
 $estado = $_POST['estado'] ?? 'abierto';
 $items_json = $_POST['items'] ?? '[]';
 $items = json_decode($items_json);
+$next_action = $_POST['next_action'] ?? null;
 
 // Datos del cliente
 $id_cliente = !empty($_POST['id_cliente']) ? $_POST['id_cliente'] : null;
@@ -145,8 +146,41 @@ curl_close($ch);
 
 $response_data = json_decode($response, true);
 $message_key = ($http_code >= 200 && $http_code < 300) ? 'success' : 'error';
-$message = urlencode($response_data['message'] ?? 'Ocurrió un error inesperado.');
+$message = $response_data['message'] ?? 'Ocurrió un error inesperado.';
 
-header("Location: $redirect_url?$message_key=$message");
+// Si la actualización/creación fue exitosa y hay una acción de estado pendiente
+if ($message_key === 'success' && !empty($next_action)) {
+    $current_order_id = $order_id;
+    if (!$is_editing && isset($response_data['id'])) {
+        // Si es un pedido nuevo, obtenemos el ID de la respuesta
+        $current_order_id = $response_data['id'];
+    }
+
+    if ($current_order_id) {
+        $status_update_url = API_BASE_URL . "pedidos.php?id=$current_order_id&action=update_status";
+        $status_data = ['estado' => $next_action];
+
+        $ch_status = curl_init($status_update_url);
+        curl_setopt($ch_status, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch_status, CURLOPT_CUSTOMREQUEST, 'PUT');
+        curl_setopt($ch_status, CURLOPT_POSTFIELDS, json_encode($status_data));
+        curl_setopt($ch_status, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+
+        $status_response = curl_exec($ch_status);
+        $status_http_code = curl_getinfo($ch_status, CURLINFO_HTTP_CODE);
+        curl_close($ch_status);
+
+        if ($status_http_code >= 200 && $status_http_code < 300) {
+            $message = "Pedido guardado y estado cambiado a '$next_action' correctamente.";
+        } else {
+            $status_response_data = json_decode($status_response, true);
+            $status_error = $status_response_data['message'] ?? 'Error desconocido';
+            $message = "El pedido se guardó, pero falló el cambio de estado: $status_error";
+            // Mantenemos success porque la operación principal tuvo éxito, pero con una advertencia.
+        }
+    }
+}
+
+header("Location: $redirect_url?$message_key=" . urlencode($message));
 exit();
 ?>
