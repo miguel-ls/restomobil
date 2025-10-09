@@ -1346,7 +1346,7 @@ BEGIN
   FROM usuarios u
     JOIN roles r
       ON u.id_rol = r.id
-  WHERE u.username = p_username;
+  WHERE u.username COLLATE utf8mb4_unicode_ci = p_username;
 END
 $$
 

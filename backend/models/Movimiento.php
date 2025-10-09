@@ -125,5 +125,11 @@ class Movimiento {
         $stmt->closeCursor();
         return $result;
     }
+
+    public function anular($id) {
+        $stmt = $this->conn->prepare("CALL sp_anular_movimiento(:p_id_movimiento)");
+        $stmt->bindParam(':p_id_movimiento', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
 }
 ?>

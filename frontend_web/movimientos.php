@@ -167,7 +167,10 @@ if ($http_code == 200) {
                                     
                                     <td data-label="Acciones" class="actions-cell">
                                         <a href="movimiento_form.php?id=<?php echo $mov['id']; ?>" class="btn btn-edit">Editar</a>
-                                        <a href="movimiento_delete_handler.php?id=<?php echo $mov['id']; ?>" class="btn btn-delete" onclick="return confirm('¿Está seguro de que desea anular este movimiento? Esta acción no se puede deshacer.');">Anular</a>
+                                        <?php if ($mov['estado'] === 'Activado'): ?>
+                                            <a href="movimiento_anular_handler.php?id=<?php echo $mov['id']; ?>" class="btn btn-warning" onclick="return confirm('¿Está seguro de que desea ANULAR este movimiento? El estado cambiará a Desactivado.');">Anular</a>
+                                        <?php endif; ?>
+                                        <a href="movimiento_delete_handler.php?id=<?php echo $mov['id']; ?>" class="btn btn-delete" onclick="return confirm('¡ADVERTENCIA! ¿Está seguro de que desea ELIMINAR PERMANENTEMENTE este movimiento? Esta acción no se puede deshacer.');">Eliminar</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
