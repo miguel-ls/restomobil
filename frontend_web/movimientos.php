@@ -124,7 +124,6 @@ if ($http_code == 200) {
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Pedido</th>
                             <th>Fecha</th>
                             <th>Almacen</th>
                             <th>Tipo</th>
@@ -141,10 +140,6 @@ if ($http_code == 200) {
                             <?php foreach ($movimientos as $mov): ?>
                                 <tr>
                                     <td data-label="ID"><?php echo htmlspecialchars($mov['id']); ?></td>
-
-
-                                    <td data-label="Pedido">PD-<?php echo htmlspecialchars($mov['id_pedido'] ?? 'N/A'); ?></td>
-
                                     <td data-label="Fecha"><?php echo htmlspecialchars($mov['fecha_movimiento']); ?></td>
                                     <td data-label="Almacen"><?php echo htmlspecialchars($mov['nombre_almacen']); ?></td>
 
@@ -172,10 +167,7 @@ if ($http_code == 200) {
                                     
                                     <td data-label="Acciones" class="actions-cell">
                                         <a href="movimiento_form.php?id=<?php echo $mov['id']; ?>" class="btn btn-edit">Editar</a>
-                                        <?php if ($mov['estado'] === 'Activado'): ?>
-                                            <a href="movimiento_anular_handler.php?id=<?php echo $mov['id']; ?>" class="btn btn-warning" onclick="return confirm('¿Está seguro de que desea ANULAR este movimiento? El estado cambiará a Desactivado.');">Anular</a>
-                                        <?php endif; ?>
-                                        <a href="movimiento_delete_handler.php?id=<?php echo $mov['id']; ?>" class="btn btn-delete" onclick="return confirm('¡ADVERTENCIA! ¿Está seguro de que desea ELIMINAR PERMANENTEMENTE este movimiento? Esta acción no se puede deshacer.');">Eliminar</a>
+                                        <a href="movimiento_delete_handler.php?id=<?php echo $mov['id']; ?>" class="btn btn-delete" onclick="return confirm('¿Está seguro de que desea anular este movimiento? Esta acción no se puede deshacer.');">Anular</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

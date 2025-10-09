@@ -486,6 +486,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
+            // Si el pedido está pagado y se quiere "Abrir", solo se cambia el estado sin guardar datos del formulario.
+            if (newStatus === 'abierto' && initialOrderData && initialOrderData.estado === 'pagado') {
+                if (!confirm('¿Está seguro de que desea reabrir este pedido? El pedido volverá al estado "abierto" pero la venta y el movimiento de salida asociados no se verán afectados.')) {
+                    return;
+                }
+                this.disabled = true;
+                this.textContent = 'Abriendo...';
+                try {
+                    const response = await fetch(`${apiBaseUrl}pedidos.php?id=${orderId}&action=update_status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ estado: newStatus })
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.message || 'Error desconocido.');
+
+                    // Recargar la página para reflejar el cambio de estado y habilitar el formulario
+                    window.location.reload();
+
+                } catch (error) {
+                    showAlert('Error', `No se pudo abrir el pedido: ${error.message}`);
+                    this.disabled = false;
+                    this.textContent = 'Abrir';
+                }
+                return; // Detener la ejecución aquí
+            }
+
             // El botón "Cancelar" no debe guardar cambios, por lo que mantiene la lógica original.
             if (newStatus === 'cancelado') {
                 if (!confirm('¿Está seguro de que desea cancelar este pedido? Esta acción no se puede deshacer.')) {
@@ -516,7 +543,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Para "Abrir" y "Completar", primero guardamos los cambios.
+            // Para "Abrir" (no pagado) y "Completar", primero guardamos los cambios.
             // Establecemos la acción siguiente y enviamos el formulario.
             document.getElementById('next_action').value = newStatus;
 

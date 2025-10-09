@@ -1,13 +1,15 @@
 <?php
-// config.php
+// frontend_web/config.php
 
-// URL base de la API del backend
-define('API_BASE_URL', 'http://localhost:8080/api/v1/');
+/**
+ * Archivo de configuración para el frontend web.
+ */
 
-// Símbolo de la moneda
-define('CURRENCY_SYMBOL', 'S/');
+// Define el símbolo de la moneda que se usará en la interfaz de usuario.
+define('CURRENCY_SYMBOL', 'S/.');
 
-// Nombres personalizados para la interfaz
-define('PUNTO_VENTA', 'Punto de Venta'); // En lugar de "Mesa"
-define('VENDEDOR', 'Vendedor'); // En lugar de "Mozo"
-?>
+define('PUNTO_VENTA', 'Punto Venta');
+define('VENDEDOR', 'Vendedor');
+
+// Define la URL base para la API. Asegúrate de que termine con una barra inclinada (/).
+define('API_BASE_URL', 'http://localhost/personal/restaurante_system/backend/api/v1/');

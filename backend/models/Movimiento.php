@@ -107,29 +107,5 @@ class Movimiento {
         $stmt->bindParam(':p_id_movimiento', $id);
         return $stmt->execute();
     }
-
-    public function verificarMovimientoPorPedido($id_pedido) {
-        $stmt = $this->conn->prepare("CALL sp_verificar_movimiento_por_pedido(:p_id_pedido)");
-        $stmt->bindParam(':p_id_pedido', $id_pedido, PDO::PARAM_INT);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        $stmt->closeCursor();
-        return $result['movimiento_existente'] > 0;
-    }
-
-    public function crearMovimientoSalidaPorVenta($id_pedido) {
-        $stmt = $this->conn->prepare("CALL sp_crear_movimiento_salida_por_venta(:p_id_pedido)");
-        $stmt->bindParam(':p_id_pedido', $id_pedido, PDO::PARAM_INT);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        $stmt->closeCursor();
-        return $result;
-    }
-
-    public function anular($id) {
-        $stmt = $this->conn->prepare("CALL sp_anular_movimiento(:p_id_movimiento)");
-        $stmt->bindParam(':p_id_movimiento', $id, PDO::PARAM_INT);
-        return $stmt->execute();
-    }
 }
 ?>
