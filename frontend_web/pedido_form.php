@@ -138,6 +138,7 @@ $return_page_name = ($from_page === 'caja' || $is_caja_create_view || $is_pago_v
                             }
                         ?>
                         <input type="hidden" name="estado" id="estado" value="<?php echo htmlspecialchars($order_data['estado'] ?? $default_estado); ?>">
+                        <input type="hidden" name="next_action" id="next_action" value="">
 
                         <div class="form-actions" style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e0e0e0;">
                             <button type="submit" class="btn" <?php if ($is_pago_view && !$is_paid) echo 'style="background-color: #28a745; color: white;"'; ?> <?php if ($is_paid) echo 'disabled'; ?>>
@@ -476,8 +477,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.querySelectorAll('.status-btn').forEach(button => {
         button.addEventListener('click', async function(e) {
-            e.preventDefault(); // Prevenir cualquier comportamiento por defecto
-
+            e.preventDefault();
             const newStatus = this.dataset.status;
             const orderId = isEditing ? initialOrderData.id : null;
 
@@ -486,47 +486,55 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Deshabilitar botones para evitar clics múltiples
-            const originalTexts = {};
-            document.querySelectorAll('.status-btn').forEach(btn => {
-                originalTexts[btn.dataset.status] = btn.textContent;
-                btn.disabled = true;
-            });
-            this.textContent = 'Actualizando...';
-
-            try {
-                const response = await fetch(`${apiBaseUrl}pedidos.php?id=${orderId}&action=update_status`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ estado: newStatus })
-                });
-
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.message || 'Error desconocido del servidor.');
+            // El botón "Cancelar" no debe guardar cambios, por lo que mantiene la lógica original.
+            if (newStatus === 'cancelado') {
+                if (!confirm('¿Está seguro de que desea cancelar este pedido? Esta acción no se puede deshacer.')) {
+                    return;
                 }
+                this.disabled = true;
+                this.textContent = 'Cancelando...';
+                try {
+                    const response = await fetch(`${apiBaseUrl}pedidos.php?id=${orderId}&action=update_status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ estado: newStatus })
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.message || 'Error desconocido.');
 
-                // Redireccionar inmediatamente después del éxito
-                const volverLink = document.getElementById('volver-link');
-                const redirectUrl = volverLink ? volverLink.href : 'pedidos.php';
+                    const volverLink = document.getElementById('volver-link');
+                    const redirectUrl = volverLink ? volverLink.href : 'pedidos.php';
+                    const finalUrl = new URL(redirectUrl, window.location.origin);
+                    finalUrl.searchParams.set('success', 'El pedido ha sido cancelado.');
+                    window.location.href = finalUrl.href;
 
-                // Añadimos un mensaje de éxito a la URL de redirección
-                const finalUrl = new URL(redirectUrl, window.location.origin);
-                finalUrl.searchParams.set('success', 'El estado del pedido se ha actualizado correctamente.');
-
-                window.location.href = finalUrl.href;
-
-            } catch (error) {
-                console.error('Error al actualizar el estado:', error);
-                showAlert('Error', `No se pudo actualizar el estado: ${error.message}`);
-
-                // Rehabilitar botones en caso de error
-                document.querySelectorAll('.status-btn').forEach(btn => {
-                    btn.disabled = false;
-                    btn.textContent = originalTexts[btn.dataset.status];
-                });
+                } catch (error) {
+                    showAlert('Error', `No se pudo cancelar el pedido: ${error.message}`);
+                    this.disabled = false;
+                    this.textContent = 'Cancelar';
+                }
+                return;
             }
+
+            // Para "Abrir" y "Completar", primero guardamos los cambios.
+            // Establecemos la acción siguiente y enviamos el formulario.
+            document.getElementById('next_action').value = newStatus;
+
+            // Adjuntar los items al formulario antes de enviarlo
+            const itemsInput = document.createElement('input');
+            itemsInput.type = 'hidden';
+            itemsInput.name = 'items';
+            itemsInput.value = JSON.stringify(Object.values(currentOrder));
+            orderForm.appendChild(itemsInput);
+
+            // Cambiar el estado del botón principal para que el usuario entienda la acción
+            const mainSubmitButton = orderForm.querySelector('button[type="submit"]');
+            if(mainSubmitButton) {
+                mainSubmitButton.textContent = 'Guardando y ' + newStatus.charAt(0).toUpperCase() + newStatus.slice(1) + '...';
+                mainSubmitButton.disabled = true;
+            }
+
+            orderForm.submit();
         });
     });
 
