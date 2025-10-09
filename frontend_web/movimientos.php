@@ -169,13 +169,12 @@ if ($http_code == 200) {
                                         </span>
                                     </td>
                                     
-                                    
                                     <td data-label="Acciones" class="actions-cell">
-                                        <a href="movimiento_form.php?id=<?php echo $mov['id']; ?>" class="btn btn-edit">Editar</a>
+                                        <a href="movimiento_form.php?id=<?php echo $mov['id']; ?>" class="btn btn-edit bi bi-pencil"></a>
                                         <?php if ($mov['estado'] === 'Activado'): ?>
-                                            <a href="movimiento_anular_handler.php?id=<?php echo $mov['id']; ?>" class="btn btn-warning" onclick="return confirm('¿Está seguro de que desea ANULAR este movimiento? El estado cambiará a Desactivado.');">Anular</a>
+                                            <a href="movimiento_anular_handler.php?id=<?php echo $mov['id']; ?>" class="btn btn-warning bi bi-slash-circle" onclick="return confirm('¿Está seguro de que desea ANULAR este movimiento? El estado cambiará a Desactivado.');"></a>
                                         <?php endif; ?>
-                                        <a href="movimiento_delete_handler.php?id=<?php echo $mov['id']; ?>" class="btn btn-delete" onclick="return confirm('¡ADVERTENCIA! ¿Está seguro de que desea ELIMINAR PERMANENTEMENTE este movimiento? Esta acción no se puede deshacer.');">Eliminar</a>
+                                        <a href="movimiento_delete_handler.php?id=<?php echo $mov['id']; ?>" class="btn btn-delete bi bi-trash" onclick="return confirm('¡ADVERTENCIA! ¿Está seguro de que desea ELIMINAR PERMANENTEMENTE este movimiento? Esta acción no se puede deshacer.');"></a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

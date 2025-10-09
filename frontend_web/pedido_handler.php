@@ -99,8 +99,7 @@ if ($is_pago_view || $is_caja_create_view) {
     $redirect_url = 'pedidos.php';
 }
 
-//if (!$id_mesa || !$id_usuario_mozo || empty($items)) {
-if ( empty($items)) {    
+if (!$id_mesa || !$id_usuario_mozo || empty($items)) {
     $error_param = $is_editing ? "?id=$order_id" : "";
     if ($is_pago_view) {
         $error_param .= ($is_editing ? "&" : "?") . "view=pago";

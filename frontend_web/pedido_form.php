@@ -169,7 +169,8 @@ $return_page_name = ($from_page === 'caja' || $is_caja_create_view || $is_pago_v
                                 <div class="form-group-row">
                                     <div class="form-group" style="flex-grow: 1;">
                                         <label for="id_mesa"><?php echo PUNTO_VENTA; ?></label>
-                                        <select id="id_mesa" name="id_mesa" required <?php if ($is_paid) echo 'disabled'; ?>>
+                                        <!-- <select id="id_mesa" name="id_mesa" required <?php if ($is_paid) echo 'disabled'; ?>> -->
+                                        <select id="id_mesa" name="id_mesa" >
                                             <?php
                                             if (empty($mesas) && $is_editing && $order_data) {
                                                 echo "<option value=\"{$order_data['id_mesa']}\" selected>Mesa {$order_data['id_mesa']} (Actual)</option>";
@@ -187,7 +188,8 @@ $return_page_name = ($from_page === 'caja' || $is_caja_create_view || $is_pago_v
                                     </div>
                                     <div class="form-group" style="flex-grow: 1;">
                                         <label for="id_usuario_mozo"><?php echo VENDEDOR; ?></label>
-                                        <select id="id_usuario_mozo" name="id_usuario_mozo" required <?php if ($is_paid) echo 'disabled'; ?>>
+                                        <!-- <select id="id_usuario_mozo" name="id_usuario_mozo" required <?php if ($is_paid) echo 'disabled'; ?>> -->
+                                        <select id="id_usuario_mozo" name="id_usuario_mozo" >
                                             <?php foreach ($mozos as $mozo): ?>
                                                 <option value="<?php echo $mozo['id']; ?>" <?php if($is_editing && $order_data['id_usuario_mozo'] == $mozo['id']) echo 'selected'; ?>>
                                                     <?php echo htmlspecialchars($mozo['nombre_completo']); ?>
