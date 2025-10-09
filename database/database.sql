@@ -766,7 +766,7 @@ DELIMITER $$
 -- Create procedure `sp_updateIdentityDocumentType`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_updateIdentityDocumentType (IN p_id int,
 IN p_codigo varchar(2),
 IN p_nombre varchar(100),
@@ -786,7 +786,7 @@ $$
 -- Create procedure `sp_getOneIdentityDocumentType`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getOneIdentityDocumentType (IN p_id int)
 BEGIN
   SELECT
@@ -804,7 +804,7 @@ $$
 -- Create procedure `sp_getAllIdentityDocumentTypes`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getAllIdentityDocumentTypes ()
 BEGIN
   SELECT
@@ -822,7 +822,7 @@ $$
 -- Create procedure `sp_deleteIdentityDocumentType`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_deleteIdentityDocumentType (IN p_id int)
 BEGIN
   DELETE
@@ -835,7 +835,7 @@ $$
 -- Create procedure `sp_createIdentityDocumentType`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_createIdentityDocumentType (IN p_codigo varchar(2),
 IN p_nombre varchar(100),
 IN p_descripcion text)
@@ -891,7 +891,7 @@ DELIMITER $$
 -- Create procedure `sp_updateProveedor`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_updateProveedor (IN p_id int,
 IN p_id_tipo_documento_identidad int,
 IN p_numero_documento varchar(20),
@@ -919,7 +919,7 @@ $$
 -- Create procedure `sp_getOneProveedor`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_getOneProveedor (IN p_id int)
 BEGIN
   SELECT
@@ -941,7 +941,7 @@ $$
 -- Create procedure `sp_getAllProveedores`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_getAllProveedores ()
 BEGIN
   SELECT
@@ -965,7 +965,7 @@ $$
 -- Create procedure `sp_deleteProveedor`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_deleteProveedor (IN p_id int)
 BEGIN
   UPDATE `proveedores`
@@ -978,7 +978,7 @@ $$
 -- Create procedure `sp_createProveedor`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_createProveedor (IN p_id_tipo_documento_identidad int,
 IN p_numero_documento varchar(20),
 IN p_nombres_apellidos varchar(200),
@@ -1043,7 +1043,7 @@ DELIMITER $$
 -- Create procedure `sp_updateCliente`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_updateCliente (IN p_id int,
 IN p_id_tipo_documento_identidad int,
 IN p_numero_documento varchar(20),
@@ -1071,7 +1071,7 @@ $$
 -- Create procedure `sp_searchClientes`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_searchClientes (IN p_search_term varchar(200))
 BEGIN
   SELECT
@@ -1098,7 +1098,7 @@ $$
 -- Create procedure `sp_getOneCliente`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getOneCliente (IN p_id int)
 BEGIN
   SELECT
@@ -1120,7 +1120,7 @@ $$
 -- Create procedure `sp_getAllClientes`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getAllClientes ()
 BEGIN
   SELECT
@@ -1145,7 +1145,7 @@ $$
 -- Create procedure `sp_deleteCliente`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_deleteCliente (IN p_id int)
 BEGIN
   DELETE
@@ -1158,7 +1158,7 @@ $$
 -- Create procedure `sp_createCliente`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_createCliente (IN p_id_tipo_documento_identidad int,
 IN p_numero_documento varchar(20),
 IN p_nombres_apellidos varchar(200),
@@ -1217,7 +1217,7 @@ DELIMITER $$
 -- Create procedure `sp_getAllRoles`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getAllRoles ()
 BEGIN
   SELECT
@@ -1270,7 +1270,7 @@ DELIMITER $$
 -- Create procedure `sp_updateUser`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_updateUser (IN p_id int, IN p_nombre_completo varchar(100), IN p_email varchar(100), IN p_id_rol int, IN p_activo boolean, IN p_password_hash varchar(255))
 BEGIN
   UPDATE usuarios
@@ -1292,7 +1292,7 @@ $$
 -- Create procedure `sp_readOneUser`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_readOneUser (IN p_id int)
 BEGIN
   SELECT
@@ -1311,7 +1311,7 @@ $$
 -- Create procedure `sp_getUsersByRole`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getUsersByRole (IN p_role_name varchar(50))
 BEGIN
   SELECT
@@ -1332,7 +1332,7 @@ $$
 -- Create procedure `sp_getUserByUsername`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getUserByUsername (IN p_username varchar(50))
 BEGIN
   SELECT
@@ -1354,7 +1354,7 @@ $$
 -- Create procedure `sp_getAllUsers`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getAllUsers ()
 BEGIN
   SELECT
@@ -1376,7 +1376,7 @@ $$
 -- Create procedure `sp_deleteUser`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_deleteUser (IN p_id int)
 BEGIN
   UPDATE usuarios
@@ -1389,7 +1389,7 @@ $$
 -- Create procedure `sp_createUser`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_createUser (IN p_username varchar(50), IN p_nombre_completo varchar(100), IN p_email varchar(100), IN p_password_hash varchar(255), IN p_id_rol int)
 BEGIN
   INSERT INTO usuarios (username, nombre_completo, email, password_hash, id_rol)
@@ -1496,7 +1496,7 @@ DELIMITER $$
 -- Create procedure `sp_verificarAperturaActiva`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_verificarAperturaActiva (IN p_fecha date)
 BEGIN
   DECLARE v_apertura_count int;
@@ -1532,7 +1532,7 @@ $$
 -- Create procedure `sp_verificar_cierre_por_fecha`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_verificar_cierre_por_fecha (IN p_fecha date)
 BEGIN
   DECLARE cierre_existente int DEFAULT 0;
@@ -1552,7 +1552,7 @@ $$
 -- Create procedure `sp_updateTipoMovimiento`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_updateTipoMovimiento (IN p_id int,
 IN p_tipo char(1),
 IN p_codigo char(3),
@@ -1572,7 +1572,7 @@ $$
 -- Create procedure `sp_getOneTipoMovimiento`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_getOneTipoMovimiento (IN p_id int)
 BEGIN
   SELECT
@@ -1590,7 +1590,7 @@ $$
 -- Create procedure `sp_getAllTiposMovimiento`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_getAllTiposMovimiento (IN p_descripcion varchar(255),
 IN p_estado varchar(20))
 BEGIN
@@ -1616,7 +1616,7 @@ $$
 -- Create procedure `sp_deleteTipoMovimiento`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_deleteTipoMovimiento (IN p_id int)
 BEGIN
   UPDATE tipo_movimiento
@@ -1629,7 +1629,7 @@ $$
 -- Create procedure `sp_createTipoMovimiento`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_createTipoMovimiento (IN p_tipo char(1),
 IN p_codigo char(3),
 IN p_descripcion varchar(1000))
@@ -1669,7 +1669,7 @@ DELIMITER $$
 -- Create procedure `sp_leer_almacenes`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_leer_almacenes (IN p_nombre varchar(255),
 IN p_estado boolean,
 IN p_offset int,
@@ -1696,7 +1696,7 @@ $$
 -- Create procedure `sp_leer_almacen_por_id`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_leer_almacen_por_id (IN p_id int)
 BEGIN
   SELECT
@@ -1713,7 +1713,7 @@ $$
 -- Create procedure `sp_desactivar_almacen`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_desactivar_almacen (IN p_id int)
 BEGIN
   UPDATE `almacenes`
@@ -1727,7 +1727,7 @@ $$
 -- Create procedure `sp_crear_almacen`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_crear_almacen (IN p_nombre varchar(255),
 IN p_predeterminado boolean)
 BEGIN
@@ -1749,7 +1749,7 @@ $$
 -- Create procedure `sp_contar_almacenes`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_contar_almacenes (IN p_nombre varchar(255),
 IN p_estado boolean)
 BEGIN
@@ -1768,7 +1768,7 @@ $$
 -- Create procedure `sp_actualizar_almacen`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_actualizar_almacen (IN p_id int,
 IN p_nombre varchar(255),
 IN p_estado boolean,
@@ -1815,7 +1815,7 @@ DELIMITER $$
 -- Create procedure `sp_updateTable`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_updateTable (IN p_id int, IN p_numero_mesa varchar(10), IN p_capacidad int, IN p_estado enum ('disponible', 'ocupada', 'reservada', 'mantenimiento'), IN p_es_libre boolean)
 BEGIN
   UPDATE mesas
@@ -1831,7 +1831,7 @@ $$
 -- Create procedure `sp_readOneTable`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_readOneTable (IN p_id int)
 BEGIN
   SELECT
@@ -1849,7 +1849,7 @@ $$
 -- Create procedure `sp_getTablesByLibreStatus`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getTablesByLibreStatus (IN p_es_libre boolean)
 BEGIN
   SELECT
@@ -1867,7 +1867,7 @@ $$
 -- Create procedure `sp_getAllTables`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getAllTables ()
 BEGIN
   SELECT
@@ -1885,7 +1885,7 @@ $$
 -- Create procedure `sp_deleteTable`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_deleteTable (IN p_id int)
 BEGIN
   DELETE
@@ -1898,7 +1898,7 @@ $$
 -- Create procedure `sp_createTable`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_createTable (IN p_numero_mesa varchar(10), IN p_capacidad int, IN p_estado enum ('disponible', 'ocupada', 'reservada', 'mantenimiento'), IN p_es_libre boolean)
 BEGIN
   INSERT INTO mesas (numero_mesa, capacidad, estado, es_libre)
@@ -1944,7 +1944,7 @@ DELIMITER $$
 -- Create procedure `sp_updateReservation`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_updateReservation (IN p_id int,
 IN p_id_mesa int,
 IN p_nombre_cliente varchar(100),
@@ -1972,7 +1972,7 @@ $$
 -- Create procedure `sp_readOneReservation`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_readOneReservation (IN p_id int)
 BEGIN
   SELECT
@@ -1994,7 +1994,7 @@ $$
 -- Create procedure `sp_getAllReservations`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getAllReservations ()
 BEGIN
   SELECT
@@ -2016,7 +2016,7 @@ $$
 -- Create procedure `sp_createReservation`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_createReservation (IN p_id_mesa int,
 IN p_nombre_cliente varchar(100),
 IN p_telefono_cliente varchar(20),
@@ -2036,7 +2036,7 @@ $$
 -- Create procedure `sp_cancelReservation`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_cancelReservation (IN p_id int)
 BEGIN
   UPDATE reservas
@@ -2077,7 +2077,7 @@ DELIMITER $$
 -- Create procedure `sp_updateSaleDocumentType`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_updateSaleDocumentType (IN p_id int,
 IN p_codigo varchar(2),
 IN p_nombre varchar(100),
@@ -2097,7 +2097,7 @@ $$
 -- Create procedure `sp_getOneSaleDocumentType`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getOneSaleDocumentType (IN p_id int)
 BEGIN
   SELECT
@@ -2115,7 +2115,7 @@ $$
 -- Create procedure `sp_getAllTipoDocumentoVenta`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getAllTipoDocumentoVenta ()
 BEGIN
   SELECT
@@ -2132,7 +2132,7 @@ $$
 -- Create procedure `sp_getAllSaleDocumentTypes`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getAllSaleDocumentTypes ()
 BEGIN
   SELECT
@@ -2150,7 +2150,7 @@ $$
 -- Create procedure `sp_deleteSaleDocumentType`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_deleteSaleDocumentType (IN p_id int)
 BEGIN
   DELETE
@@ -2163,7 +2163,7 @@ $$
 -- Create procedure `sp_createSaleDocumentType`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_createSaleDocumentType (IN p_codigo varchar(2),
 IN p_nombre varchar(100),
 IN p_descripcion text)
@@ -2207,7 +2207,7 @@ DELIMITER $$
 -- Create procedure `sp_updateSerie`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_updateSerie (IN p_id int,
 IN p_id_tipo_documento int,
 IN p_serie varchar(10),
@@ -2225,7 +2225,7 @@ $$
 -- Create procedure `sp_getOneSerie`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getOneSerie (IN p_id int)
 BEGIN
   SELECT
@@ -2245,7 +2245,7 @@ $$
 -- Create procedure `sp_getAllSeries`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getAllSeries ()
 BEGIN
   SELECT
@@ -2265,7 +2265,7 @@ $$
 -- Create procedure `sp_deleteSerie`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_deleteSerie (IN p_id int)
 BEGIN
   DELETE
@@ -2278,7 +2278,7 @@ $$
 -- Create procedure `sp_createSerie`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_createSerie (IN p_id_tipo_documento int,
 IN p_serie varchar(10))
 BEGIN
@@ -2349,7 +2349,7 @@ DELIMITER $$
 -- Create procedure `sp_updateOrderStatus`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_updateOrderStatus (IN p_id_pedido int,
 IN p_estado varchar(50))
 BEGIN
@@ -2376,7 +2376,7 @@ $$
 -- Create procedure `sp_getOrdersByStatus`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getOrdersByStatus (IN p_status varchar(255))
 BEGIN
   SELECT
@@ -2402,7 +2402,7 @@ $$
 -- Create procedure `sp_getOrderDetail`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getOrderDetail (IN p_id_pedido int)
 BEGIN
   SELECT
@@ -2439,7 +2439,7 @@ $$
 -- Create procedure `sp_getAvailableTables`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getAvailableTables ()
 BEGIN
   SELECT
@@ -2460,7 +2460,7 @@ $$
 -- Create procedure `sp_getAllOrders`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getAllOrders (IN p_status varchar(255))
 BEGIN
   SELECT
@@ -2553,7 +2553,7 @@ DELIMITER $$
 -- Create procedure `sp_verificarVentaPorPedido`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_verificarVentaPorPedido (IN p_id_pedido int)
 BEGIN
   SELECT
@@ -2567,7 +2567,7 @@ $$
 -- Create procedure `sp_leer_ventas`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_leer_ventas (IN p_fecha_inicio date,
 IN p_fecha_fin date,
 IN p_estado varchar(20),
@@ -2627,7 +2627,7 @@ $$
 -- Create procedure `sp_contar_ventas`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_contar_ventas (IN p_fecha_inicio date,
 IN p_fecha_fin date,
 IN p_estado varchar(10),
@@ -2662,7 +2662,7 @@ $$
 -- Create procedure `sp_calcular_cierre`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_calcular_cierre (IN p_fecha date)
 BEGIN
   DECLARE total_movimientos decimal(10, 2);
@@ -2766,7 +2766,7 @@ DELIMITER $$
 -- Create procedure `sp_read_movimientos`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_read_movimientos (IN p_filter varchar(255),
 IN p_tipo_movimiento char(1),
 IN p_tipo_entidad char(1),
@@ -2832,7 +2832,7 @@ $$
 -- Create procedure `sp_delete_movimiento`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_delete_movimiento (IN p_id_movimiento bigint)
 BEGIN
   DELETE
@@ -2845,7 +2845,7 @@ $$
 -- Create procedure `sp_count_movimientos`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_count_movimientos (IN p_filter varchar(255),
 IN p_tipo_movimiento char(1),
 IN p_tipo_entidad char(1),
@@ -2916,7 +2916,7 @@ DELIMITER $$
 -- Create procedure `sp_updateCategory`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_updateCategory (IN p_id int,
 IN p_nombre varchar(100),
 IN p_descripcion text,
@@ -2936,7 +2936,7 @@ $$
 -- Create procedure `sp_readOneCategory`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_readOneCategory (IN p_id int)
 BEGIN
   SELECT
@@ -2954,7 +2954,7 @@ $$
 -- Create procedure `sp_getAllCategories`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getAllCategories ()
 BEGIN
   SELECT
@@ -2972,7 +2972,7 @@ $$
 -- Create procedure `sp_deleteCategory`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_deleteCategory (IN p_id int)
 BEGIN
   DELETE
@@ -2985,7 +2985,7 @@ $$
 -- Create procedure `sp_createCategory`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_createCategory (IN p_nombre varchar(100),
 IN p_descripcion text,
 IN p_tipo_categoria enum ('Bienes', 'Servicios'))
@@ -3033,7 +3033,7 @@ DELIMITER $$
 -- Create procedure `sp_updateProduct`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_updateProduct (IN p_id int,
 IN p_nombre varchar(100),
 IN p_descripcion text,
@@ -3057,7 +3057,7 @@ $$
 -- Create procedure `sp_readOneProduct`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_readOneProduct (IN p_id int)
 BEGIN
   SELECT
@@ -3081,7 +3081,7 @@ $$
 -- Create procedure `sp_getAllProducts`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_getAllProducts (IN p_id int,
 IN p_nombre varchar(100),
 IN p_descripcion text,
@@ -3130,7 +3130,7 @@ $$
 -- Create procedure `sp_deleteProduct`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_deleteProduct (IN p_id int)
 BEGIN
   DELETE
@@ -3143,7 +3143,7 @@ $$
 -- Create procedure `sp_createProduct`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_createProduct (IN p_nombre varchar(100),
 IN p_descripcion text,
 IN p_precio decimal(10, 2),
@@ -3162,7 +3162,7 @@ $$
 -- Create procedure `sp_countAllProducts`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_countAllProducts (IN p_id int,
 IN p_nombre varchar(100),
 IN p_descripcion text,
@@ -3268,7 +3268,7 @@ DELIMITER $$
 -- Create procedure `sp_updateOrder`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_updateOrder (IN p_id_pedido int,
 IN p_id_mesa int,
 IN p_id_usuario_mozo int,
@@ -3329,7 +3329,7 @@ $$
 -- Create procedure `sp_getOrderItems`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getOrderItems (IN p_id_pedido int)
 BEGIN
   SELECT
@@ -3353,7 +3353,7 @@ $$
 -- Create procedure `sp_createOrder`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_createOrder (IN p_id_mesa int,
 IN p_id_usuario_mozo int,
 IN p_items_json json,
@@ -3428,7 +3428,7 @@ DELIMITER $$
 -- Create procedure `sp_getDepartamentos`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getDepartamentos ()
 BEGIN
   SELECT
@@ -3469,7 +3469,7 @@ DELIMITER $$
 -- Create procedure `sp_getProvincias`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getProvincias (IN p_id_departamento varchar(2))
 BEGIN
   SELECT
@@ -3519,7 +3519,7 @@ DELIMITER $$
 -- Create procedure `sp_getDistritos`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getDistritos (IN p_id_provincia varchar(4))
 BEGIN
   SELECT
@@ -3595,7 +3595,7 @@ DELIMITER $$
 -- Create procedure `sp_updateEmpresa`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_updateEmpresa (IN p_id int,
 IN p_nombre_largo varchar(255),
 IN p_nombre_corto varchar(100),
@@ -3639,7 +3639,7 @@ $$
 -- Create procedure `sp_leer_venta_por_id`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_leer_venta_por_id (IN `p_id_venta` int)
 BEGIN
   -- Primero, obtener los datos principales de la venta, del cliente y de la empresa
@@ -3694,7 +3694,7 @@ $$
 -- Create procedure `sp_getOneEmpresa`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getOneEmpresa (IN p_id int)
 BEGIN
   SELECT
@@ -3708,7 +3708,7 @@ $$
 -- Create procedure `sp_getAllEmpresas`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_getAllEmpresas ()
 BEGIN
   SELECT
@@ -3725,7 +3725,7 @@ $$
 -- Create procedure `sp_deleteEmpresa`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_deleteEmpresa (IN p_id int)
 BEGIN
   DELETE
@@ -3738,7 +3738,7 @@ $$
 -- Create procedure `sp_createEmpresa`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_createEmpresa (IN p_nombre_largo varchar(255),
 IN p_nombre_corto varchar(100),
 IN p_ruc varchar(11),
@@ -3795,7 +3795,7 @@ DELIMITER $$
 -- Create procedure `sp_update_unidad_medida`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_update_unidad_medida (IN p_id int,
 IN p_codigo varchar(10),
 IN p_descripcion varchar(255),
@@ -3813,7 +3813,7 @@ $$
 -- Create procedure `sp_read_unidades_medida`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_read_unidades_medida (IN p_filter varchar(255),
 IN p_limit int,
 IN p_offset int)
@@ -3835,7 +3835,7 @@ $$
 -- Create procedure `sp_get_unidad_medida_by_id`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_get_unidad_medida_by_id (IN p_id int)
 BEGIN
   SELECT
@@ -3852,7 +3852,7 @@ $$
 -- Create procedure `sp_delete_unidad_medida`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_delete_unidad_medida (IN p_id int)
 BEGIN
   UPDATE `unidades_medida`
@@ -3865,7 +3865,7 @@ $$
 -- Create procedure `sp_create_unidad_medida`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_create_unidad_medida (IN p_codigo varchar(10),
 IN p_descripcion varchar(255))
 BEGIN
@@ -3880,7 +3880,7 @@ $$
 -- Create procedure `sp_count_unidades_medida`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_count_unidades_medida (IN p_filter varchar(255))
 BEGIN
   SELECT
@@ -3950,7 +3950,7 @@ DELIMITER $$
 -- Create procedure `sp_update_movimiento`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_update_movimiento (IN p_id_movimiento bigint,
 IN p_anio char(4),
 IN p_periodo char(2),
@@ -4012,7 +4012,7 @@ $$
 -- Create procedure `sp_get_movimiento_by_id`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_get_movimiento_by_id (IN p_id bigint)
 BEGIN
   -- Obtener cabecera
@@ -4045,7 +4045,7 @@ $$
 -- Create procedure `sp_create_movimiento`
 --
 CREATE
-DEFINER = 'miguel'@'%'
+
 PROCEDURE sp_create_movimiento (IN p_anio char(4),
 IN p_periodo char(2),
 IN p_codigo_movimiento int,
@@ -4133,7 +4133,7 @@ DELIMITER $$
 -- Create procedure `sp_leer_impuestos`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_leer_impuestos (IN p_codigo char(3),
 IN p_estado boolean,
 IN p_offset int,
@@ -4160,7 +4160,7 @@ $$
 -- Create procedure `sp_leer_impuesto_por_id`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_leer_impuesto_por_id (IN p_id int)
 BEGIN
   SELECT
@@ -4179,7 +4179,7 @@ $$
 -- Create procedure `sp_leer_codigos_impuesto`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_leer_codigos_impuesto ()
 BEGIN
   SELECT DISTINCT
@@ -4193,7 +4193,7 @@ $$
 -- Create procedure `sp_eliminar_impuesto`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_eliminar_impuesto (IN p_id int)
 BEGIN
   DELETE
@@ -4206,7 +4206,7 @@ $$
 -- Create procedure `sp_crear_impuesto`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_crear_impuesto (IN p_codigo char(3),
 IN p_fecha_inicial date,
 IN p_fecha_final date,
@@ -4222,7 +4222,7 @@ $$
 -- Create procedure `sp_contar_impuestos`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_contar_impuestos (IN p_codigo char(3),
 IN p_estado boolean)
 BEGIN
@@ -4241,7 +4241,7 @@ $$
 -- Create procedure `sp_calcular_y_actualizar_impuestos_venta`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_calcular_y_actualizar_impuestos_venta (IN p_id_venta int)
 BEGIN
   -- Declaración de variables para almacenar los valores calculados
@@ -4300,7 +4300,7 @@ $$
 -- Create procedure `sp_update_venta`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_update_venta (IN p_id_venta int,
 IN p_fecha_emision datetime)
 BEGIN
@@ -4328,7 +4328,7 @@ $$
 -- Create procedure `sp_crear_venta_con_impuestos`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_crear_venta_con_impuestos (IN p_id_pedido int,
 IN p_id_cliente int,
 IN p_id_usuario_cajero int,
@@ -4397,7 +4397,7 @@ $$
 -- Create procedure `sp_actualizar_impuesto`
 --
 CREATE
-DEFINER = 'miguel'@'localhost'
+
 PROCEDURE sp_actualizar_impuesto (IN p_id int,
 IN p_codigo char(3),
 IN p_fecha_inicial date,
