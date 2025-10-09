@@ -124,6 +124,7 @@ if ($http_code == 200) {
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Pedido</th>
                             <th>Fecha</th>
                             <th>Almacen</th>
                             <th>Tipo</th>
@@ -140,6 +141,10 @@ if ($http_code == 200) {
                             <?php foreach ($movimientos as $mov): ?>
                                 <tr>
                                     <td data-label="ID"><?php echo htmlspecialchars($mov['id']); ?></td>
+
+
+                                    <td data-label="Pedido">PD-<?php echo htmlspecialchars($mov['id_pedido'] ?? 'N/A'); ?></td>
+
                                     <td data-label="Fecha"><?php echo htmlspecialchars($mov['fecha_movimiento']); ?></td>
                                     <td data-label="Almacen"><?php echo htmlspecialchars($mov['nombre_almacen']); ?></td>
 
