@@ -1229,19 +1229,60 @@ DEFINER = 'miguel'@'%'
 PROCEDURE sp_getAllProveedores ()
 BEGIN
   SELECT
-    p.id,
-    p.id_tipo_documento_identidad,
-    tdi.nombre AS tipo_documento_nombre,
-    p.numero_documento,
-    p.nombres_apellidos,
-    p.direccion,
-    p.email,
-    p.telefono,
-    p.estado
-  FROM `proveedores` p
-    JOIN `tipo_documento_identidad` tdi
-      ON p.id_tipo_documento_identidad = tdi.id
-  ORDER BY p.nombres_apellidos ASC;
+    u.id,
+    u.username,
+    u.nombre_completo,
+    u.email
+  FROM usuarios u
+    JOIN roles r
+      ON u.id_rol = r.id
+  WHERE r.nombre_rol = p_role_name
+  AND u.activo = 1
+  ORDER BY u.nombre_completo;
+END
+$$
+
+--
+-- Create procedure `sp_getUserByUsername`
+--
+CREATE
+
+PROCEDURE sp_getUserByUsername (IN p_username varchar(50))
+BEGIN
+  SELECT
+    u.id,
+    u.username,
+    u.nombre_completo,
+    u.email,
+    u.password_hash,
+    u.id_rol,
+    r.nombre_rol
+  FROM usuarios u
+    JOIN roles r
+      ON u.id_rol = r.id
+  WHERE u.username COLLATE utf8mb4_unicode_ci = p_username;
+END
+$$
+
+--
+-- Create procedure `sp_getAllUsers`
+--
+CREATE
+
+PROCEDURE sp_getAllUsers ()
+BEGIN
+  SELECT
+    u.id,
+    u.username,
+    u.nombre_completo,
+    u.email,
+    u.id_rol,
+    r.nombre_rol,
+    u.activo
+  FROM usuarios u
+    JOIN roles r
+      ON u.id_rol = r.id
+  ORDER BY u.nombre_completo;
 END
 $$
 
